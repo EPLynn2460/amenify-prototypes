@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>rmResident × Amenify — Rent Payment Flow v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mr-navy: #0B2046;
+    --mr-navy-2: #122B58;
+    --mr-navy-3: #1A3970;
+    --mr-orange: #F26A2B;
+    --mr-orange-strong: #DB5418;
+    --mr-orange-soft: #FFDDC8;
+    --mr-orange-pale: #FFEDDE;
+    --mr-green: #1FA855;
+    --mr-green-soft: #C5E8D2;
+    --mr-green-pale: #E6F4EC;
+    --mr-bg: #F5F7FA;
+    --mr-bg-2: #E8EDF5;
+    --mr-cta-blue: #2563EB;
+    --mr-cta-2: #1E4FB8;
+    --mr-amber: #FFE082;
+    --mr-ink: #0F1B36;
+    --mr-ink-2: #303D5C;
+    --mr-muted: #5C6B82;
+    --mr-faint: #A0AABB;
+    --mr-line: #DDE3ED;
+    --mr-line-strong: #C5CFDE;
+    --mr-card: #FFFFFF;
+    --mr-success: #1F8A4C;
+    --mr-danger: #C2492C;
+    --shadow-sm: 0 1px 2px rgba(11,32,70,0.04), 0 1px 3px rgba(11,32,70,0.06);
+    --shadow-md: 0 4px 12px rgba(11,32,70,0.06), 0 8px 24px rgba(11,32,70,0.06);
+    --shadow-lg: 0 12px 40px rgba(11,32,70,0.18);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--mr-bg); color: var(--mr-ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+
+  .page { max-width: 1600px; margin: 0 auto; padding: 48px 32px 80px; }
+  .page-header { margin-bottom: 36px; }
+  .page-header h1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 48px; line-height: 1.05;
+    letter-spacing: -1px; color: var(--mr-navy);
+    font-weight: 500;
+  }
+  .page-header h1 .hl {
+    background: linear-gradient(180deg, transparent 58%, var(--mr-orange) 58%, var(--mr-orange) 90%, transparent 90%);
+    padding: 0 6px;
+  }
+  .page-header p { margin-top: 14px; color: var(--mr-muted); max-width: 740px; line-height: 1.6; font-size: 15px; }
+  .meta-row { display: flex; gap: 14px; margin-top: 20px; flex-wrap: wrap; font-size: 12px; color: var(--mr-muted); }
+  .meta-row .pill { background: #FFF; border: 1px solid var(--mr-line); padding: 6px 12px; border-radius: 999px; font-weight: 500; }
+  .meta-row .pill strong { color: var(--mr-navy); font-weight: 700; }
+  .meta-row a { color: var(--mr-navy); text-decoration: none; font-weight: 600; border-bottom: 1.5px solid var(--mr-navy); padding-bottom: 2px; }
+
+  .flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px 28px; margin-top: 16px; }
+  @media (max-width: 1180px) { .flow { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width: 760px) { .flow { grid-template-columns: 1fr; } }
+
+  .screen-wrap { display: grid; grid-template-rows: 84px auto; align-items: start; justify-items: center; gap: 14px; }
+  .step-tag { display: flex; align-items: flex-start; gap: 10px; align-self: start; justify-self: start; margin-left: 8px; height: 100%; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--mr-navy); color: var(--mr-orange); display: grid; place-items: center; font-weight: 700; font-size: 13px; font-family: 'Inter'; flex-shrink: 0; }
+  .step-label { font-family: 'Inter', sans-serif; font-size: 22px; color: var(--mr-navy); font-weight: 500; letter-spacing: -0.3px; }
+  .step-sub { font-size: 12px; color: var(--mr-muted); margin-top: 2px; max-width: 320px; line-height: 1.5; }
+  .star-tag { background: var(--mr-orange); color: var(--mr-navy); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 999px; letter-spacing: 0.5px; margin-left: 6px; text-transform: uppercase; }
+
+  /* iPhone frame */
+  .phone { width: 360px; height: 740px; background: #000; border-radius: 46px; padding: 11px; box-shadow: var(--shadow-lg); position: relative; flex-shrink: 0; }
+  .phone::before { content: ''; position: absolute; left: 50%; top: 22px; transform: translateX(-50%); width: 110px; height: 32px; background: #000; border-radius: 20px; z-index: 5; }
+  .screen { width: 100%; height: 100%; background: #FFFFFF; border-radius: 36px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+  .status-bar { height: 48px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 4px; font-size: 14px; font-weight: 600; color: var(--mr-navy); flex-shrink: 0; position: relative; z-index: 6; }
+  .status-bar .signal { display: flex; gap: 4px; align-items: center; }
+  .body { flex: 1; overflow-y: auto; padding: 4px 18px 100px; -webkit-overflow-scrolling: touch; }
+  .body::-webkit-scrollbar { width: 0; }
+
+  .tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 78px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--mr-line); display: flex; align-items: flex-start; justify-content: space-around; padding-top: 10px; z-index: 4; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--mr-faint); font-size: 10px; font-weight: 500; padding: 4px 8px; border-radius: 8px; }
+  .tab svg { width: 22px; height: 22px; }
+  .tab.active { color: var(--mr-navy); position: relative; }
+  .tab.active::before { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: var(--mr-green); border-radius: 50%; z-index: -1; box-shadow: 0 3px 10px rgba(31,168,85,0.45); }
+
+  /* rmResident brand primitives */
+  .mr-wordmark { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 22px; color: var(--mr-navy); letter-spacing: -0.5px; line-height: 1; }
+  .mr-wordmark sup { font-size: 8px; vertical-align: super; opacity: 0.7; font-weight: 600; }
+  .mr-wordmark.sm { font-size: 18px; }
+  .mr-mark { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: var(--mr-navy); color: var(--mr-orange); font-family: 'Inter', sans-serif; font-weight: 900; font-size: 24px; line-height: 0.8; letter-spacing: -1px; flex-shrink: 0; }
+  .mr-mark.sm { width: 28px; height: 28px; font-size: 18px; border-radius: 7px; }
+
+  .greeting-row { display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 4px 18px; }
+  .greeting .date { font-size: 12px; color: var(--mr-muted); margin-bottom: 4px; }
+  .greeting h2 { font-family: 'Inter', sans-serif; font-size: 28px; line-height: 1.05; font-weight: 500; letter-spacing: -0.6px; color: var(--mr-navy); }
+  .greeting p { font-size: 12px; color: var(--mr-muted); margin-top: 4px; }
+  .icon-row { display: flex; gap: 10px; align-items: center; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 50%; background: #FFF; border: 1px solid var(--mr-line); display: grid; place-items: center; position: relative; }
+  .icon-btn .badge { position: absolute; top: -3px; right: -3px; background: var(--mr-danger); color: #FFF; font-size: 10px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; border: 2px solid #FFF; }
+
+  .card { background: #FFF; border-radius: 18px; padding: 18px; margin-bottom: 12px; border: 1px solid var(--mr-line); box-shadow: var(--shadow-sm); }
+  .card h3 { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 500; margin-bottom: 6px; color: var(--mr-navy); }
+
+  .hero-tile { background: radial-gradient(circle at 88% 16%, rgba(242,106,43,0.32) 0%, rgba(242,106,43,0) 48%), linear-gradient(135deg, var(--mr-navy) 0%, var(--mr-navy-2) 60%, var(--mr-navy-3) 100%); border-radius: 22px; padding: 18px; margin-bottom: 14px; color: #FFF; position: relative; overflow: hidden; min-height: 200px; box-shadow: 0 8px 24px rgba(11,32,70,0.18); }
+  .hero-tile .diamond-bg { position: absolute; inset: 0; pointer-events: none; opacity: 0.16; background-image: linear-gradient(135deg, rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(225deg, rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 22px 22px; }
+  .hero-tile .unit-pill { position: absolute; top: 14px; right: 14px; z-index: 2; background: rgba(255,255,255,0.92); padding: 5px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; color: var(--mr-navy); letter-spacing: 0.3px; }
+  .hero-tile .resident-mark { position: absolute; left: 18px; top: 18px; z-index: 2; display: flex; align-items: center; gap: 8px; }
+  .hero-tile .resident-mark .rm-sq { width: 30px; height: 30px; border-radius: 8px; background: var(--mr-orange); display: grid; place-items: center; box-shadow: 0 4px 10px rgba(242,106,43,0.45); }
+  .hero-tile .resident-mark .rm-sq svg { width: 17px; height: 17px; }
+  .hero-tile .resident-mark .rm-word { color: #FFF; font-weight: 700; font-size: 13px; letter-spacing: 0.3px; }
+  .hero-tile .amount-block { position: absolute; left: 18px; bottom: 18px; right: 90px; z-index: 2; }
+  .hero-tile .label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.78); text-transform: uppercase; letter-spacing: 0.6px; }
+  .hero-tile .amount { font-family: 'Inter', sans-serif; font-size: 32px; line-height: 1; margin-top: 6px; letter-spacing: -1px; font-weight: 700; color: #FFF; }
+  .hero-tile .sub { font-size: 10.5px; color: rgba(255,255,255,0.7); margin-top: 5px; }
+  .hero-tile .pay-now { position: absolute; right: 14px; bottom: 18px; z-index: 2; background: var(--mr-cta-blue); color: #FFF; border: none; border-radius: 10px; padding: 11px 18px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 6px 14px rgba(37,99,235,0.45); }
+  .hero-tile .menu-dot { position: absolute; right: 92px; bottom: 20px; z-index: 2; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.18); display: grid; place-items: center; cursor: pointer; }
+
+  .alert { background: var(--mr-amber); border: 1px solid #E4C865; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+  .alert .title { font-weight: 700; font-size: 13px; color: var(--mr-navy); }
+  .alert .body-txt { font-size: 12px; color: var(--mr-ink-2); margin-top: 3px; line-height: 1.4; }
+  .alert .all-link { font-size: 12px; color: var(--mr-navy); font-weight: 600; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(11,32,70,0.1); text-align: center; }
+
+  .checklist-card { background: #FFF; border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--mr-line); display: flex; gap: 10px; align-items: center; }
+  .checklist-card .left { flex: 1; }
+  .checklist-card .title { font-weight: 700; font-size: 13px; color: var(--mr-navy); }
+  .checklist-card .sub { font-size: 11px; color: var(--mr-muted); margin-top: 2px; }
+  .checklist-card .pct { font-size: 11px; color: var(--mr-navy); font-weight: 600; margin-top: 6px; }
+  .checklist-card .bar { height: 4px; background: var(--mr-orange-soft); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .checklist-card .bar > div { height: 100%; background: var(--mr-orange-strong); }
+  .checklist-card .view-btn { background: var(--mr-navy); color: #FFF; border: none; border-radius: 10px; padding: 8px 12px; font-size: 11px; font-weight: 600; }
+
+  .hub-title { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 500; color: var(--mr-navy); margin: 14px 4px 10px; letter-spacing: -0.3px; }
+  .hub-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .hub-tile { background: #FFF; border-radius: 14px; padding: 12px 8px 10px; border: 1px solid var(--mr-line); box-shadow: var(--shadow-sm); text-align: left; position: relative; }
+  .hub-tile .arrow { position: absolute; top: 8px; right: 8px; color: var(--mr-faint); }
+  .hub-tile .ic { width: 26px; height: 26px; color: var(--mr-navy); margin-bottom: 24px; margin-top: 4px; }
+  .hub-tile .nm { font-weight: 700; font-size: 12px; color: var(--mr-navy); line-height: 1.15; }
+  .hub-tile .sub { font-size: 9.5px; color: var(--mr-muted); margin-top: 3px; line-height: 1.3; }
+
+  .topbar { display: flex; align-items: center; gap: 12px; padding: 8px 4px 16px; }
+  .topbar .back { width: 36px; height: 36px; border-radius: 50%; background: #FFF; border: 1px solid var(--mr-line); display: grid; place-items: center; }
+  .topbar h2 { font-family: 'Inter', sans-serif; font-size: 26px; flex: 1; font-weight: 500; color: var(--mr-navy); letter-spacing: -0.5px; }
+  .topbar .x { width: 36px; height: 36px; border-radius: 50%; background: transparent; display: grid; place-items: center; color: var(--mr-muted); }
+
+  .balance-card { background: #FFF; border-radius: 18px; padding: 20px; margin-bottom: 14px; border: 1px solid var(--mr-line); box-shadow: var(--shadow-sm); }
+  .balance-card .label { font-size: 11px; font-weight: 600; color: var(--mr-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  .balance-card .amount { font-family: 'Inter', sans-serif; font-size: 42px; line-height: 1; margin-top: 8px; letter-spacing: -1.2px; color: var(--mr-navy); font-weight: 500; }
+  .balance-card .sub { font-size: 12px; color: var(--mr-muted); margin-top: 6px; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 18px; border-radius: 14px; font-family: 'Inter'; font-weight: 600; font-size: 14px; border: none; width: 100%; }
+  .btn-primary { background: var(--mr-navy); color: #FFF; }
+  .btn-secondary { background: #FFF; color: var(--mr-navy); border: 1px solid var(--mr-line-strong); }
+  .btn-lime { background: var(--mr-orange); color: var(--mr-navy); font-weight: 700; }
+  .btn-lime-disabled { background: var(--mr-orange-soft); color: var(--mr-faint); }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+
+  .actions-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .action-row { background: #FFF; border-radius: 14px; padding: 14px; border: 1px solid var(--mr-line); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 12px; }
+  .action-row .ic-wrap { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; }
+  .action-row .meta { flex: 1; }
+  .action-row .nm { font-weight: 600; font-size: 13.5px; color: var(--mr-navy); }
+  .action-row .sub { font-size: 11px; color: var(--mr-muted); margin-top: 2px; }
+
+  .mr-cash-card { background: linear-gradient(135deg, var(--mr-orange-pale) 0%, var(--mr-orange-soft) 100%); border-radius: 18px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--mr-orange-soft); display: flex; gap: 12px; align-items: flex-start; }
+  .mr-cash-card .meta { flex: 1; }
+  .mr-cash-card .nm { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; color: var(--mr-navy); display: flex; align-items: center; gap: 4px; }
+  .mr-cash-card .nm sup { font-size: 8px; font-weight: 600; }
+  .mr-cash-card p { font-size: 12px; color: var(--mr-ink-2); line-height: 1.45; margin-top: 4px; }
+  .mr-cash-card .balance { background: rgba(255,255,255,0.7); padding: 5px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-top: 8px; display: inline-block; color: var(--mr-navy); }
+
+  .sec-title { font-family: 'Inter', sans-serif; font-size: 17px; margin: 8px 4px 10px; color: var(--mr-navy); font-weight: 500; letter-spacing: -0.3px; }
+  .input-field { background: #FFF; border-radius: 14px; padding: 14px 16px; border: 1px solid var(--mr-line); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .input-field .lab { font-size: 11px; color: var(--mr-muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+  .input-field .val { font-family: 'Inter', sans-serif; font-size: 18px; color: var(--mr-navy); font-weight: 500; }
+
+  .nudge-card { background: #FFF; border: 1px dashed var(--mr-line-strong); border-radius: 14px; padding: 14px; margin-top: 6px; display: flex; gap: 10px; align-items: center; }
+  .nudge-card p { font-size: 11.5px; color: var(--mr-ink-2); line-height: 1.4; }
+
+  .pm-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .pm-option { display: flex; align-items: center; gap: 12px; background: #FFF; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--mr-line); box-shadow: var(--shadow-sm); }
+  .pm-option.selected { border-color: var(--mr-navy); background: var(--mr-orange-pale); }
+  .pm-radio { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--mr-line-strong); display: grid; place-items: center; flex-shrink: 0; }
+  .pm-option.selected .pm-radio { border-color: var(--mr-navy); background: var(--mr-navy); }
+  .pm-option.selected .pm-radio::after { content: ''; width: 8px; height: 8px; background: var(--mr-orange); border-radius: 50%; }
+  .pm-icon { width: 36px; height: 26px; border-radius: 4px; background: var(--mr-bg-2); display: grid; place-items: center; flex-shrink: 0; }
+  .pm-meta { flex: 1; }
+  .pm-meta .name { font-weight: 600; font-size: 14px; color: var(--mr-navy); }
+  .pm-meta .sub { font-size: 11px; color: var(--mr-muted); margin-top: 2px; }
+
+  .offer { background: linear-gradient(160deg, var(--mr-orange-pale) 0%, var(--mr-orange-soft) 60%, #C9DDBE 100%); border: 1.5px solid var(--mr-navy); border-radius: 20px; padding: 20px; margin-bottom: 18px; box-shadow: 0 8px 30px rgba(11,32,70,0.18); }
+  .offer .head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .offer .head .mr-mark { box-shadow: 0 4px 12px rgba(11,32,70,0.25); }
+  .offer h4 { font-family: 'Inter', sans-serif; font-size: 19px; line-height: 1.15; letter-spacing: -0.3px; color: var(--mr-navy); font-weight: 600; flex: 1; }
+  .offer h4 sup { font-size: 9px; font-weight: 600; }
+  .offer .sub { font-size: 12.5px; color: var(--mr-ink-2); line-height: 1.45; margin-bottom: 14px; }
+  .reward-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .reward-tile { background: rgba(255,255,255,0.75); border: 1px solid rgba(11,32,70,0.12); border-radius: 12px; padding: 12px; text-align: left; }
+  .reward-tile .rt-icon { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .reward-tile .rt-amt { font-family: 'Inter', sans-serif; font-size: 22px; line-height: 1; letter-spacing: -0.4px; color: var(--mr-navy); font-weight: 600; }
+  .reward-tile .rt-lab { font-size: 11px; color: var(--mr-ink-2); margin-top: 4px; font-weight: 600; }
+  .offer ul { list-style: none; padding: 0; background: rgba(255,255,255,0.6); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
+  .offer li { font-size: 12px; color: var(--mr-ink-2); line-height: 1.5; padding-left: 16px; position: relative; }
+  .offer li:before { content: ''; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--mr-navy); }
+  .offer li + li { margin-top: 6px; }
+  .offer li strong { color: var(--mr-navy); font-weight: 800; }
+  .offer .agree-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+  .offer .checkbox { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--mr-navy); background: var(--mr-navy); flex-shrink: 0; margin-top: 1px; display: grid; place-items: center; }
+  .offer .checkbox::after { content: '✓'; color: var(--mr-orange); font-size: 12px; font-weight: 800; }
+  .offer .agree-text { font-size: 11.5px; color: var(--mr-ink-2); line-height: 1.4; }
+
+  .summary-line { display: flex; justify-content: space-between; padding: 11px 0; font-size: 13px; border-bottom: 1px solid var(--mr-line); }
+  .summary-line:last-child { border-bottom: none; }
+  .summary-line.total { font-weight: 700; font-size: 15px; border-top: 2px solid var(--mr-navy); margin-top: 4px; border-bottom: none; }
+  .summary-line .label { color: var(--mr-muted); text-transform: uppercase; font-size: 11px; letter-spacing: .5px; font-weight: 600; }
+  .summary-line.total .label { color: var(--mr-navy); }
+
+  .reward-callout { background: linear-gradient(135deg, var(--mr-orange-pale) 0%, var(--mr-orange-soft) 100%); border: 1px solid var(--mr-orange-soft); border-radius: 14px; padding: 14px; margin: 14px 0; display: flex; align-items: center; gap: 12px; }
+  .reward-callout .ic { width: 32px; height: 32px; border-radius: 8px; background: var(--mr-navy); display: grid; place-items: center; flex-shrink: 0; color: var(--mr-orange); font-family: 'Inter', sans-serif; font-weight: 900; font-size: 22px; line-height: 0.8; }
+  .reward-callout p { font-size: 12.5px; line-height: 1.45; color: var(--mr-ink-2); }
+  .reward-callout p strong { color: var(--mr-navy); font-weight: 800; }
+  .reward-callout.amber { background: linear-gradient(135deg, #FFF4D6 0%, #FFE082 100%); border-color: #E4C865; }
+  .reward-callout.amber .ic { background: var(--mr-navy); color: var(--mr-amber); }
+
+  .meta-block { font-size: 12px; color: var(--mr-muted); margin: 12px 0; }
+  .meta-block .lab { text-transform: uppercase; font-size: 10px; letter-spacing: .5px; font-weight: 700; color: var(--mr-faint); margin-bottom: 4px; }
+  .meta-block .val { color: var(--mr-ink); font-size: 13px; line-height: 1.4; font-weight: 500; }
+
+  .approved-hero { background: linear-gradient(160deg, var(--mr-navy) 0%, var(--mr-navy-3) 100%); border-radius: 22px; padding: 30px 22px 26px; margin: 8px 0 20px; color: #FFF; text-align: center; position: relative; overflow: hidden; }
+  .approved-hero::after { content: ''; position: absolute; top: -50px; right: -50px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(242,106,43,0.15) 0%, transparent 65%); }
+  .approved-hero .check { width: 64px; height: 64px; border-radius: 50%; background: var(--mr-orange); margin: 0 auto 14px; display: grid; place-items: center; box-shadow: 0 6px 20px rgba(31,168,85,0.4); position: relative; z-index: 2; }
+  .approved-hero h3 { font-family: 'Inter', sans-serif; font-size: 26px; letter-spacing: -.5px; margin-bottom: 6px; color: #FFF; font-weight: 500; position: relative; z-index: 2; }
+  .approved-hero p { font-size: 13px; opacity: .9; line-height: 1.4; position: relative; z-index: 2; }
+
+  .notif-card { background: linear-gradient(135deg, var(--mr-orange-pale) 0%, var(--mr-orange-soft) 100%); border: 1px solid var(--mr-orange-soft); border-radius: 18px; padding: 14px; margin: 14px auto 0; max-width: 320px; box-shadow: var(--shadow-md); display: flex; gap: 10px; align-items: flex-start; }
+  .notif-card .meta { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--mr-muted); margin-bottom: 4px; }
+  .notif-card .meta strong { color: var(--mr-navy); }
+  .notif-card .body-txt { font-size: 12.5px; color: var(--mr-ink-2); line-height: 1.4; margin-top: 2px; }
+  .notif-card .body-txt strong { color: var(--mr-navy); font-weight: 700; }
+
+  .plus-card { background: linear-gradient(155deg, var(--mr-navy) 0%, var(--mr-navy-2) 60%, var(--mr-navy-3) 100%); border-radius: 20px; padding: 22px 20px 20px; margin: 6px 0 14px; color: #FFF; position: relative; overflow: hidden; box-shadow: 0 12px 36px rgba(11,32,70,0.25); }
+  .plus-card::after { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(242,106,43,0.18) 0%, transparent 65%); }
+  .plus-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .plus-brand .pl-mark { background: var(--mr-orange); color: var(--mr-navy); width: 28px; height: 28px; border-radius: 7px; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 18px; line-height: 0.8; display: grid; place-items: center; }
+  .plus-brand .pl-name { color: #FFF; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -0.3px; }
+  .plus-brand .pl-tier { background: var(--mr-orange); color: var(--mr-navy); padding: 4px 10px; border-radius: 6px; font-weight: 800; letter-spacing: 2px; font-size: 10px; line-height: 1; }
+  .plus-card h4 { font-family: 'Inter', sans-serif; font-size: 22px; line-height: 1.15; color: #FFF; font-weight: 500; margin-bottom: 8px; letter-spacing: -0.3px; position: relative; z-index: 2; }
+  .plus-card .pl-sub { font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,0.82); margin-bottom: 16px; position: relative; z-index: 2; }
+  .plus-benefits { background: rgba(255,255,255,0.06); border: 1px solid rgba(242,106,43,0.18); border-radius: 12px; padding: 14px; margin-bottom: 16px; position: relative; z-index: 2; }
+  .plus-benefits .pb-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .plus-benefits .pb-row:last-child { border-bottom: none; }
+  .plus-benefits .pb-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--mr-orange); color: var(--mr-navy); display: grid; place-items: center; flex-shrink: 0; font-size: 11px; font-weight: 800; }
+  .plus-benefits .pb-text { font-size: 12px; line-height: 1.45; color: rgba(255,255,255,0.92); }
+  .plus-benefits .pb-text strong { color: var(--mr-orange); font-weight: 700; }
+  .plus-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 14px; position: relative; z-index: 2; }
+  .plus-price .pp-amt { font-family: 'Inter', sans-serif; font-size: 34px; line-height: 1; color: #FFF; letter-spacing: -0.6px; font-weight: 500; }
+  .plus-price .pp-per { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .btn-plus { background: var(--mr-orange); color: var(--mr-navy); width: 100%; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 14px; position: relative; z-index: 2; }
+  .ach-confirm-pill { display: flex; align-items: center; gap: 8px; background: var(--mr-bg-2); border-radius: 999px; padding: 6px 12px; margin: 8px 0 14px; font-size: 11px; color: var(--mr-muted); width: fit-content; }
+  .ach-confirm-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--mr-success); }
+
+  .rewards-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 4px 18px; }
+  .rewards-head h2 { font-family: 'Inter', sans-serif; font-size: 32px; line-height: 1.05; letter-spacing: -0.8px; color: var(--mr-navy); font-weight: 500; margin-top: 6px; }
+  .points-card { background: linear-gradient(155deg, var(--mr-navy) 0%, var(--mr-navy-3) 100%); border-radius: 20px; padding: 22px 20px; color: #FFF; position: relative; overflow: hidden; margin-bottom: 14px; box-shadow: 0 8px 28px rgba(11,32,70,0.2); }
+  .points-card::after { content: ''; position: absolute; top: -30px; right: -30px; width: 130px; height: 130px; background: radial-gradient(circle, rgba(242,106,43,0.18) 0%, transparent 65%); }
+  .points-card .label { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 600; letter-spacing: 0.2px; position: relative; z-index: 2; }
+  .points-card .pts { font-family: 'Inter', sans-serif; font-size: 38px; line-height: 1; color: #FFF; letter-spacing: -1px; margin-top: 6px; font-weight: 500; position: relative; z-index: 2; }
+  .points-card .cash-row { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(242,106,43,0.2); display: flex; justify-content: space-between; align-items: baseline; position: relative; z-index: 2; }
+  .points-card .cash-lab { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 600; letter-spacing: 0.2px; }
+  .points-card .cash-amt { font-family: 'Inter', sans-serif; font-size: 22px; color: var(--mr-green); letter-spacing: -0.4px; font-weight: 700; }
+  .redeem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .redeem-tile { background: #FFF; border-radius: 14px; padding: 14px; border: 1px solid var(--mr-line); box-shadow: var(--shadow-sm); }
+  .redeem-tile .rd-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--mr-orange-pale); display: grid; place-items: center; margin-bottom: 10px; color: var(--mr-navy); }
+  .redeem-tile .rd-name { font-weight: 700; font-size: 13px; color: var(--mr-navy); }
+  .redeem-tile .rd-sub { font-size: 10.5px; color: var(--mr-muted); margin-top: 3px; }
+  .spend-section { font-family: 'Inter', sans-serif; font-size: 17px; margin: 14px 4px 10px; color: var(--mr-navy); font-weight: 500; letter-spacing: -0.3px; }
+  .service-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .service-tile { background: #FFF; border: 1px solid var(--mr-line); border-radius: 14px; padding: 12px 8px 10px; text-align: center; box-shadow: var(--shadow-sm); }
+  .service-tile .st-icon-wrap { width: 38px; height: 38px; border-radius: 50%; background: var(--mr-orange-pale); display: grid; place-items: center; margin: 0 auto 8px; }
+  .service-tile.s-pink .st-icon-wrap { background: #FFEDDE; }
+  .service-tile.s-cream .st-icon-wrap { background: var(--mr-bg-2); }
+  .service-tile.s-yellow .st-icon-wrap { background: #FFF4D6; }
+  .service-tile .st-icon { font-size: 17px; line-height: 1; }
+  .service-tile .st-name { font-weight: 700; font-size: 11px; line-height: 1.2; color: var(--mr-navy); }
+  .service-tile .st-meta { font-size: 9.5px; color: var(--mr-muted); margin-top: 4px; line-height: 1.3; }
+  .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--mr-line); }
+  .tx-row:last-child { border-bottom: none; }
+  .tx-row .tx-meta .nm { font-weight: 600; font-size: 13px; color: var(--mr-navy); }
+  .tx-row .tx-meta .dt { font-size: 11px; color: var(--mr-muted); margin-top: 2px; }
+  .tx-row .tx-amt { font-weight: 700; font-size: 13px; color: var(--mr-navy); }
+  .tx-row .tx-amt.plus { color: var(--mr-success); }
+
+  /* Legend section */
+  .legend { margin-top: 56px; padding-top: 36px; border-top: 1px solid var(--mr-line-strong); }
+  .legend h3 { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 500; color: var(--mr-navy); letter-spacing: -0.5px; margin-bottom: 12px; }
+  .legend p { color: var(--mr-muted); max-width: 720px; line-height: 1.6; font-size: 14px; margin-bottom: 20px; }
+  .legend-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 1100px; }
+  @media (max-width: 800px) { .legend-grid { grid-template-columns: 1fr; } }
+  .legend-item { background: #FFF; border: 1px solid var(--mr-line); border-radius: 14px; padding: 16px 18px; }
+  .legend-item h4 { font-family: 'Inter', sans-serif; font-size: 16px; color: var(--mr-navy); font-weight: 600; margin-bottom: 6px; letter-spacing: -0.2px; }
+  .legend-item p { font-size: 13px; color: var(--mr-ink-2); line-height: 1.55; margin: 0; }
+  .legend-item strong { color: var(--mr-navy); }
+
+  /* Banner CTA */
+  .banner-cta { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--mr-orange-pale); color: var(--mr-navy); border-radius: 16px; padding: 14px 16px; margin: 12px 0 8px; border: 1.5px solid var(--mr-orange); box-shadow: var(--shadow-sm); }
+  .banner-cta .bc-meta { flex: 1; }
+  .banner-cta .bc-title { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 15px; line-height: 1.2; letter-spacing: -0.2px; color: var(--mr-navy); }
+  .banner-cta .bc-sub { font-size: 11.5px; color: var(--mr-navy); opacity: 0.78; margin-top: 3px; }
+  .banner-cta .bc-arrow { width: 28px; height: 28px; border-radius: 50%; background: var(--mr-orange); color: #FFF; display: grid; place-items: center; flex-shrink: 0; }
+
+  /* Why screen */
+  .why-headline { font-family: 'Inter', sans-serif; font-size: 26px; line-height: 1.05; letter-spacing: -0.6px; color: var(--mr-navy); font-weight: 500; margin-bottom: 8px; }
+  .why-sub { font-size: 12.5px; color: var(--mr-ink-2); line-height: 1.5; margin-bottom: 16px; }
+  .why-hero-card { background: linear-gradient(155deg, var(--mr-navy) 0%, var(--mr-navy-3) 100%); border-radius: 20px; padding: 18px; color: #FFF; margin-bottom: 14px; position: relative; overflow: hidden; box-shadow: 0 12px 36px rgba(11,32,70,0.25); }
+  .why-hero-card::after { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(242,106,43,0.18) 0%, transparent 65%); }
+  .why-hero-card .lab { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; position: relative; z-index: 2; }
+  .why-hero-card .pct { font-family: 'Inter', sans-serif; font-size: 42px; line-height: 1; letter-spacing: -1.2px; margin-top: 6px; font-weight: 500; position: relative; z-index: 2; }
+  .why-hero-card .pct .small { font-size: 18px; opacity: 0.8; }
+  .why-hero-card p { font-size: 12px; color: rgba(255,255,255,0.86); line-height: 1.4; margin-top: 8px; position: relative; z-index: 2; max-width: 240px; }
+  .place-section { font-family: 'Inter', sans-serif; font-size: 15px; margin: 14px 4px 8px; color: var(--mr-navy); font-weight: 500; letter-spacing: -0.2px; }
+  .place-list { display: flex; flex-direction: column; background: #FFF; border: 1px solid var(--mr-line); border-radius: 14px; box-shadow: var(--shadow-sm); overflow: hidden; }
+  .place-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid var(--mr-line); }
+  .place-row:last-child { border-bottom: none; }
+  .place-row .pr-meta { flex: 1; }
+  .place-row .pr-name { font-weight: 700; font-size: 13px; color: var(--mr-navy); }
+  .place-row .pr-sub { font-size: 10.5px; color: var(--mr-muted); margin-top: 2px; }
+  .place-row .pr-pct { background: var(--mr-orange-soft); color: var(--mr-navy); font-weight: 800; font-size: 11px; padding: 4px 9px; border-radius: 999px; }
+  .brand-chip { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; font-family: 'Inter', sans-serif; font-weight: 800; color: #FFF; font-size: 12px; letter-spacing: -0.5px; }
+  .brand-chip.uber { background: #000; }
+  .brand-chip.walmart { background: #0071CE; }
+  .brand-chip.cvs { background: #CC0000; }
+  .brand-chip.doordash { background: #FF3008; }
+  .brand-chip.target { background: #CC0000; }
+  .brand-chip.amazon { background: #FF9900; color: #000; }
+  .why-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .why-stat { background: #FFF; border: 1px solid var(--mr-line); border-radius: 12px; padding: 10px 12px; }
+  .why-stat .ws-lab { font-size: 9.5px; color: var(--mr-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .why-stat .ws-val { font-family: 'Inter', sans-serif; font-size: 20px; line-height: 1; color: var(--mr-navy); letter-spacing: -0.5px; margin-top: 4px; font-weight: 600; }
+
+  /* Link card screen */
+  .link-hero { font-family: 'Inter', sans-serif; font-size: 22px; line-height: 1.08; letter-spacing: -0.5px; color: var(--mr-navy); font-weight: 500; margin: 4px 4px 6px; text-align: center; }
+  .link-sub { font-size: 12px; color: var(--mr-muted); line-height: 1.45; text-align: center; margin: 0 12px 16px; }
+  .mr-visa-card { background: linear-gradient(135deg, var(--mr-navy) 0%, var(--mr-navy-2) 55%, var(--mr-navy-3) 100%); border-radius: 14px; padding: 14px 16px 14px; color: #FFF; width: 100%; max-width: 250px; margin: 0 auto 18px; position: relative; overflow: hidden; aspect-ratio: 1.586 / 1; box-shadow: 0 16px 40px rgba(11,32,70,0.32); border: 1px solid rgba(242,106,43,0.18); }
+  .mr-visa-card::after { content: ''; position: absolute; top: -50px; right: -30px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(242,106,43,0.16) 0%, transparent 65%); }
+  .mr-visa-card .top-row { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+  .mr-visa-card .word { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; color: var(--mr-orange); letter-spacing: -0.4px; line-height: 1; }
+  .mr-visa-card .word sup { font-size: 6px; vertical-align: super; opacity: 0.8; font-weight: 600; }
+  .mr-visa-card .h-mark { width: 22px; height: 22px; border-radius: 5px; background: var(--mr-orange); color: var(--mr-navy); font-family: 'Inter', sans-serif; font-weight: 900; font-size: 14px; line-height: 0.8; display: grid; place-items: center; }
+  .mr-visa-card .chip { width: 32px; height: 22px; border-radius: 4px; background: linear-gradient(135deg, #D4D4D4 0%, #A0A0A0 100%); margin-top: 14px; position: relative; z-index: 2; }
+  .mr-visa-card .num { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.86); margin-top: 8px; position: relative; z-index: 2; }
+  .mr-visa-card .footer-row { display: flex; justify-content: space-between; align-items: flex-end; position: absolute; bottom: 12px; left: 16px; right: 16px; z-index: 2; }
+  .mr-visa-card .name { font-size: 9.5px; color: rgba(255,255,255,0.88); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .mr-visa-card .visa { font-family: 'Inter', sans-serif; font-weight: 900; font-style: italic; font-size: 15px; color: #FFF; letter-spacing: 0.5px; }
+  .link-option-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .link-option { background: #FFF; border: 1.5px solid var(--mr-line); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); }
+  .link-option.selected { border-color: var(--mr-navy); background: var(--mr-orange-pale); }
+  .link-option .lo-radio { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--mr-line-strong); flex-shrink: 0; }
+  .link-option.selected .lo-radio { border-color: var(--mr-navy); background: var(--mr-navy); display: grid; place-items: center; }
+  .link-option.selected .lo-radio::after { content: ''; width: 7px; height: 7px; background: var(--mr-orange); border-radius: 50%; }
+  .link-option .lo-icon { width: 32px; height: 22px; border-radius: 4px; background: #1A1F71; display: grid; place-items: center; flex-shrink: 0; }
+  .link-option .lo-icon span { color: #FFF; font-weight: 800; font-size: 8px; letter-spacing: 0.5px; }
+  .link-option .lo-meta { flex: 1; }
+  .link-option .lo-name { font-weight: 600; font-size: 13px; color: var(--mr-navy); }
+  .link-option .lo-sub { font-size: 10.5px; color: var(--mr-muted); margin-top: 2px; }
+  .link-option.add .lo-icon { background: var(--mr-orange-pale); }
+  .link-option.add .lo-icon::after { content: '+'; color: var(--mr-navy); font-size: 16px; font-weight: 700; }
+
+  /* All set */
+  .allset-card-wrap { position: relative; max-width: 250px; margin: 12px auto 8px; }
+  .allset-card-wrap .check-overlay { position: absolute; right: -6px; bottom: -6px; width: 50px; height: 50px; border-radius: 50%; background: var(--mr-orange); border: 4px solid var(--mr-bg); display: grid; place-items: center; z-index: 5; box-shadow: 0 6px 18px rgba(31,168,85,0.5); }
+  .allset-headline { font-family: 'Inter', sans-serif; font-size: 22px; line-height: 1.1; letter-spacing: -0.4px; color: var(--mr-navy); font-weight: 500; text-align: center; margin: 18px 0 8px; }
+  .allset-sub { font-size: 12px; color: var(--mr-ink-2); line-height: 1.5; text-align: center; margin: 0 14px 18px; }
+  .allset-sub strong { color: var(--mr-navy); font-weight: 700; }
+  .benefit-list { display: flex; flex-direction: column; gap: 14px; margin: 0 6px 18px; }
+  .benefit-row { display: flex; gap: 12px; align-items: flex-start; }
+  .benefit-row .br-icon { width: 32px; height: 32px; border-radius: 50%; background: var(--mr-orange-pale); border: 1.5px solid var(--mr-orange-soft); display: grid; place-items: center; flex-shrink: 0; color: var(--mr-navy); }
+  .benefit-row .br-meta { flex: 1; }
+  .benefit-row .br-title { font-weight: 700; font-size: 13px; color: var(--mr-navy); line-height: 1.2; }
+  .benefit-row .br-body { font-size: 11px; color: var(--mr-muted); line-height: 1.4; margin-top: 3px; }
+
+  /* Maddie */
+  .maddie-header { display: flex; align-items: center; gap: 12px; padding: 10px 4px 14px; }
+  .maddie-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--mr-orange-soft) 0%, var(--mr-orange-pale) 100%); flex-shrink: 0; border: 2px solid #FFF; box-shadow: 0 4px 12px rgba(11,32,70,0.1); position: relative; overflow: hidden; }
+  .maddie-avatar::before { content: ''; position: absolute; bottom: 0; left: 25%; right: 25%; top: 60%; background: var(--mr-navy); border-radius: 50% 50% 0 0; }
+  .maddie-avatar::after { content: ''; position: absolute; top: 22%; left: 27%; right: 27%; bottom: 50%; background: linear-gradient(135deg, #E5C9A0 0%, #D4B485 100%); border-radius: 50%; }
+  .maddie-meta { flex: 1; }
+  .maddie-meta .name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; color: var(--mr-navy); display: flex; align-items: center; gap: 6px; }
+  .maddie-meta .ai-tag { background: var(--mr-orange); color: var(--mr-navy); font-size: 8px; font-weight: 800; padding: 2px 5px; border-radius: 3px; letter-spacing: 0.5px; }
+  .maddie-meta .status { font-size: 10.5px; color: var(--mr-muted); margin-top: 2px; }
+  .maddie-actions { display: flex; gap: 6px; align-items: center; }
+  .maddie-actions .ma-pill { background: var(--mr-orange-pale); color: var(--mr-navy); font-weight: 700; font-size: 10px; padding: 4px 8px; border-radius: 999px; }
+  .maddie-actions .ma-dots { width: 26px; height: 26px; border-radius: 50%; background: var(--mr-bg-2); display: grid; place-items: center; }
+  .chat-body { display: flex; flex-direction: column; gap: 10px; padding: 6px 0; }
+  .chat-msg { max-width: 78%; display: flex; flex-direction: column; gap: 3px; }
+  .chat-msg.out { align-self: flex-end; align-items: flex-end; }
+  .chat-msg.in { align-self: flex-start; align-items: flex-start; }
+  .chat-bubble { padding: 9px 13px; border-radius: 15px; font-size: 12px; line-height: 1.4; }
+  .chat-msg.out .chat-bubble { background: var(--mr-navy); color: #FFF; border-bottom-right-radius: 4px; }
+  .chat-msg.in .chat-bubble { background: #FFF; color: var(--mr-ink); border: 1px solid var(--mr-line); border-bottom-left-radius: 4px; }
+  .chat-time { font-size: 9.5px; color: var(--mr-faint); padding: 0 4px; }
+  .chat-card-order { background: #FFF; border: 1px solid var(--mr-line); border-radius: 14px; padding: 11px 12px; align-self: flex-start; max-width: 88%; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 10px; }
+  .chat-card-order .order-logo { width: 38px; height: 38px; border-radius: 9px; background: #006491; display: grid; place-items: center; flex-shrink: 0; color: #FFF; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -1px; }
+  .chat-card-order .order-meta { flex: 1; }
+  .chat-card-order .order-name { font-weight: 700; font-size: 12px; color: var(--mr-navy); line-height: 1.2; }
+  .chat-card-order .order-items { font-size: 10.5px; color: var(--mr-muted); margin-top: 3px; line-height: 1.4; }
+  .chat-card-order .order-price { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 15px; color: var(--mr-navy); letter-spacing: -0.2px; }
+  .chat-earn { align-self: flex-start; max-width: 88%; background: linear-gradient(135deg, var(--mr-navy) 0%, var(--mr-navy-3) 100%); color: #FFF; padding: 9px 13px; border-radius: 14px; border-bottom-left-radius: 4px; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 18px rgba(11,32,70,0.18); }
+  .chat-earn .ce-mark { width: 20px; height: 20px; border-radius: 5px; background: var(--mr-orange); color: var(--mr-navy); font-family: 'Inter', sans-serif; font-weight: 900; font-size: 13px; line-height: 0.8; display: grid; place-items: center; flex-shrink: 0; }
+  .chat-earn .ce-text { font-size: 11.5px; line-height: 1.4; }
+  .chat-earn .ce-text strong { color: var(--mr-orange); font-weight: 700; }
+  .chat-input-bar { margin-top: 14px; background: #FFF; border: 1px solid var(--mr-line); border-radius: 999px; padding: 9px 14px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-sm); }
+  .chat-input-bar input { flex: 1; border: none; outline: none; background: transparent; font-family: 'Inter'; font-size: 12px; color: var(--mr-ink); }
+  .chat-input-bar input::placeholder { color: var(--mr-faint); }
+  .chat-input-bar .send-btn { width: 26px; height: 26px; border-radius: 50%; background: var(--mr-navy); color: var(--mr-orange); display: grid; place-items: center; flex-shrink: 0; border: none; }
+
+  /* Visa wordmark */
+  .visa-svg { display: inline-block; line-height: 1; vertical-align: middle; }
+  .visa-svg.lg { width: 50px; height: 16px; }
+  .visa-svg.sm { width: 30px; height: 11px; }
+  .visa-svg text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-style: italic; font-weight: 900; }
+  .visa-blue { color: #1A1F71; }
+  .visa-white { color: #FFFFFF; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="page-header">
+    <h1>rmResident × Amenify — <span class="hl">Full resident flow</span></h1>
+    <p>How an rmResident user earns rmCash across two motions: <strong>paying rent</strong> (screens 1–8, Visa happy path + ACH/rm Plus alt) and <strong>everyday spending</strong> (screens 9–12, link a card → earn at Uber/Walmart/CVS/etc. → order via Maddie). Twelve screens total.</p>
+    <div class="meta-row">
+      <span class="pill">Persona: <strong>Sarah Thompson</strong></span>
+      <span class="pill">Property: <strong>Villa Verano</strong></span>
+      <span class="pill">Rent: <strong>$2,105.00 / mo</strong></span>
+      <span class="pill">Reward rate: <strong>1.0% rmCash</strong></span>
+      <span class="pill"><a href="rmresident-prototype-v1.html">Launch clickable prototype →</a></span>
+    </div>
+  </header>
+
+  <div class="flow">
+
+    <!-- SCREEN 1: HOME -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">1</span>
+        <div>
+          <div class="step-label">Home</div>
+          <div class="step-sub">Resident lands in rmResident. The navy diamond-pattern hero card surfaces Amount Due with a Pay Now CTA. rmCash card sets up the rewards story.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="greeting-row">
+              <div class="greeting"><span style="font-size:11px;color:var(--mr-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase">Wed · May 22</span><h2 style="margin-top:6px">Welcome, Sarah</h2><p>Villa Verano · Cincinnati, OH</p></div>
+              <div class="icon-row"><div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2"><path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="badge">3</span></div><div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2"><path d="M4 4h16v16H4z"/><polyline points="4,4 12,13 20,4"/></svg></div></div>
+            </div>
+            <div class="hero-tile">
+              <div class="diamond-bg"></div>
+              <span class="unit-pill">UNIT 412</span>
+              <div class="resident-mark"><div class="rm-sq"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11L12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" fill="#FFF"/><rect x="6.5" y="13" width="3" height="3" fill="#F26A2B"/><rect x="14.5" y="13" width="3" height="3" fill="#F26A2B"/></svg></div><span class="rm-word">Resident</span></div>
+              <div class="menu-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="#FFF"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></div>
+              <div class="amount-block"><div class="label">Amount Due</div><div class="amount">$2,105<span style="font-size:18px;opacity:0.7">.00</span></div><div class="sub">Total Balance: $2,105.00</div></div>
+              <button class="pay-now">Pay Now</button>
+            </div>
+            <div class="mr-cash-card"><div class="mr-mark">R</div><div class="meta"><div class="nm">rmCash</div><p>Earn cash back on rent and spend it on cleaning, pet care, and other resident services.</p><span class="balance">Wallet <strong>$0.00</strong></span></div></div>
+            <div class="alert"><div class="title">Payment Return</div><div class="body-txt">Your payment of $100.01 made on Apr 30 was returned.</div></div>
+            <div class="hub-title">Resident Hub</div>
+            <div class="hub-grid">
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8 6 6 9 6 13a6 6 0 0 0 12 0c0-4-2-7-6-11z"/></svg><div class="nm">Amenities</div><div class="sub">Reserve</div></div>
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg><div class="nm">Documents</div><div class="sub">Lease &amp; docs</div></div>
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="4"/></svg><div class="nm">Contacts</div><div class="sub">Property team</div></div>
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="11" x2="21" y2="11"/></svg><div class="nm">Events</div><div class="sub">Community</div></div>
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="13" width="18" height="6" rx="1"/></svg><div class="nm">Vehicles</div><div class="sub">Parking</div></div>
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 7l-2 2-9 9v3h3l9-9 2-2-3-3z"/></svg><div class="nm">Maintenance</div><div class="sub">Service</div></div>
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg><div class="nm">Payments</div><div class="sub">Pay rent</div></div>
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h12l4 4v12H4z"/></svg><div class="nm">My Lease</div><div class="sub">Manage</div></div>
+              <div class="hub-tile"><svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M9 7h8v8"/></svg><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg><div class="nm">Rewards</div><div class="sub">Earn &amp; spend</div></div>
+            </div>
+          </div>
+          <nav class="tabbar">
+            <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg>Services</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/></svg>Offers</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v12H7l-4 4z"/></svg>Messages</div>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: PAYMENTS -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">2</span>
+        <div>
+          <div class="step-label">Payments</div>
+          <div class="step-sub">Balance and entry point to Pay Now. Reminds the resident: paying now earns rmCash.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar"><div class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Payments</h2></div>
+            <div class="balance-card"><div class="label">Balance Due</div><div class="amount">$2,105<span style="font-size:24px;color:var(--mr-muted)">.00</span></div><div class="sub">Due May 31, 2026 · Pay now to earn rmCash</div><div class="btn-row"><button class="btn btn-primary">Pay Now</button><button class="btn btn-secondary">Schedule</button></div></div>
+            <div class="actions-list">
+              <div class="action-row"><div class="ic-wrap" style="background:var(--mr-orange-pale)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div><div class="meta"><div class="nm">View Balance Details</div><div class="sub">Charges, credits &amp; deposits</div></div></div>
+              <div class="action-row"><div class="ic-wrap" style="background:var(--mr-orange-pale)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/></svg></div><div class="meta"><div class="nm">Manage Payment Methods</div><div class="sub">Cards &amp; bank accounts</div></div></div>
+              <div class="action-row"><div class="ic-wrap" style="background:var(--mr-orange-pale)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/></svg></div><div class="meta"><div class="nm">Manage Auto-payments</div><div class="sub">Set it &amp; forget it</div></div></div>
+              <div class="action-row"><div class="ic-wrap" style="background:var(--mr-orange-pale)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2"><path d="M3 3v18h18"/></svg></div><div class="meta"><div class="nm">Account History</div><div class="sub">All past transactions</div></div></div>
+            </div>
+          </div>
+          <nav class="tabbar">
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg>Services</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/></svg>Rewards</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/></svg>Offers</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v12H7l-4 4z"/></svg>Messages</div>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: MAKE A PAYMENT -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">3</span>
+        <div>
+          <div class="step-label">Make a Payment</div>
+          <div class="step-sub">Account snapshot + payment amount/date. Subtle nudge: choose Visa next to earn rmCash.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar"><div class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Make a Payment</h2></div>
+            <div class="card" style="background:var(--mr-orange-pale);border:1px solid var(--mr-orange-soft)">
+              <div style="font-size:11px;font-weight:600;color:var(--mr-muted);text-transform:uppercase;letter-spacing:.6px">Account Snapshot</div>
+              <div style="font-family:'Inter',sans-serif;font-size:34px;line-height:1.05;margin-top:8px;color:var(--mr-navy);font-weight:500">$2,105.00</div>
+              <div style="font-size:11.5px;color:var(--mr-muted);margin-top:4px">Current due · includes rent &amp; deposits</div>
+            </div>
+            <div class="sec-title">Payment Details</div>
+            <div class="input-field"><span class="lab">Payment Amount</span><span class="val">$2,105.00 ▾</span></div>
+            <div class="input-field"><span class="lab">Payment Date</span><span class="val">05/18/26 ▾</span></div>
+            <div class="nudge-card"><div class="mr-mark sm">R</div><p>Earn rmCash on this payment when you choose Visa on the next screen.</p></div>
+            <div style="margin-top:18px"><button class="btn btn-primary">Continue to Payment Method →</button></div>
+            <div style="margin-top:10px"><button class="btn" style="background:transparent;border:none;color:var(--mr-muted);font-weight:500">Cancel</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: METHOD ★ -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">4</span>
+        <div>
+          <div class="step-label">Payment Method <span class="star-tag">★ key screen</span></div>
+          <div class="step-sub">Visa selected by default. Inline offer card surfaces $21.05 rmCash + 8,420 rmPoints. Free enrollment with one-tap consent.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar"><div class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Payment Method</h2><div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+            <div class="pm-list">
+              <div class="pm-option selected"><div class="pm-radio"></div><div class="pm-icon" style="background:#1A1F71"><svg class="visa-svg sm visa-white" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div><div class="pm-meta"><div class="name">Saved Payment</div><div class="sub">Visa Credit Card · ending in 4242</div></div></div>
+              <div class="pm-option"><div class="pm-radio"></div><div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#5C6B82" stroke-width="1.8"><path d="M3 6L12 1l9 5"/><path d="M2 17h20"/></svg></div><div class="pm-meta"><div class="name">Bank Account</div><div class="sub">ACH transfer · No fee</div></div></div>
+              <div class="pm-option"><div class="pm-radio"></div><div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#5C6B82" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div><div class="pm-meta"><div class="name">Credit Card</div><div class="sub">Add a new card</div></div></div>
+            </div>
+            <div class="offer">
+              <div class="head"><div class="mr-mark">R</div><h4>Earn rmCash + Points on this payment.</h4></div>
+              <p class="sub">Free to enroll. Rewards land in your wallet to spend on cleaning, laundry, pet care, and other Villa Verano services.</p>
+              <div class="reward-tiles">
+                <div class="reward-tile"><div class="rt-icon" style="background:var(--mr-navy)"><span style="color:var(--mr-orange);font-family:'Inter',sans-serif;font-weight:900;font-size:14px;line-height:0.8">R</span></div><div class="rt-amt">$21.05</div><div class="rt-lab">in rmCash</div></div>
+                <div class="reward-tile"><div class="rt-icon" style="background:var(--mr-orange)"><span style="font-size:14px">★</span></div><div class="rt-amt">8,420</div><div class="rt-lab">rmPoints</div></div>
+              </div>
+              <ul>
+                <li>Pay with <strong>Visa</strong> to earn <strong>1.0% rmCash</strong> back on rent</li>
+                <li>Earn <strong>1 rmPoint</strong> for every <strong>$0.25</strong> of rent paid</li>
+              </ul>
+              <div class="agree-row"><div class="checkbox"></div><div class="agree-text">I agree to enroll in rmCash.</div></div>
+              <button class="btn btn-lime">Enroll Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: SUMMARY -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">5</span>
+        <div>
+          <div class="step-label">Summary</div>
+          <div class="step-sub">Final review before charging the card. Reward callout reinforces the $21.05 + 8,420 points the resident is about to earn.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar"><div class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Summary</h2><div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+            <div class="card" style="padding:18px 20px">
+              <div class="summary-line"><span class="label">Amount</span><span>$2,105.00</span></div>
+              <div class="summary-line"><span class="label">Convenience Fee</span><span>$9.99</span></div>
+              <div class="summary-line total"><span class="label">Total</span><span>$2,114.99</span></div>
+            </div>
+            <div class="reward-callout"><div class="ic">R</div><p>This payment earns you <strong>$21.05 in rmCash</strong> + <strong>8,420 rmPoints</strong>.</p></div>
+            <div class="meta-block"><div class="lab">Payment Method</div><div class="val">Visa Credit Card · ending in 4242</div></div>
+            <div class="meta-block"><div class="lab">Billing Address</div><div class="val">Sarah Thompson<br/>Villa Verano, Unit 412<br/>Cincinnati, OH 45377</div></div>
+            <div><button class="btn btn-primary">Submit Payment</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 6: APPROVED -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">6</span>
+        <div>
+          <div class="step-label">Payment Approved</div>
+          <div class="step-sub">Confirmation hero in rmResident navy. Push notification reinforces the reward — copy modeled on rmResident's existing push-notification tone from the App Store screens.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar" style="padding-top:14px"><h2 style="text-align:center;flex:1">Payment Approved</h2></div>
+            <div class="approved-hero"><div class="check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Thank you, Sarah!</h3><p>Your payment of <strong>$2,114.99</strong> has been approved.</p></div>
+            <div class="reward-callout" style="margin-top:0"><div class="ic">R</div><p>You earned <strong>$21.05 in rmCash</strong> by paying with your Visa card.</p></div>
+            <div class="reward-callout amber" style="margin-top:-4px"><div class="ic">★</div><p>You earned <strong>8,420 rmPoints</strong> toward your next reward.</p></div>
+            <div class="meta-block"><div class="lab">Payment Method</div><div class="val">Visa Credit Card · 4242</div></div>
+            <div class="meta-block"><div class="lab">Payment Date</div><div class="val">05/18/26</div></div>
+            <div class="notif-card"><div class="mr-mark sm">R</div><div style="flex:1"><div class="meta"><span><strong>rmResident</strong></span><span>now</span></div><div class="body-txt">Thanks for paying rent on time, Sarah! You've received <strong>$21.05 in rmCash</strong> + <strong>8,420 rmPoints</strong> — now available in your wallet.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 7: ACH → RM PLUS ALT -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">7</span>
+        <div>
+          <div class="step-label">ACH → rm Plus <span class="star-tag">alt path</span></div>
+          <div class="step-sub">If resident picks Bank Account, surface rm Plus: $9.99/mo for 1% cash on ACH, 5% at local services, 7-day concierge. Recovers the lost cash story for non-Visa payers.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar"><div class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><h2>Payment Method</h2><div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+            <div class="pm-list">
+              <div class="pm-option"><div class="pm-radio"></div><div class="pm-icon" style="background:#1A1F71"><svg class="visa-svg sm visa-white" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div><div class="pm-meta"><div class="name">Saved Payment</div><div class="sub">Visa · ending in 4242</div></div></div>
+              <div class="pm-option selected"><div class="pm-radio"></div><div class="pm-icon" style="background:var(--mr-orange-pale)"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#0B2046" stroke-width="2"><path d="M3 6L12 1l9 5"/><path d="M2 17h20"/></svg></div><div class="pm-meta"><div class="name">Bank Account</div><div class="sub">ACH transfer · No fee</div></div></div>
+            </div>
+            <div class="ach-confirm-pill">ACH selected · No rmCash on this payment</div>
+            <div class="plus-card">
+              <div class="plus-brand"><div class="pl-mark">R</div><span class="pl-name">rmResident</span><span class="pl-tier">PLUS</span></div>
+              <h4>Pay by bank? Earn rewards anyway.</h4>
+              <p class="pl-sub">rm Plus members earn rmCash on every rent payment — no matter how they pay.</p>
+              <div class="plus-benefits">
+                <div class="pb-row"><div class="pb-icon">%</div><div class="pb-text"><strong>1% rmCash</strong> back on every rent payment</div></div>
+                <div class="pb-row"><div class="pb-icon">5</div><div class="pb-text">Up to <strong>5.0%</strong> at <strong>local dining, home services, shopping</strong></div></div>
+                <div class="pb-row"><div class="pb-icon">★</div><div class="pb-text"><strong>7-day concierge</strong> for services &amp; community</div></div>
+              </div>
+              <div class="plus-price"><span class="pp-amt">$9.99</span><span class="pp-per">/ month · cancel anytime</span></div>
+              <button class="btn-plus">Start rm Plus →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 8: REWARDS / WALLET -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">8</span>
+        <div>
+          <div class="step-label">Rewards Wallet</div>
+          <div class="step-sub">Where earned rewards live. Native rmResident-styled redeem grid (Prepaid Visa, Travel, Pay rent with points, Gift card) sits above the Amenify-powered service marketplace.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="rewards-head"><div><span class="mr-wordmark sm">rmResident</span><h2>Rewards</h2></div><div class="icon-row"><div class="icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div></div>
+            <div class="points-card"><div class="label">rmPoints</div><div class="pts">59,609</div><div class="cash-row"><div class="cash-lab">rmCash</div><div class="cash-amt">$21.05</div></div></div>
+            <div class="redeem-grid">
+              <div class="redeem-tile"><div class="rd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="13" rx="2"/></svg></div><div class="rd-name">Prepaid Visa Card</div><div class="rd-sub">Up to $25</div></div>
+              <div class="redeem-tile"><div class="rd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 22l4-4M16 2l6 6"/></svg></div><div class="rd-name">Travel</div><div class="rd-sub">Up to $70</div></div>
+              <div class="redeem-tile"><div class="rd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div><div class="rd-name">Pay rent with points</div><div class="rd-sub">Apply to balance</div></div>
+              <div class="redeem-tile"><div class="rd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="13" rx="2"/></svg></div><div class="rd-name">Gift card</div><div class="rd-sub">Up to $50</div></div>
+            </div>
+            <div class="spend-section">Spend your rmCash</div>
+            <div class="service-grid">
+              <div class="service-tile"><div class="st-icon-wrap"><span class="st-icon">🧽</span></div><div class="st-name">Cleaning</div></div>
+              <div class="service-tile s-pink"><div class="st-icon-wrap"><span class="st-icon">🛒</span></div><div class="st-name">Groceries</div></div>
+              <div class="service-tile s-cream"><div class="st-icon-wrap"><span class="st-icon">🛍️</span></div><div class="st-name">Shopping</div></div>
+              <div class="service-tile s-yellow"><div class="st-icon-wrap"><span class="st-icon">🔧</span></div><div class="st-name">Handyman</div></div>
+              <div class="service-tile s-pink"><div class="st-icon-wrap"><span class="st-icon">🐾</span></div><div class="st-name">Pet Care</div></div>
+              <div class="service-tile s-cream"><div class="st-icon-wrap"><span class="st-icon">🍽️</span></div><div class="st-name">Local Dining</div></div>
+            </div>
+          </div>
+          <nav class="tabbar">
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/></svg>Services</div>
+            <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/></svg>Offers</div>
+            <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v12H7l-4 4z"/></svg>Messages</div>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 9: WHY LINK CARD -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">9</span>
+        <div>
+          <div class="step-label">Why Link a Card</div>
+          <div class="step-sub">Explainer: extend the cashback story beyond rent. Shows Sarah she can earn at Uber, Walmart, CVS, DoorDash, Target — plus social proof and a single CTA.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar"><div class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><h2 style="font-size:20px">Earn Everywhere</h2><div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+            <div class="why-headline">Earn rmCash everywhere you spend.</div>
+            <p class="why-sub">Link your Visa card and we'll auto-credit your wallet at places you love. <strong>Exclusive Visa partnership</strong>.</p>
+            <div class="why-hero-card"><div class="lab">Up to</div><div class="pct">5%<span class="small"> back</span></div><p>at thousands of brands like Uber, Walmart, CVS — plus local spots.</p></div>
+            <div class="place-section">Popular places</div>
+            <div class="place-list">
+              <div class="place-row"><div class="brand-chip uber"><span style="font-size:9px;letter-spacing:0.5px">Uber</span></div><div class="pr-meta"><div class="pr-name">Uber</div><div class="pr-sub">Rides &amp; Eats</div></div><span class="pr-pct">2%</span></div>
+              <div class="place-row"><div class="brand-chip walmart"><span style="font-size:14px;line-height:0.8">✦</span></div><div class="pr-meta"><div class="pr-name">Walmart</div><div class="pr-sub">Groceries &amp; more</div></div><span class="pr-pct">2%</span></div>
+              <div class="place-row"><div class="brand-chip cvs"><span style="font-size:10px;letter-spacing:0">CVS</span></div><div class="pr-meta"><div class="pr-name">CVS Pharmacy</div><div class="pr-sub">Health &amp; everyday</div></div><span class="pr-pct">2%</span></div>
+              <div class="place-row"><div class="brand-chip doordash"><span style="font-size:12px;letter-spacing:0">DD</span></div><div class="pr-meta"><div class="pr-name">DoorDash</div><div class="pr-sub">Food delivery</div></div><span class="pr-pct">5%</span></div>
+              <div class="place-row"><div class="brand-chip target"><span style="font-size:16px;line-height:0.8">◉</span></div><div class="pr-meta"><div class="pr-name">Target</div><div class="pr-sub">Everyday essentials</div></div><span class="pr-pct">3%</span></div>
+            </div>
+            <div class="why-stats"><div class="why-stat"><div class="ws-lab">Avg earned</div><div class="ws-val">$42<span style="font-size:12px;opacity:0.6">/mo</span></div></div><div class="why-stat"><div class="ws-lab">Brands</div><div class="ws-val">3,400+</div></div></div>
+            <div style="margin-top:10px"><button class="btn btn-primary">Link a card to start earning →</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 10: LINK YOUR CARD -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">10</span>
+        <div>
+          <div class="step-label">Link Your Card</div>
+          <div class="step-sub">Reassurance-first design. Show the rmResident-branded Visa card, let the resident pick a saved card or add new. Bank-grade encryption note inline.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar"><div class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><h2 style="font-size:20px">Link your card</h2><div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+            <div class="link-hero">Choose a card to link</div>
+            <p class="link-sub">Bank-grade encryption. We never see your full card number or charge your card.</p>
+            <div class="mr-visa-card">
+              <div class="top-row"><span class="word">rmResident</span><div class="h-mark">R</div></div>
+              <div class="chip"></div>
+              <div class="num">•••• •••• •••• 4242</div>
+              <div class="footer-row"><span class="name">Sarah Thompson</span><span class="visa"><svg class="visa-svg lg visa-white" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></span></div>
+            </div>
+            <div class="link-option-list">
+              <div class="link-option selected"><div class="lo-radio"></div><div class="lo-icon"><svg class="visa-svg sm visa-white" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div><div class="lo-meta"><div class="lo-name">Use your saved card</div><div class="lo-sub">Visa · ending in 4242</div></div></div>
+              <div class="link-option add"><div class="lo-radio"></div><div class="lo-icon"></div><div class="lo-meta"><div class="lo-name">Add a new Visa card</div><div class="lo-sub">Visa-exclusive rewards partner</div></div></div>
+            </div>
+            <div style="margin-top:14px"><button class="btn btn-primary">Link Card</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 11: YOU'RE ALL SET -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">11</span>
+        <div>
+          <div class="step-label">You're All Set</div>
+          <div class="step-sub">Confirmation moment. Card art with green check overlay, three trust pillars (Secure &amp; private, Works everywhere, No extra steps), Done → Maddie.</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="topbar" style="padding-top:14px"><div class="back"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><h2 style="text-align:center;flex:1;font-size:18px">Link your card</h2><div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+            <div class="allset-card-wrap">
+              <div class="mr-visa-card" style="margin-bottom:0">
+                <div class="top-row"><span class="word">rmResident</span><div class="h-mark">R</div></div>
+                <div class="chip"></div>
+                <div class="num">•••• •••• •••• 4242</div>
+                <div class="footer-row"><span class="name">Sarah Thompson</span><span class="visa"><svg class="visa-svg lg visa-white" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></span></div>
+              </div>
+              <div class="check-overlay"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0B2046" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+            <div class="allset-headline">You're all set!</div>
+            <p class="allset-sub">We'll automatically earn <strong>rmCash</strong> when you shop with your linked cards.</p>
+            <div class="benefit-list">
+              <div class="benefit-row"><div class="br-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><div class="br-meta"><div class="br-title">Secure &amp; private</div><div class="br-body">Encrypted, never sold.</div></div></div>
+              <div class="benefit-row"><div class="br-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/></svg></div><div class="br-meta"><div class="br-title">Works everywhere</div><div class="br-body">In-store, online, in-app.</div></div></div>
+              <div class="benefit-row"><div class="br-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div><div class="br-meta"><div class="br-title">No extra steps</div><div class="br-body">Use your cards like normal.</div></div></div>
+            </div>
+            <div style="margin-top:14px"><button class="btn btn-lime">Done</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 12: ORDER WITH MADDIE -->
+    <div class="screen-wrap">
+      <div class="step-tag">
+        <span class="step-num">12</span>
+        <div>
+          <div class="step-label">Order with Maddie</div>
+          <div class="step-sub">Where the loop closes. Maddie AI places a Domino's order (Pepperoni + Diet Coke, $24.18), confirms it's on the way, surfaces a navy earn pill: "$1.21 in rmCash (5% back)."</div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#0B2046"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#0B2046"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#0B2046"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#0B2046"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#0B2046" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#0B2046" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#0B2046"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#0B2046"/></svg></span></div>
+          <div class="body">
+            <div class="maddie-header">
+              <div class="maddie-avatar"></div>
+              <div class="maddie-meta"><div class="name">Maddie <span class="ai-tag">AI</span></div><div class="status">Here to help, anytime.</div></div>
+              <div class="maddie-actions"><span class="ma-pill">5%</span><div class="ma-dots"><svg width="12" height="12" viewBox="0 0 24 24" fill="#0B2046"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></div></div>
+            </div>
+            <div class="chat-body">
+              <div class="chat-msg out"><div class="chat-bubble">Please order a pepperoni pizza from Domino's and a diet coke.</div><span class="chat-time">9:41 AM</span></div>
+              <div class="chat-msg in"><div class="chat-bubble">Got it! I'll place your order now.</div><span class="chat-time">9:41 AM</span></div>
+              <div class="chat-card-order"><div class="order-logo">D</div><div class="order-meta"><div class="order-name">Domino's Pizza</div><div class="order-items">1 Large Pepperoni Pizza<br/>1 Diet Coke</div></div><div class="order-price">$24.18</div></div>
+              <div class="chat-msg in"><div class="chat-bubble">Your order is confirmed and on the way! 🎉</div><span class="chat-time">9:42 AM</span></div>
+              <div class="chat-earn"><div class="ce-mark">R</div><div class="ce-text">You earned <strong>$1.21 in rmCash</strong> (5% back) — now in your wallet.</div></div>
+            </div>
+            <div class="chat-input-bar"><input type="text" placeholder="Message Maddie..." disabled /><button class="send-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="legend">
+    <h3>Design notes</h3>
+    <p>The rmResident flow mirrors the LOFT and Homebody structures (eight screens, Visa happy path, ACH alternate path, rewards wallet endpoint) and rebrands every reward surface in rmResident's own visual language — navy + orange, geometric diamond patterns, utilitarian sans-serif typography, and a property-management aesthetic pulled directly from the rmResident App Store screens.</p>
+    <div class="legend-grid">
+      <div class="legend-item">
+        <h4>Triple reinforcement of the reward</h4>
+        <p>The <strong>$21.05 + 8,420 points</strong> figure appears three times: in the inline offer on Payment Method, in the Summary callout, and again in the Approved screen. Followed by a fourth touch via push notification reusing Entrata's exact brand-guide copy ("Thanks for paying rent on time…").</p>
+      </div>
+      <div class="legend-item">
+        <h4>Reward currencies</h4>
+        <p><strong>rmCash</strong> is the 1% cashback layer (1.0% on Visa rent payments). <strong>rmPoints</strong> is the loyalty-points currency layered in for resident engagement — earned at 1 point per $0.25 of rent paid. Both names sit comfortably in rmResident's native vocabulary ("rm" mirrors MRI's product prefix — rmResident, rmManager, rmCommercial).</p>
+      </div>
+      <div class="legend-item">
+        <h4>ACH recovery path: rm Plus</h4>
+        <p>Residents who pick Bank Account see a $9.99/mo rm Plus membership offer with 1% rmCash on ACH, 5% on local dining/home services/shopping, plus 7-day concierge. Recovers the lost cashback story for non-Visa payers.</p>
+      </div>
+      <div class="legend-item">
+        <h4>Rewards wallet structure</h4>
+        <p>Native-styled redeem options (Prepaid Visa, Travel, Pay rent with points, Gift card) sit at the top — matching the utilitarian list-style aesthetic of rmResident's transactions screen. Below that, an Amenify-powered service marketplace (Cleaning, Pet Care, Local Dining, etc.) gives residents a place to spend their rmCash.</p>
+      </div>
+      <div class="legend-item">
+        <h4>Linked-card extension (screens 9–12)</h4>
+        <p>Two entry points — an orange banner on the <strong>Approved</strong> screen and a tile in the <strong>Rewards Wallet</strong> — both route to the "Why link a card" explainer. From there: pick a card → confirmation moment → meet <strong>Maddie</strong>, the AI assistant who places orders and surfaces the cashback in real time ("$1.21 in rmCash, 5% back").</p>
+      </div>
+      <div class="legend-item">
+        <h4>Single-wallet story</h4>
+        <p>Per the partner decision, there's <strong>one currency</strong> across the whole flow: <strong>rmCash</strong>. Sarah sees the same wallet balance grow from her rent payment ($21.05) <em>and</em> from her Uber/Walmart/Domino's purchases — never two separate buckets. Reinforces a clean, white-labeled experience for Entrata to demo.</p>
+      </div>
+      <div class="legend-item">
+        <h4>Maddie the AI assistant</h4>
+        <p>Same AI persona as the LOFT and Homebody mockups, rebranded in rmResident's palette. The chat surface uses navy outgoing bubbles, the orange "R" mark on the earn callout, and the existing 5-tab Amenify nav (Home / Services / Rewards / Offers / Messages). Maddie is the "everywhere I spend" wedge — natural language ordering + rmCash earning in one moment.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>
