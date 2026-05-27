@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Homebody × Amenify — Resident Rent Payment Prototype</title>
+<meta name="description" content="Interactive UX prototype showing how Entrata Homebody residents earn Homebody Cash™ and Homebody Points by paying rent with a Visa card." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hb-forest: #0E2A21;
+    --hb-forest-2: #143828;
+    --hb-lime: #94E081;
+    --hb-lime-soft: #DDEAD5;
+    --hb-lime-pale: #EEF6E8;
+    --hb-cream: #F5EEE5;
+    --hb-pink: #F5C7D0;
+    --hb-yellow: #F7E27A;
+    --hb-ink: #0E2A21;
+    --hb-ink-2: #2A3833;
+    --hb-muted: #6B7068;
+    --hb-faint: #9DA29B;
+    --hb-line: #E7E1D5;
+    --hb-line-strong: #D5CFC0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--hb-cream);
+    color: var(--hb-ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 40px;
+    border-bottom: 1px solid rgba(213,207,192,0.5);
+  }
+  .nav .brand-pair {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 13px; color: var(--hb-muted);
+  }
+  .hb-wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--hb-forest);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    font-variation-settings: "opsz" 9;
+  }
+  .hb-wordmark sup { font-size: 8px; vertical-align: super; opacity: 0.7; font-weight: 600; }
+  .x { color: var(--hb-faint); font-weight: 600; }
+  .amenify-logo {
+    background: var(--hb-forest); color: #FFF;
+    padding: 5px 12px; border-radius: 7px;
+    font-weight: 700; font-size: 13px; letter-spacing: 0.5px;
+    line-height: 1;
+  }
+  .nav .meta-pill {
+    background: #FFF; border: 1px solid var(--hb-line-strong);
+    padding: 6px 12px; border-radius: 999px;
+    font-size: 11px; color: var(--hb-muted); font-weight: 600;
+  }
+
+  main {
+    flex: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 56px 32px 48px;
+    width: 100%;
+  }
+
+  .hero { text-align: center; margin-bottom: 56px; }
+  .hero .eyebrow {
+    display: inline-block;
+    background: var(--hb-lime-pale);
+    color: var(--hb-forest);
+    padding: 6px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    border: 1px solid var(--hb-lime-soft);
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 58px;
+    line-height: 1.05;
+    letter-spacing: -1.2px;
+    max-width: 820px;
+    margin: 0 auto;
+    color: var(--hb-forest);
+    font-weight: 500;
+  }
+  .hero h1 .hl {
+    background: linear-gradient(180deg, transparent 60%, var(--hb-lime) 60%, var(--hb-lime) 90%, transparent 90%);
+    padding: 0 8px;
+  }
+  .hero p {
+    margin: 24px auto 0;
+    max-width: 640px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--hb-muted);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 880px;
+    margin: 0 auto 48px;
+  }
+  @media (max-width: 720px) { .cards { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #FFF;
+    border: 1px solid var(--hb-line);
+    border-radius: 22px;
+    padding: 28px;
+    text-decoration: none;
+    color: var(--hb-ink);
+    display: flex; flex-direction: column;
+    gap: 16px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(14,42,33,0.08);
+    border-color: var(--hb-forest);
+  }
+  .card.primary {
+    background: linear-gradient(160deg, var(--hb-lime-pale) 0%, var(--hb-lime-soft) 100%);
+    border-color: var(--hb-forest);
+  }
+  .card .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.75);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--hb-forest);
+    width: fit-content;
+    text-transform: uppercase;
+  }
+  .card .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--hb-forest); }
+  .card .badge.gray { background: var(--hb-cream); color: var(--hb-muted); }
+  .card .badge.gray .dot { background: var(--hb-faint); }
+  .card h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 28px; line-height: 1.1;
+    letter-spacing: -0.5px;
+    color: var(--hb-forest);
+    font-weight: 500;
+  }
+  .card p {
+    font-size: 14px; line-height: 1.55;
+    color: var(--hb-ink-2);
+    flex: 1;
+  }
+  .card .cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 700; font-size: 14px;
+    color: var(--hb-forest);
+    border-bottom: 1.5px solid var(--hb-forest);
+    padding-bottom: 2px;
+    width: fit-content;
+  }
+
+  .how {
+    background: #FFF;
+    border: 1px solid var(--hb-line);
+    border-radius: 18px;
+    padding: 28px 32px;
+    max-width: 880px;
+    margin: 0 auto 48px;
+  }
+  .how h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 24px; line-height: 1.1;
+    margin-bottom: 18px;
+    letter-spacing: -0.4px;
+    color: var(--hb-forest);
+    font-weight: 500;
+  }
+  .how-steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 720px) { .how-steps { grid-template-columns: 1fr; gap: 14px; } }
+  .step {
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .step .num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--hb-forest); color: var(--hb-lime);
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .step .body { font-size: 13px; line-height: 1.5; color: var(--hb-ink-2); }
+  .step .body strong { color: var(--hb-forest); }
+
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 14px;
+    justify-content: center;
+    max-width: 880px; margin: 0 auto;
+  }
+  .meta .pill {
+    background: #FFF; border: 1px solid var(--hb-line-strong);
+    padding: 8px 14px; border-radius: 999px;
+    font-size: 12px; color: var(--hb-muted); font-weight: 500;
+  }
+  .meta .pill strong { color: var(--hb-forest); font-weight: 700; margin-left: 4px; }
+
+  footer {
+    padding: 28px 40px;
+    border-top: 1px solid rgba(213,207,192,0.5);
+    text-align: center;
+    font-size: 12px; color: var(--hb-faint);
+  }
+  footer a { color: var(--hb-muted); text-decoration: none; border-bottom: 1px solid var(--hb-line-strong); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand-pair">
+    <span class="hb-wordmark">homebody<sup>™</sup></span>
+    <span class="x">×</span>
+    <span class="amenify-logo">amenify</span>
+  </div>
+  <span class="meta-pill">Prototype · v1 · May 2026</span>
+</nav>
+
+<main>
+  <section class="hero">
+    <span class="eyebrow">Entrata Homebody × Amenify Integration</span>
+    <h1>Earn <span class="hl">Homebody Cash</span> on rent — and everywhere else.</h1>
+    <p>An interactive UX prototype showing how Homebody residents earn Homebody Cash™ in two motions: paying rent with a Visa card, and tap-and-go cashback at thousands of brands like Uber, Walmart, and CVS.</p>
+  </section>
+
+  <div class="cards">
+    <a class="card primary" href="homebody-prototype-v1.html">
+      <span class="badge"><span class="dot"></span>Recommended</span>
+      <h2>Launch the clickable prototype</h2>
+      <p>Step through the full twelve-screen flow: home dashboard, rent payment (Visa or ACH/Homebody+ alt path), rewards wallet, then the linked-card extension — Why link → Link your card → You're all set → order with Maddie the AI assistant. Tap any button to advance, or tap anywhere to highlight clickable hotspots.</p>
+      <span class="cta">Launch demo →</span>
+    </a>
+    <a class="card" href="homebody-rent-payment-flow-v1.html">
+      <span class="badge gray"><span class="dot"></span>For review</span>
+      <h2>View the grid layout</h2>
+      <p>All twelve screens visible at once, side-by-side, with annotation captions and design notes. Useful for reviewing both flows without clicking through, or for sharing as a static reference image.</p>
+      <span class="cta">Open grid view →</span>
+    </a>
+  </div>
+
+  <div class="how">
+    <h3>How to use the prototype</h3>
+    <div class="how-steps">
+      <div class="step">
+        <span class="num">1</span>
+        <div class="body">Start on screen 1 (Home). Tap <strong>Pay Now</strong> on the plant-hero card to walk the rent flow (screens 2–8).</div>
+      </div>
+      <div class="step">
+        <span class="num">2</span>
+        <div class="body">On screen 6 (Approved) <em>or</em> screen 8 (Rewards), tap the lime <strong>"Link a card to earn everywhere"</strong> banner to enter the spend flow (screens 9–12).</div>
+      </div>
+      <div class="step">
+        <span class="num">3</span>
+        <div class="body">Tap anywhere on the phone to <strong>highlight clickable areas</strong>, or use ← / → arrow keys to advance through all twelve screens.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="meta">
+    <span class="pill">Persona:<strong>Sarah Thompson</strong></span>
+    <span class="pill">Property:<strong>Sloane Lofts</strong></span>
+    <span class="pill">Rent:<strong>$2,105.00 / mo</strong></span>
+    <span class="pill">Reward rate:<strong>1.0% Homebody Cash</strong></span>
+    <span class="pill">Built for:<strong>Entrata Homebody</strong></span>
+  </div>
+</main>
+
+<footer>
+  Built by the Amenify Partners team · Internal preview, please do not share externally without approval · <a href="homebody-prototype-v1.html">Launch prototype</a>
+</footer>
+
+</body>
+</html>
