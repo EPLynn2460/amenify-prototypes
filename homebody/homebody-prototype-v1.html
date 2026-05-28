@@ -791,15 +791,19 @@
   }
   .service-tile.selected .check svg { opacity: 1; }
 
+  /* CTA dock — pinned to the bottom of the screen so it never floats mid-viewport.
+     Lives at the .screen level (absolute) so it isn't trapped by .body's scroll. */
   .cta-dock {
-    position: sticky; bottom: 0;
+    position: absolute; left: 0; right: 0; bottom: 0;
     background: #FFFFFF;
-    padding: 16px 0 12px;
-    margin-top: 12px;
+    padding: 14px 18px 16px;
     border-top: 1px solid var(--hb-line);
-    box-shadow: 0 -10px 18px -6px rgba(255,255,255,0.95), 0 -1px 0 var(--hb-line);
+    /* Fade-to-white above the dock so scrolling content visually disappears into it */
+    box-shadow: 0 -22px 24px -8px rgba(255,255,255,0.98), 0 -36px 36px -16px rgba(255,255,255,0.85);
     z-index: 30;
   }
+  /* Screens that include a .cta-dock need their scroll body to clear the dock height */
+  .screen.has-cta-dock .body { padding-bottom: 150px; }
   .selected-count {
     font-size: 11.5px; color: var(--hb-muted);
     margin-bottom: 8px; text-align: center; font-weight: 600;
@@ -920,37 +924,59 @@
     70% { outline: 4px solid rgba(148,224,129,0.6); outline-offset: 4px; }
   }
   .reveal-banner {
-    position: absolute; bottom: 92px; left: 50%; transform: translateX(-50%);
-    background: var(--hb-forest); color: var(--hb-lime);
+    /* Top-anchored toast — below the status bar, never collides with scrolled content cards */
+    position: absolute; top: 56px; left: 50%; transform: translate(-50%, -6px);
+    background: rgba(14,42,33,0.96); color: var(--hb-lime);
     padding: 8px 14px; border-radius: 999px;
     font-size: 12px; font-weight: 600;
-    box-shadow: 0 8px 24px rgba(14,42,33,0.4);
-    opacity: 0; transition: opacity 0.25s;
+    box-shadow: 0 10px 28px rgba(14,42,33,0.35);
+    border: 1px solid rgba(148,224,129,0.18);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease;
     z-index: 100; pointer-events: none;
     white-space: nowrap;
+    max-width: calc(100% - 32px);
   }
-  .screen.reveal-hotspots .reveal-banner { opacity: 1; }
+  .screen.reveal-hotspots .reveal-banner { opacity: 1; transform: translate(-50%, 0); }
 
   /* ─────────── Thumbnail strip ─────────── */
-  .thumbs {
-    display: flex; align-items: center; justify-content: center;
-    gap: 6px; flex-wrap: wrap; margin-top: 4px;
+  .thumbs-wrap {
+    position: relative;
+    margin-top: 4px;
+    /* edge fades so off-screen chips are visually implied, not just clipped */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
   }
+  .thumbs {
+    display: flex; align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 24px;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .thumbs::-webkit-scrollbar { display: none; }
   .thumb {
     display: inline-flex; align-items: center; gap: 6px;
     background: #FFF;
     border: 1px solid var(--hb-line-strong);
     border-radius: 999px;
-    padding: 6px 12px;
+    padding: 6px 11px;
     font-size: 12px; font-weight: 500;
     color: var(--hb-muted);
     cursor: pointer; transition: all 0.15s;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .thumb:hover { border-color: var(--hb-forest); color: var(--hb-forest); }
   .thumb .tnum {
     background: var(--hb-cream-2); color: var(--hb-forest); font-weight: 700;
     width: 18px; height: 18px; border-radius: 50%;
     display: grid; place-items: center; font-size: 10px;
+    flex-shrink: 0;
   }
   .thumb.is-active { background: var(--hb-forest); border-color: var(--hb-forest); color: #FFF; }
   .thumb.is-active .tnum { background: var(--hb-lime); color: var(--hb-forest); }
@@ -1250,7 +1276,7 @@
 
       <!-- ─────────── SCREEN 1: HOME ─────────── -->
       <!-- ─────────── SCREEN 1: INTEREST SURVEY ─────────── -->
-      <div class="screen is-active" data-screen="survey" data-name="Interest Survey" data-step="1">
+      <div class="screen is-active has-cta-dock" data-screen="survey" data-name="Interest Survey" data-step="1">
         <div class="status-bar">
           <span>9:41</span>
           <span class="signal">
@@ -1336,12 +1362,11 @@
               <div class="st-meta">Classes, gyms,<br/>spa perks</div>
             </div>
           </div>
-
-          <div class="cta-dock">
-            <div class="selected-count" id="survey-count">Pick at least one to claim your <strong>$50 credit</strong></div>
-            <button class="btn btn-primary" id="survey-submit" data-goto="reward" disabled>Claim my $50 credit →</button>
-            <a class="skip" data-goto="home">Maybe later</a>
-          </div>
+        </div>
+        <div class="cta-dock">
+          <div class="selected-count" id="survey-count">Pick at least one to claim your <strong>$50 credit</strong></div>
+          <button class="btn btn-primary" id="survey-submit" data-goto="reward" disabled>Claim my $50 credit →</button>
+          <a class="skip" data-goto="home">Maybe later</a>
         </div>
       </div>
 
@@ -1520,7 +1545,7 @@
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M6 10h12M6 14h6"/></svg>Offers</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v12H7l-4 4z"/></svg>Messages</div>
         </nav>
-        <div class="reveal-banner">Tap Pay Now to continue ↑</div>
+        <div class="reveal-banner">Tap Pay Now to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 2: PAYMENTS ─────────── -->
@@ -1577,7 +1602,7 @@
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M6 10h12M6 14h6"/></svg>Offers</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v12H7l-4 4z"/></svg>Messages</div>
         </nav>
-        <div class="reveal-banner">Tap Pay Now to continue ↑</div>
+        <div class="reveal-banner">Tap Pay Now to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 3: MAKE A PAYMENT ─────────── -->
@@ -1616,7 +1641,7 @@
           <div style="margin-top:18px"><button class="btn btn-primary" data-goto="method">Continue to Payment Method →</button></div>
           <div style="margin-top:10px"><button class="btn" style="background:transparent;border:none;color:var(--hb-muted);font-weight:500" data-goto="payments">Cancel</button></div>
         </div>
-        <div class="reveal-banner">Tap Continue to choose method ↑</div>
+        <div class="reveal-banner">Tap Continue to choose method</div>
       </div>
 
       <!-- ─────────── SCREEN 4: PAYMENT METHOD ─────────── -->
@@ -1689,7 +1714,7 @@
 
           <div style="margin-top:6px"><button class="btn btn-primary" data-goto="summary">Next →</button></div>
         </div>
-        <div class="reveal-banner">Tap Visa or Bank Account to choose ↑</div>
+        <div class="reveal-banner">Tap Visa or Bank Account to choose</div>
       </div>
 
       <!-- ─────────── SCREEN 5: SUMMARY ─────────── -->
@@ -1725,7 +1750,7 @@
           </div>
           <div><button class="btn btn-primary" data-goto="approved">Submit Payment</button></div>
         </div>
-        <div class="reveal-banner">Tap Submit Payment to continue ↑</div>
+        <div class="reveal-banner">Tap Submit Payment to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 6: APPROVED ─────────── -->
@@ -1774,7 +1799,7 @@
             </div>
           </div>
         </div>
-        <div class="reveal-banner">Tap Done to restart ↑</div>
+        <div class="reveal-banner">Tap Done to restart</div>
       </div>
 
       <!-- ─────────── SCREEN 7: ACH / HOMEBODY+ UPSELL ─────────── -->
@@ -1835,7 +1860,7 @@
           <div style="margin-top:6px"><button class="btn btn-primary" data-goto="summary">Continue with ACH</button></div>
           <div style="text-align:center;margin-top:10px"><a href="javascript:void(0)" data-goto="method" style="font-size:12px;color:var(--hb-muted);text-decoration:none">Maybe later</a></div>
         </div>
-        <div class="reveal-banner">Tap Start Homebody+ to subscribe ↑</div>
+        <div class="reveal-banner">Tap Start Homebody+ to subscribe</div>
       </div>
 
       <!-- ─────────── SCREEN 8: REWARDS / WALLET ─────────── -->
@@ -1988,7 +2013,7 @@
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M6 10h12M6 14h6"/></svg>Offers</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v12H7l-4 4z"/></svg>Messages</div>
         </nav>
-        <div class="reveal-banner">Tap "Link a card" to continue ↑</div>
+        <div class="reveal-banner">Tap "Link a card" to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 9: WHY LINK CARD ─────────── -->
@@ -2079,7 +2104,7 @@
           <div style="margin-top:14px"><button class="btn btn-primary" data-goto="link">Link a card to start earning →</button></div>
           <div style="text-align:center;margin-top:10px"><a href="javascript:void(0)" data-goto="wallet" style="font-size:12px;color:var(--hb-muted);text-decoration:none">Maybe later</a></div>
         </div>
-        <div class="reveal-banner">Tap "Link a card" to continue ↑</div>
+        <div class="reveal-banner">Tap "Link a card" to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 10: LINK YOUR CARD ─────────── -->
@@ -2131,7 +2156,7 @@
           <div style="margin-top:18px"><button class="btn btn-primary" data-goto="set">Link Card</button></div>
           <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--hb-muted)">By linking your card you agree to the <a href="javascript:void(0)" style="color:var(--hb-forest);font-weight:600;text-decoration:none;border-bottom:1px solid var(--hb-forest)">Shop Local Credit Terms</a>.</div>
         </div>
-        <div class="reveal-banner">Tap "Link Card" to confirm ↑</div>
+        <div class="reveal-banner">Tap "Link Card" to confirm</div>
       </div>
 
       <!-- ─────────── SCREEN 11: YOU'RE ALL SET ─────────── -->
@@ -2195,7 +2220,7 @@
 
           <div style="margin-top:18px"><button class="btn btn-lime" data-goto="maddie">Done</button></div>
         </div>
-        <div class="reveal-banner">Tap "Done" to meet Maddie ↑</div>
+        <div class="reveal-banner">Tap "Done" to meet Maddie</div>
       </div>
 
       <!-- ─────────── SCREEN 12: ORDER WITH MADDIE ─────────── -->
@@ -2262,25 +2287,29 @@
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M6 10h12M6 14h6"/></svg>Offers</div>
           <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18v12H7l-4 4z"/></svg>Messages</div>
         </nav>
-        <div class="reveal-banner">Tap → to head back to your wallet ↑</div>
+        <div class="reveal-banner">Tap → to head back to your wallet</div>
       </div>
 
     </div>
   </div>
 
-  <div class="thumbs">
-    <div class="thumb is-active" data-goto="home"><span class="tnum">1</span>Home</div>
-    <div class="thumb" data-goto="payments"><span class="tnum">2</span>Payments</div>
-    <div class="thumb" data-goto="make"><span class="tnum">3</span>Make</div>
-    <div class="thumb" data-goto="method"><span class="tnum">4</span>Method ★</div>
-    <div class="thumb" data-goto="summary"><span class="tnum">5</span>Summary</div>
-    <div class="thumb" data-goto="approved"><span class="tnum">6</span>Approved</div>
-    <div class="thumb alt" data-goto="ach"><span class="tnum">7</span>ACH alt</div>
-    <div class="thumb" data-goto="wallet"><span class="tnum">8</span>Rewards</div>
-    <div class="thumb" data-goto="why"><span class="tnum">9</span>Why Link</div>
-    <div class="thumb" data-goto="link"><span class="tnum">10</span>Link Card</div>
-    <div class="thumb" data-goto="set"><span class="tnum">11</span>All Set</div>
-    <div class="thumb" data-goto="maddie"><span class="tnum">12</span>Maddie</div>
+  <div class="thumbs-wrap">
+    <div class="thumbs">
+      <div class="thumb is-active" data-goto="survey"><span class="tnum">1</span>Survey</div>
+      <div class="thumb" data-goto="reward"><span class="tnum">2</span>Credit Added</div>
+      <div class="thumb" data-goto="home"><span class="tnum">3</span>Home</div>
+      <div class="thumb" data-goto="payments"><span class="tnum">4</span>Payments</div>
+      <div class="thumb" data-goto="make"><span class="tnum">5</span>Make</div>
+      <div class="thumb" data-goto="method"><span class="tnum">6</span>Method ★</div>
+      <div class="thumb" data-goto="summary"><span class="tnum">7</span>Summary</div>
+      <div class="thumb" data-goto="approved"><span class="tnum">8</span>Approved</div>
+      <div class="thumb alt" data-goto="ach"><span class="tnum">9</span>ACH alt</div>
+      <div class="thumb" data-goto="wallet"><span class="tnum">10</span>Rewards</div>
+      <div class="thumb" data-goto="why"><span class="tnum">11</span>Why Link</div>
+      <div class="thumb" data-goto="link"><span class="tnum">12</span>Link Card</div>
+      <div class="thumb" data-goto="set"><span class="tnum">13</span>All Set</div>
+      <div class="thumb" data-goto="maddie"><span class="tnum">14</span>Maddie</div>
+    </div>
   </div>
 
   <p class="footer-hint">Tap a button on the phone to advance — or tap anywhere on the screen to <strong>highlight clickable areas</strong>. Use <kbd>←</kbd> / <kbd>→</kbd> arrow keys to navigate.</p>
@@ -2314,7 +2343,13 @@
     const label = target.dataset.name;
     curNumEl.textContent = step;
     curNameEl.textContent = label;
-    thumbs.forEach(t => t.classList.toggle('is-active', t.dataset.goto === name));
+    thumbs.forEach(t => {
+      const isActive = t.dataset.goto === name;
+      t.classList.toggle('is-active', isActive);
+      if (isActive && t.scrollIntoView) {
+        t.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+      }
+    });
     updateNav(name);
   }
 
