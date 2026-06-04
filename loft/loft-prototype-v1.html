@@ -32,13 +32,14 @@
     --shadow-lg: 0 12px 40px rgba(20,20,20,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: #EFE9DD; color: var(--loft-ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  html, body { background: #EFE9DD; color: var(--loft-ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; }
 
   /* ─────────── Stage / page chrome ─────────── */
   .stage {
     min-height: 100vh;
     display: grid;
     grid-template-rows: auto auto 1fr auto auto;
+    grid-template-columns: minmax(0, 1fr);
     gap: 18px;
     padding: 28px 24px 32px;
     max-width: 1100px;
@@ -535,11 +536,18 @@
   }
   .service-tile.selected .check svg { opacity: 1; }
 
+  /* CTA dock — pinned to bottom of screen so it never floats mid-viewport.
+     Lives at .screen level (absolute) so it isn't trapped by .body's scroll. */
   .cta-dock {
-    position: sticky; bottom: 0;
-    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 28%, #FFFFFF 100%);
-    padding: 14px 0 8px; margin-top: 4px;
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: #FFFFFF;
+    padding: 14px 18px 16px;
+    border-top: 1px solid var(--loft-line);
+    box-shadow: 0 -22px 24px -8px rgba(255,255,255,0.98), 0 -36px 36px -16px rgba(255,255,255,0.85);
+    z-index: 30;
   }
+  /* Screens that include a .cta-dock need their scroll body to clear the dock height */
+  .screen.has-cta-dock .body { padding-bottom: 150px; }
   .selected-count {
     font-size: 11.5px; color: var(--loft-muted);
     margin-bottom: 8px; text-align: center; font-weight: 600;
@@ -650,37 +658,54 @@
     }
   }
   .reveal-banner {
-    position: absolute; bottom: 92px; left: 50%; transform: translateX(-50%);
+    /* Top-anchored toast — below the status bar, never collides with scrolled content cards */
+    position: absolute; top: 56px; left: 50%; transform: translate(-50%, -6px);
     background: var(--loft-purple-dark); color: #FFF;
     padding: 8px 14px; border-radius: 999px;
     font-size: 12px; font-weight: 600;
-    box-shadow: 0 8px 24px rgba(109,40,217,0.4);
-    opacity: 0; transition: opacity 0.25s;
+    box-shadow: 0 10px 28px rgba(109,40,217,0.35);
+    border: 1px solid rgba(199,184,240,0.32);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease;
     z-index: 100; pointer-events: none;
     white-space: nowrap;
+    max-width: calc(100% - 32px);
   }
-  .screen.reveal-hotspots .reveal-banner { opacity: 1; }
+  .screen.reveal-hotspots .reveal-banner { opacity: 1; transform: translate(-50%, 0); }
 
   /* ─────────── Thumbnail strip ─────────── */
+  .thumbs-wrap {
+    position: relative;
+    margin-top: 4px;
+  }
   .thumbs {
     display: flex; align-items: center; justify-content: center;
-    gap: 6px; flex-wrap: wrap; margin-top: 4px;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 6px 12px;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  .thumbs::-webkit-scrollbar { display: none; }
   .thumb {
     display: inline-flex; align-items: center; gap: 6px;
     background: #FFF;
     border: 1px solid var(--loft-line-strong);
     border-radius: 999px;
-    padding: 6px 12px;
+    padding: 6px 11px;
     font-size: 12px; font-weight: 500;
     color: var(--loft-muted);
     cursor: pointer; transition: all 0.15s;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .thumb:hover { border-color: var(--loft-purple); color: var(--loft-purple-dark); }
   .thumb .tnum {
     background: #F0EBE0; color: var(--loft-ink); font-weight: 700;
     width: 18px; height: 18px; border-radius: 50%;
     display: grid; place-items: center; font-size: 10px;
+    flex-shrink: 0;
   }
   .thumb.is-active {
     background: var(--loft-ink); border-color: var(--loft-ink); color: #FFF;
@@ -942,6 +967,284 @@
   .visa-svg.lg { width: 56px; height: 18px; }
   .visa-svg.sm { width: 32px; height: 12px; }
   .visa-svg text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-style: italic; font-weight: 900; }
+
+  /* ═══════════ Food Delivery flow (screens 15–20) ═══════════ */
+  .fd-topbar { display: flex; align-items: center; gap: 10px; padding: 8px 2px 14px; }
+  .fd-topbar .fd-back, .fd-topbar .fd-x {
+    width: 34px; height: 34px; border-radius: 50%; background: #FFF;
+    border: 1px solid var(--loft-line); display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  }
+  .fd-topbar .fd-title { flex: 1; min-width: 0; }
+  .fd-topbar .fd-title .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--loft-purple-dark); text-transform: uppercase; }
+  .fd-topbar .fd-title h2 { font-family: 'DM Serif Display', serif; font-size: 19px; line-height: 1.1; }
+  .fd-addr { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--loft-muted); background: #FFF; border: 1px solid var(--loft-line); padding: 6px 11px; border-radius: 999px; margin-bottom: 12px; }
+  .fd-addr svg { width: 12px; height: 12px; }
+
+  /* Shop Local Cash promo banner */
+  .fd-promo {
+    border-radius: 18px; padding: 18px; margin-bottom: 14px; color: var(--loft-ink);
+    background: linear-gradient(135deg, #EDE7FB 0%, #D9C9F7 55%, #C7B8F0 100%);
+    border: 1px solid #C9B9F2; position: relative; overflow: hidden;
+  }
+  .fd-promo .fd-promo-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; color: var(--loft-purple-dark); }
+  .fd-promo h3 { font-family: 'DM Serif Display', serif; font-size: 21px; line-height: 1.12; margin: 5px 0 6px; }
+  .fd-promo p { font-size: 11.5px; color: var(--loft-ink-2); line-height: 1.4; max-width: 86%; }
+  .fd-promo .fd-promo-chips { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .fd-promo .fd-promo-chips span { background: rgba(255,255,255,0.7); font-size: 10px; font-weight: 600; padding: 5px 9px; border-radius: 999px; }
+  .fd-promo .heart { font-size: 15px; }
+
+  /* Delivery / pickup toggle */
+  .fd-toggle { display: flex; background: #FFF; border: 1px solid var(--loft-line); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 12px; }
+  .fd-toggle .fd-seg { flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: var(--loft-muted); padding: 8px 6px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .fd-toggle .fd-seg svg { width: 14px; height: 14px; }
+  .fd-toggle .fd-seg.active { background: var(--loft-ink); color: #FFF; }
+
+  .fd-chips { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
+  .fd-chips::-webkit-scrollbar { display: none; }
+  .fd-chips .fd-chip { flex-shrink: 0; font-size: 12px; font-weight: 600; padding: 7px 13px; border-radius: 999px; background: #FFF; border: 1px solid var(--loft-line); color: var(--loft-ink-2); cursor: pointer; }
+  .fd-chips .fd-chip.active { background: var(--loft-lavender-soft); border-color: var(--loft-lavender-line); color: var(--loft-purple-dark); }
+
+  .fd-section-title { font-family: 'DM Serif Display', serif; font-size: 17px; margin: 4px 0 10px; }
+
+  /* Restaurant card */
+  .fd-rest-card { background: #FFF; border: 1px solid var(--loft-line); border-radius: 18px; overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow-sm); cursor: pointer; }
+  .fd-rest-card .fd-rest-img { height: 116px; position: relative; display: grid; place-items: center; font-size: 46px; }
+  .fd-rest-card .fd-rest-img.g1 { background: linear-gradient(135deg,#F8C8D8,#F5A24F); }
+  .fd-rest-card .fd-rest-img.g2 { background: linear-gradient(135deg,#C7B8F0,#8B5CF6); }
+  .fd-rest-card .fd-rest-img.g3 { background: linear-gradient(135deg,#FFE15D,#F5A24F); }
+  .fd-rest-card .fd-feat { position: absolute; top: 10px; left: 10px; background: var(--loft-purple-dark); color: #FFF; font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 4px 9px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; }
+  .fd-rest-card .fd-heart { position: absolute; top: 9px; right: 9px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.92); display: grid; place-items: center; }
+  .fd-rest-card .fd-rest-body { padding: 12px 14px 14px; }
+  .fd-rest-card .fd-rest-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .fd-rest-card .fd-rest-name { font-weight: 700; font-size: 14.5px; }
+  .fd-rest-card .fd-rest-rating { font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .fd-rest-card .fd-rest-rating .star { color: var(--loft-orange); }
+  .fd-rest-card .fd-rest-rating .ct { color: var(--loft-faint); font-weight: 500; }
+  .fd-rest-card .fd-rest-sub { font-size: 11.5px; color: var(--loft-muted); margin-top: 3px; }
+  .fd-rest-card .fd-tags { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
+  .fd-rest-card .fd-tags span { font-size: 10px; font-weight: 600; color: var(--loft-ink-2); background: var(--loft-cream); padding: 4px 8px; border-radius: 999px; }
+
+  /* Menu header */
+  .fd-menu-hero { height: 120px; border-radius: 18px; background: linear-gradient(135deg,#F8C8D8,#F5A24F); display: grid; place-items: center; font-size: 50px; margin-bottom: 12px; position: relative; }
+  .fd-menu-hero .fd-feat { position: absolute; top: 10px; left: 10px; background: var(--loft-purple-dark); color: #FFF; font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 4px 9px; border-radius: 999px; }
+  .fd-rest-head { margin-bottom: 14px; }
+  .fd-rest-head h2 { font-family: 'DM Serif Display', serif; font-size: 22px; }
+  .fd-rest-head .fd-rest-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: var(--loft-muted); margin-top: 5px; }
+  .fd-rest-head .fd-rest-meta .star { color: var(--loft-orange); font-weight: 700; }
+  .fd-rest-head .fd-rest-meta .dot { color: var(--loft-line-strong); }
+  .fd-localbadge { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700; color: var(--loft-purple-dark); background: var(--loft-lavender-soft); border: 1px solid var(--loft-lavender-line); padding: 5px 10px; border-radius: 999px; margin-top: 10px; }
+
+  .fd-menu-cat { font-family: 'DM Serif Display', serif; font-size: 16px; margin: 6px 0 10px; }
+  .fd-item { display: flex; gap: 12px; align-items: center; background: #FFF; border: 1px solid var(--loft-line); border-radius: 16px; padding: 11px; margin-bottom: 10px; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .fd-item .fd-item-thumb { width: 62px; height: 62px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center; font-size: 30px; background: var(--loft-cream); }
+  .fd-item .fd-item-info { flex: 1; min-width: 0; }
+  .fd-item .fd-item-name { font-weight: 700; font-size: 13.5px; }
+  .fd-item .fd-item-desc { font-size: 11px; color: var(--loft-muted); line-height: 1.35; margin: 3px 0 5px; }
+  .fd-item .fd-item-price { font-weight: 700; font-size: 13px; }
+  .fd-item .fd-add { width: 32px; height: 32px; border-radius: 50%; background: var(--loft-ink); color: #FFF; display: grid; place-items: center; flex-shrink: 0; align-self: center; }
+  .fd-item .fd-add svg { width: 15px; height: 15px; }
+
+  /* Item detail sheet */
+  .fd-item-hero { height: 168px; border-radius: 18px; background: linear-gradient(135deg,#F8C8D8,#F5A24F); display: grid; place-items: center; font-size: 72px; margin-bottom: 14px; }
+  .fd-item-title { font-family: 'DM Serif Display', serif; font-size: 24px; line-height: 1.1; }
+  .fd-item-fulldesc { font-size: 12.5px; color: var(--loft-muted); line-height: 1.45; margin: 7px 0 9px; }
+  .fd-item-base { font-size: 14px; font-weight: 700; color: var(--loft-purple-dark); }
+  .fd-field-lab { font-size: 12px; font-weight: 600; margin: 16px 0 7px; }
+  .fd-textarea { width: 100%; border: 1px solid var(--loft-line-strong); border-radius: 12px; padding: 11px; font-family: 'Inter'; font-size: 12.5px; color: var(--loft-ink); resize: none; background: #FFF; }
+  .fd-textarea::placeholder { color: var(--loft-faint); }
+  .fd-qty-row { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+  .fd-qty { display: inline-flex; align-items: center; gap: 16px; border: 1px solid var(--loft-line-strong); border-radius: 999px; padding: 7px 14px; }
+  .fd-qty button { width: 26px; height: 26px; border-radius: 50%; border: none; background: var(--loft-lavender-soft); color: var(--loft-purple-dark); font-size: 18px; font-weight: 700; cursor: pointer; display: grid; place-items: center; line-height: 1; }
+  .fd-qty .fd-qnum { font-weight: 700; font-size: 15px; min-width: 16px; text-align: center; }
+
+  /* Cart */
+  .fd-cart-from { font-size: 12px; color: var(--loft-muted); margin-bottom: 14px; }
+  .fd-cart-from strong { color: var(--loft-purple-dark); }
+  .fd-cart-line { display: flex; gap: 12px; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--loft-line); margin-bottom: 14px; }
+  .fd-cart-line .fd-cl-thumb { width: 50px; height: 50px; border-radius: 11px; background: var(--loft-cream); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+  .fd-cart-line .fd-cl-info { flex: 1; min-width: 0; }
+  .fd-cart-line .fd-cl-name { font-weight: 700; font-size: 13px; }
+  .fd-cart-line .fd-cl-each { font-size: 11px; color: var(--loft-muted); margin-top: 2px; }
+  .fd-cart-line .fd-cl-price { font-weight: 700; font-size: 13px; white-space: nowrap; }
+
+  .fd-summary { background: #FFF; border: 1px solid var(--loft-line); border-radius: 16px; padding: 15px; }
+  .fd-summary .fd-row { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--loft-ink-2); margin-bottom: 9px; }
+  .fd-summary .fd-row .free { color: var(--loft-success); font-weight: 700; }
+  .fd-summary .fd-row.fd-credit { color: var(--loft-purple-dark); font-weight: 700; align-items: center; }
+  .fd-summary .fd-row.fd-credit .lab { display: inline-flex; align-items: center; gap: 5px; }
+  .fd-summary .fd-divider { height: 1px; background: var(--loft-line); margin: 12px 0; }
+  .fd-summary .fd-row.fd-total { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--loft-ink); margin-bottom: 0; }
+
+  /* Shop Local Cash apply card */
+  .fd-slc-card { background: linear-gradient(135deg,#EDE7FB,#E2D8F8); border: 1px solid #DDD3F4; border-radius: 16px; padding: 14px 15px; margin: 14px 0; }
+  .fd-slc-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .fd-slc-top .fd-slc-lab { display: flex; align-items: center; gap: 7px; }
+  .fd-slc-top .fd-slc-lab .heart { font-size: 16px; }
+  .fd-slc-top .fd-slc-lab .t { font-weight: 700; font-size: 13px; }
+  .fd-slc-top .fd-slc-lab .s { font-size: 10.5px; color: var(--loft-muted); margin-top: 1px; }
+  .fd-switch { width: 44px; height: 26px; border-radius: 999px; background: var(--loft-purple); position: relative; flex-shrink: 0; cursor: pointer; transition: background .15s; }
+  .fd-switch::after { content: ''; position: absolute; top: 3px; left: 21px; width: 20px; height: 20px; border-radius: 50%; background: #FFF; transition: left .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .fd-switch.off { background: #CFC6E6; }
+  .fd-switch.off::after { left: 3px; }
+  .fd-slc-applied { font-size: 11px; color: var(--loft-purple-dark); font-weight: 600; margin-top: 9px; padding-top: 9px; border-top: 1px solid #DDD3F4; }
+
+  /* Checkout cards */
+  .fd-card { background: #FFF; border: 1px solid var(--loft-line); border-radius: 16px; padding: 15px; margin-bottom: 12px; }
+  .fd-card .fd-card-head { display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: 13px; margin-bottom: 11px; }
+  .fd-card .fd-card-head svg { width: 15px; height: 15px; }
+  .fd-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .fd-input { border: 1px solid var(--loft-line-strong); border-radius: 11px; padding: 10px 11px; font-size: 12px; color: var(--loft-ink); background: #FFF; }
+  .fd-input .fd-in-lab { font-size: 9.5px; font-weight: 600; color: var(--loft-faint); text-transform: uppercase; letter-spacing: .5px; }
+  .fd-input .fd-in-val { font-size: 12.5px; margin-top: 2px; }
+  .fd-input.full { grid-column: 1 / -1; }
+  .fd-time { display: flex; align-items: center; gap: 11px; border: 1.5px solid var(--loft-purple); background: var(--loft-lavender-soft); border-radius: 12px; padding: 12px; }
+  .fd-radio { width: 18px; height: 18px; border-radius: 50%; border: 5px solid var(--loft-purple); background: #FFF; flex-shrink: 0; }
+  .fd-time .fd-t-name { font-weight: 700; font-size: 13px; }
+  .fd-time .fd-t-sub { font-size: 11px; color: var(--loft-muted); }
+  .fd-tips { display: flex; gap: 7px; flex-wrap: wrap; }
+  .fd-tip { font-size: 12px; font-weight: 600; padding: 9px 13px; border-radius: 999px; border: 1px solid var(--loft-line-strong); background: #FFF; color: var(--loft-ink-2); cursor: pointer; }
+  .fd-tip.active { background: var(--loft-ink); color: #FFF; border-color: var(--loft-ink); }
+
+  /* Order tracking */
+  .fd-track-head { border-radius: 18px; padding: 18px; color: #FFF; background: linear-gradient(135deg,#2D2D2D,#1A1A1A); margin-bottom: 14px; }
+  .fd-track-head .fd-ord-id { font-size: 9.5px; letter-spacing: 1.5px; opacity: .65; text-transform: uppercase; }
+  .fd-track-head h2 { font-family: 'DM Serif Display', serif; font-size: 24px; margin: 4px 0 10px; }
+  .fd-track-head .fd-eta-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.14); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .fd-map { height: 130px; border-radius: 16px; margin-bottom: 14px; position: relative; overflow: hidden; background:
+      linear-gradient(135deg, #DDE7D8 0%, #E8EDE0 45%, #DCE6EC 100%); border: 1px solid var(--loft-line); }
+  .fd-map .road { position: absolute; background: rgba(255,255,255,0.7); }
+  .fd-map .r1 { top: 38%; left: 0; right: 0; height: 7px; transform: rotate(-4deg); }
+  .fd-map .r2 { top: 0; bottom: 0; left: 60%; width: 7px; }
+  .fd-map .r3 { top: 70%; left: 0; right: 0; height: 5px; transform: rotate(3deg); }
+  .fd-map .pin { position: absolute; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; border: 3px solid #FFF; box-shadow: var(--shadow-sm); }
+  .fd-map .pin.courier { top: 32%; left: 22%; background: var(--loft-orange); }
+  .fd-map .pin.home { top: 60%; left: 64%; background: var(--loft-purple); }
+  .fd-map .dash { position: absolute; top: 40%; left: 28%; width: 40%; border-top: 2.5px dashed #6B6B6B; transform: rotate(18deg); }
+
+  .fd-progress { background: #FFF; border: 1px solid var(--loft-line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  .fd-progress .fd-prog-title { font-family: 'DM Serif Display', serif; font-size: 16px; margin-bottom: 12px; }
+  .fd-step { display: flex; align-items: center; gap: 12px; padding: 7px 0; }
+  .fd-step .fd-dot { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--loft-line); color: var(--loft-faint); flex-shrink: 0; }
+  .fd-step .fd-dot svg { width: 15px; height: 15px; }
+  .fd-step.done .fd-dot { background: var(--loft-orange); color: #FFF; }
+  .fd-step.active .fd-dot { background: var(--loft-purple); color: #FFF; }
+  .fd-step .fd-step-lab { font-size: 13px; font-weight: 600; color: var(--loft-ink-2); }
+  .fd-step:not(.done):not(.active) .fd-step-lab { color: var(--loft-faint); font-weight: 500; }
+
+  .fd-courier { display: flex; align-items: center; gap: 11px; background: #FFF; border: 1px solid var(--loft-line); border-radius: 16px; padding: 13px; margin-bottom: 12px; }
+  .fd-courier .fd-c-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--loft-orange); color: #FFF; display: grid; place-items: center; font-weight: 700; }
+  .fd-courier .fd-c-name { font-weight: 700; font-size: 13px; }
+  .fd-courier .fd-c-sub { font-size: 11px; color: var(--loft-muted); }
+
+  .fd-earn-banner { display: flex; align-items: center; gap: 9px; background: var(--loft-lavender-soft); border: 1px solid var(--loft-lavender-line); border-radius: 14px; padding: 12px 14px; }
+  .fd-earn-banner .heart { font-size: 17px; }
+  .fd-earn-banner .fd-earn-text { font-size: 12px; color: var(--loft-ink-2); line-height: 1.4; }
+  .fd-earn-banner .fd-earn-text strong { color: var(--loft-purple-dark); }
+
+  /* Home food entry tile */
+  .fd-home-tile { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg,#FFF 0%,#FBF8FF 100%); border: 1px solid var(--loft-lavender-line); border-radius: 18px; padding: 14px; margin-bottom: 14px; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .fd-home-tile .fd-ht-icon { width: 44px; height: 44px; border-radius: 13px; background: linear-gradient(135deg,#F8C8D8,#F5A24F); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+  .fd-home-tile .fd-ht-name { font-weight: 700; font-size: 14px; }
+  .fd-home-tile .fd-ht-sub { font-size: 11.5px; color: var(--loft-muted); margin-top: 2px; }
+  .fd-home-tile .fd-ht-arrow { margin-left: auto; color: var(--loft-purple); }
+
+  /* Home quick-action row (Food / Cleaning / Gas) */
+  .fd-quick-head { font-size: 12px; font-weight: 700; color: var(--loft-ink-2); margin: 2px 2px 9px; }
+  .fd-quick3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; margin-bottom: 14px; }
+  .fd-qtile { background: #FFF; border: 1px solid var(--loft-line); border-radius: 16px; padding: 12px 7px 11px; text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .fd-qtile .ic { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 22px; margin: 0 auto 8px; }
+  .fd-qtile .ic.g-food { background: linear-gradient(135deg,#F8C8D8,#F5A24F); }
+  .fd-qtile .ic.g-clean { background: linear-gradient(135deg,#C7B8F0,#8B5CF6); }
+  .fd-qtile .ic.g-gas { background: linear-gradient(135deg,#FFE15D,#F5A24F); }
+  .fd-qtile .nm { font-size: 11.5px; font-weight: 700; line-height: 1.15; }
+  .fd-qtile .sb { font-size: 9.5px; color: var(--loft-purple-dark); font-weight: 600; margin-top: 3px; }
+
+  /* Gas screen */
+  .gas-feat { border-radius: 18px; padding: 16px; margin-bottom: 14px; border: 1px solid #DDD3F4; background: linear-gradient(135deg,#EDE7FB 0%,#E2D8F8 100%); }
+  .gas-feat .gf-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--loft-purple-dark); color: #FFF; font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 4px 9px; border-radius: 999px; }
+  .gas-feat .gf-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-top: 10px; }
+  .gas-feat .gf-name { font-weight: 700; font-size: 15px; }
+  .gas-feat .gf-addr { font-size: 11.5px; color: var(--loft-muted); margin-top: 2px; }
+  .gas-feat .gf-price { text-align: right; white-space: nowrap; }
+  .gas-feat .gf-price .now { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--loft-ink); }
+  .gas-feat .gf-price .was { font-size: 12px; color: var(--loft-faint); text-decoration: line-through; }
+  .gas-feat .gf-price .unit { font-size: 10px; color: var(--loft-muted); }
+  .gas-feat .gf-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--loft-purple-dark); background: #FFF; border: 1px solid #DDD3F4; padding: 7px 11px; border-radius: 999px; margin: 12px 0 4px; }
+  .gas-maps-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; padding: 13px 16px; border-radius: 14px; background: var(--loft-ink); color: #FFF; font-weight: 600; font-size: 13.5px; text-decoration: none; }
+  .gas-maps-btn:active { transform: scale(0.98); }
+  .gas-maps-btn svg { width: 16px; height: 16px; }
+
+  .gas-list-title { font-family: 'DM Serif Display', serif; font-size: 16px; margin: 6px 0 10px; }
+  .gas-row { display: flex; align-items: center; gap: 11px; background: #FFF; border: 1px solid var(--loft-line); border-radius: 16px; padding: 11px 12px; margin-bottom: 10px; box-shadow: var(--shadow-sm); text-decoration: none; color: inherit; }
+  .gas-row:active { transform: scale(0.995); }
+  .gas-row .gr-logo { width: 40px; height: 40px; border-radius: 11px; background: #1E40AF; color: #FFF; font-size: 18px; display: grid; place-items: center; flex-shrink: 0; }
+  .gas-row .gr-info { flex: 1; min-width: 0; }
+  .gas-row .gr-name { font-weight: 700; font-size: 13px; }
+  .gas-row .gr-addr { font-size: 11px; color: var(--loft-muted); margin-top: 1px; }
+  .gas-row .gr-back { font-size: 10.5px; font-weight: 700; color: var(--loft-purple-dark); margin-top: 4px; }
+  .gas-row .gr-right { text-align: right; white-space: nowrap; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .gas-row .gr-now { font-weight: 800; font-size: 14px; }
+  .gas-row .gr-was { font-size: 10.5px; color: var(--loft-faint); text-decoration: line-through; }
+  .gas-row .gr-nav { width: 30px; height: 30px; border-radius: 50%; background: var(--loft-lavender-soft); display: grid; place-items: center; color: var(--loft-purple-dark); }
+  .gas-row .gr-nav svg { width: 15px; height: 15px; }
+  .gas-foot { font-size: 10.5px; color: var(--loft-faint); text-align: center; line-height: 1.4; margin-top: 6px; padding: 0 8px; }
+
+  /* Gas highlight on card-linking */
+  .gas-link-feat { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg,#FFF7E0 0%,#FFE7C2 100%); border: 1px solid #F3D08A; border-radius: 16px; padding: 13px 14px; margin: 14px 0 4px; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .gas-link-feat .glf-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg,#FFE15D,#F5A24F); display: grid; place-items: center; font-size: 22px; flex-shrink: 0; }
+  .gas-link-feat .glf-title { font-weight: 700; font-size: 13px; }
+  .gas-link-feat .glf-sub { font-size: 11px; color: var(--loft-ink-2); margin-top: 2px; line-height: 1.35; }
+  .gas-link-feat .glf-sub strong { color: var(--loft-purple-dark); }
+  .gas-link-feat .glf-arrow { margin-left: auto; color: var(--loft-orange); }
+
+  /* Offer map (Food + Gas) */
+  .offer-map { position: relative; height: 220px; border-radius: 18px; overflow: hidden; border: 1px solid var(--loft-line); margin-bottom: 14px; background: linear-gradient(135deg,#E3EBDD 0%,#EAEFE2 45%,#DCE7EC 100%); }
+  .offer-map .om-road { position: absolute; background: rgba(255,255,255,0.8); }
+  .offer-map .om-r1 { top: 28%; left: -5%; right: -5%; height: 8px; transform: rotate(-5deg); }
+  .offer-map .om-r2 { top: 0; bottom: 0; left: 46%; width: 8px; transform: rotate(4deg); }
+  .offer-map .om-r3 { top: 66%; left: -5%; right: -5%; height: 6px; transform: rotate(3deg); }
+  .offer-map .om-green { position: absolute; border-radius: 48%; background: rgba(150,190,140,0.45); }
+  .om-pin { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 2; }
+  .om-chip { background: #FFF; border: 1.5px solid var(--loft-line-strong); border-radius: 999px; padding: 4px 9px; font-size: 10.5px; font-weight: 800; white-space: nowrap; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 5px; }
+  .om-chip .cb { color: var(--loft-purple-dark); font-weight: 800; }
+  .om-pin.best { z-index: 3; }
+  .om-pin.best .om-chip { background: var(--loft-purple); border-color: var(--loft-purple); color: #FFF; }
+  .om-pin.best .om-chip .cb { color: #FFE15D; }
+  .om-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--loft-ink); border: 2px solid #FFF; margin-top: -1px; box-shadow: var(--shadow-sm); }
+  .om-pin.best .om-dot { background: var(--loft-purple); }
+  .om-pop { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: 86%; background: #FFF; border-radius: 14px; box-shadow: var(--shadow-md); padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid var(--loft-line); z-index: 4; }
+  .om-pop .op-thumb { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; font-size: 21px; flex-shrink: 0; }
+  .om-pop .op-thumb.food { background: linear-gradient(135deg,#F8C8D8,#F5A24F); }
+  .om-pop .op-thumb.gas { background: linear-gradient(135deg,#FFE15D,#F5A24F); }
+  .om-pop .op-name { font-weight: 700; font-size: 13px; }
+  .om-pop .op-sub { font-size: 11px; color: var(--loft-muted); margin-top: 1px; }
+  .om-pop .op-go { margin-left: auto; color: var(--loft-purple); display: grid; place-items: center; }
+
+  /* Gas offer detail */
+  .go-hero { border-radius: 18px; padding: 16px; margin-bottom: 14px; background: linear-gradient(135deg,#FFF7E0 0%,#FFE7C2 100%); border: 1px solid #F3D08A; }
+  .go-hero .gh-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .go-hero .gh-name { font-family: 'DM Serif Display', serif; font-size: 20px; }
+  .go-hero .gh-addr { font-size: 11.5px; color: var(--loft-muted); margin-top: 2px; }
+  .go-hero .gh-price .now { font-family: 'DM Serif Display', serif; font-size: 24px; text-align: right; }
+  .go-hero .gh-price .was { font-size: 12px; color: var(--loft-faint); text-decoration: line-through; }
+  .go-hero .gh-price .unit { font-size: 10px; color: var(--loft-muted); }
+  .go-back-big { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg,#EDE7FB,#E2D8F8); border: 1px solid #DDD3F4; border-radius: 16px; padding: 15px; margin-bottom: 14px; }
+  .go-back-big .gb-amt { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--loft-purple-dark); line-height: 1; flex-shrink: 0; }
+  .go-back-big .gb-lab { font-weight: 700; font-size: 13px; }
+  .go-back-big .gb-sub { font-size: 11.5px; color: var(--loft-ink-2); margin-top: 3px; line-height: 1.35; }
+  .go-visa-row { display: flex; align-items: center; gap: 10px; background: #FFF; border: 1px solid var(--loft-line); border-radius: 14px; padding: 12px; margin-bottom: 14px; }
+  .go-visa-row .gv-chip { width: 46px; height: 30px; border-radius: 6px; background: #1A1F71; display: grid; place-items: center; flex-shrink: 0; }
+  .go-visa-row .gv-name { font-weight: 700; font-size: 12.5px; }
+  .go-visa-row .gv-sub { font-size: 11px; color: var(--loft-muted); margin-top: 1px; }
+  .go-visa-row .gv-tag { margin-left: auto; font-size: 10px; font-weight: 700; color: var(--loft-success); background: #E7F7F0; border-radius: 999px; padding: 4px 9px; white-space: nowrap; }
+  .go-steps { background: #FFF; border: 1px solid var(--loft-line); border-radius: 16px; padding: 15px; margin-bottom: 14px; }
+  .go-steps .gs-title { font-weight: 700; font-size: 13px; margin-bottom: 11px; }
+  .go-step { display: flex; align-items: flex-start; gap: 11px; padding: 6px 0; }
+  .go-step .gs-num { width: 24px; height: 24px; border-radius: 50%; background: var(--loft-lavender-soft); color: var(--loft-purple-dark); font-weight: 800; font-size: 12px; display: grid; place-items: center; flex-shrink: 0; }
+  .go-step .gs-text { font-size: 12.5px; color: var(--loft-ink-2); line-height: 1.4; }
+  .go-step .gs-text strong { color: var(--loft-ink); }
+  .go-link-note { text-align: center; font-size: 12px; margin-top: 12px; }
+  .go-link-note a { color: var(--loft-purple-dark); font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--loft-purple-dark); }
 </style>
 </head>
 <body>
@@ -977,7 +1280,7 @@
     <div class="phone">
 
       <!-- ─────────── SCREEN 1: INTEREST SURVEY ─────────── -->
-      <div class="screen is-active" data-screen="survey" data-name="Interest Survey" data-step="1">
+      <div class="screen is-active has-cta-dock" data-screen="survey" data-name="Interest Survey" data-step="1">
         <div class="status-bar">
           <span>9:41</span>
           <span class="signal">
@@ -1063,12 +1366,11 @@
               <div class="st-meta">Classes, gyms,<br/>spa perks</div>
             </div>
           </div>
-
-          <div class="cta-dock">
-            <div class="selected-count" id="survey-count">Pick at least one to claim your <strong>$50 credit</strong></div>
-            <button class="btn btn-primary" id="survey-submit" data-goto="reward" disabled>Claim my $50 credit →</button>
-            <a class="skip" data-goto="home">Maybe later</a>
-          </div>
+        </div>
+        <div class="cta-dock">
+          <div class="selected-count" id="survey-count">Pick at least one to claim your <strong>$50 credit</strong></div>
+          <button class="btn btn-primary" id="survey-submit" data-goto="reward" disabled>Claim my $50 credit →</button>
+          <a class="skip" data-goto="home">Maybe later</a>
         </div>
       </div>
 
@@ -1143,6 +1445,24 @@
               <span class="tier-pill">💜 Shop Local Cash $0.00</span>
             </div>
           </div>
+          <div class="fd-quick-head">Shop &amp; earn Shop Local Cash 💜</div>
+          <div class="fd-quick3">
+            <div class="fd-qtile" data-goto="food">
+              <div class="ic g-food">🍔</div>
+              <div class="nm">Food</div>
+              <div class="sb">5% back</div>
+            </div>
+            <div class="fd-qtile" data-goto="wallet">
+              <div class="ic g-clean">🧽</div>
+              <div class="nm">Cleaning</div>
+              <div class="sb">Book a Pro</div>
+            </div>
+            <div class="fd-qtile" data-goto="gas">
+              <div class="ic g-gas">⛽</div>
+              <div class="nm">Save on Gas</div>
+              <div class="sb">25¢/gal back</div>
+            </div>
+          </div>
           <div class="balance-card">
             <div class="label">Balance Due</div>
             <div class="amount">$2,105<span style="font-size:22px;color:var(--loft-muted)">.00</span></div>
@@ -1170,7 +1490,7 @@
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
-        <div class="reveal-banner">Tap a highlighted area to continue ↓</div>
+        <div class="reveal-banner">Tap a highlighted area to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 2: PAYMENTS ─────────── -->
@@ -1220,7 +1540,7 @@
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
-        <div class="reveal-banner">Tap a highlighted area to continue ↓</div>
+        <div class="reveal-banner">Tap a highlighted area to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 3: MAKE A PAYMENT ─────────── -->
@@ -1259,7 +1579,7 @@
           <div style="margin-top:18px"><button class="btn btn-primary" data-goto="method">Continue to Payment Method →</button></div>
           <div style="margin-top:10px"><button class="btn btn-secondary" style="background:transparent;border:none;color:var(--loft-muted);font-weight:500" data-goto="payments">Cancel</button></div>
         </div>
-        <div class="reveal-banner">Tap a highlighted area to continue ↑</div>
+        <div class="reveal-banner">Tap a highlighted area to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 4: PAYMENT METHOD ─────────── -->
@@ -1312,6 +1632,7 @@
             </div>
             <ul>
               <li>Pay with <strong>Visa</strong> to earn <strong>1.0% Shop Local Cash</strong> back on rent</li>
+              <li>Save <strong>up to 25¢/gal</strong> in Shop Local Cash at the pump with your linked Visa ⛽</li>
               <li>Earn <strong>1 LOFT Point</strong> for every <strong>$0.25</strong> of rent paid</li>
             </ul>
             <div class="agree-row">
@@ -1322,7 +1643,7 @@
           </div>
           <div style="margin-top:6px"><button class="btn btn-primary" data-goto="summary">Next →</button></div>
         </div>
-        <div class="reveal-banner">Tap Visa or Bank Account to choose ↑</div>
+        <div class="reveal-banner">Tap Visa or Bank Account to choose</div>
       </div>
 
       <!-- ─────────── SCREEN 5: SUMMARY ─────────── -->
@@ -1358,7 +1679,7 @@
           </div>
           <div><button class="btn btn-primary" data-goto="approved">Submit Payment</button></div>
         </div>
-        <div class="reveal-banner">Tap Submit Payment to continue ↑</div>
+        <div class="reveal-banner">Tap Submit Payment to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 6: APPROVED ─────────── -->
@@ -1407,7 +1728,7 @@
             </div>
           </div>
         </div>
-        <div class="reveal-banner">Tap Done to restart ↑</div>
+        <div class="reveal-banner">Tap Done to restart</div>
       </div>
 
       <!-- ─────────── SCREEN 7: ACH / PLATINUM UPSELL ─────────── -->
@@ -1467,7 +1788,7 @@
           <div style="margin-top:6px"><button class="btn btn-primary" data-goto="summary">Continue with ACH</button></div>
           <div style="text-align:center;margin-top:10px"><a href="javascript:void(0)" data-goto="method" style="font-size:12px;color:var(--loft-muted);text-decoration:none">Maybe later</a></div>
         </div>
-        <div class="reveal-banner">Tap Start LOFT Platinum to subscribe ↑</div>
+        <div class="reveal-banner">Tap Start LOFT Platinum to subscribe</div>
       </div>
 
       <!-- ─────────── SCREEN 8: LOFT WALLET / MARKETPLACE ─────────── -->
@@ -1581,7 +1902,7 @@
           <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
-        <div class="reveal-banner">Tap "Link a card" to continue ↑</div>
+        <div class="reveal-banner">Tap "Link a card" to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 9: WHY LINK CARD ─────────── -->
@@ -1602,7 +1923,16 @@
           </div>
 
           <div class="why-headline">Earn <span class="hl">Shop Local Cash</span> everywhere you spend.</div>
-          <p class="why-sub">Use your linked Visa card at thousands of brands and we'll auto-credit your wallet. <strong>Exclusive Visa partnership</strong>.</p>
+          <p class="why-sub">Use your linked Visa card at thousands of brands — plus <strong>up to 25¢/gal back at the pump</strong> — and we'll auto-credit your wallet. <strong>Exclusive Visa partnership</strong>.</p>
+
+          <div class="gas-link-feat" data-goto="gas">
+            <div class="glf-icon">⛽</div>
+            <div class="glf-text">
+              <div class="glf-title">Save on Gas with your linked Visa</div>
+              <div class="glf-sub">Up to <strong>25¢/gal back</strong> in Shop Local Cash at stations near you</div>
+            </div>
+            <div class="glf-arrow"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+          </div>
 
           <div class="why-card-hero">
             <div class="loft-visa-card">
@@ -1689,7 +2019,7 @@
           <div style="margin-top:14px"><button class="btn btn-primary" data-goto="link">Link a card to start earning →</button></div>
           <div style="text-align:center;margin-top:10px"><a href="javascript:void(0)" data-goto="wallet" style="font-size:12px;color:var(--loft-muted);text-decoration:none">Maybe later</a></div>
         </div>
-        <div class="reveal-banner">Tap "Link a card" to continue ↑</div>
+        <div class="reveal-banner">Tap "Link a card" to continue</div>
       </div>
 
       <!-- ─────────── SCREEN 10: LINK YOUR CARD ─────────── -->
@@ -1741,7 +2071,7 @@
           <div style="margin-top:18px"><button class="btn btn-primary" data-goto="set">Link Card</button></div>
           <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--loft-muted)">By linking your card you agree to the <a href="javascript:void(0)" style="color:var(--loft-purple-dark);font-weight:600;text-decoration:none;border-bottom:1px solid var(--loft-purple-dark)">Shop Local Cash Terms</a>.</div>
         </div>
-        <div class="reveal-banner">Tap "Link Card" to confirm ↑</div>
+        <div class="reveal-banner">Tap "Link Card" to confirm</div>
       </div>
 
       <!-- ─────────── SCREEN 11: YOU'RE ALL SET ─────────── -->
@@ -1805,7 +2135,7 @@
 
           <div style="margin-top:18px"><button class="btn btn-purple" data-goto="maddie">Done</button></div>
         </div>
-        <div class="reveal-banner">Tap "Done" to meet Maddie ↑</div>
+        <div class="reveal-banner">Tap "Done" to meet Maddie</div>
       </div>
 
       <!-- ─────────── SCREEN 12: ORDER WITH MADDIE ─────────── -->
@@ -1872,25 +2202,625 @@
           <div class="tab" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
           <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
-        <div class="reveal-banner">Tap → to head back to your wallet ↑</div>
+        <div class="reveal-banner">Tap → to head back to your wallet</div>
+      </div>
+
+      <!-- ─────────── SCREEN 15: FOOD & GROCERY (BROWSE) ─────────── -->
+      <div class="screen" data-screen="food" data-name="Food & Grocery" data-step="15">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="home"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><div class="eyebrow">LOFT · Powered by Amenify</div><h2>Food &amp; Grocery</h2></div>
+          </div>
+          <div class="fd-addr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            3155 Broderick St · Villa Verano
+          </div>
+
+          <div class="fd-promo">
+            <div class="fd-promo-eyebrow"><span class="heart">💜</span> Shop Local Cash</div>
+            <h3>Earn 5% back on<br/>every order.</h3>
+            <p>Order from local spots and we'll drop Shop Local Cash into your LOFT wallet — spend it on anything.</p>
+            <div class="fd-promo-chips"><span>Free resident delivery</span><span>Wallet works everywhere</span></div>
+          </div>
+
+          <div class="fd-toggle">
+            <div class="fd-seg active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="15" height="11" rx="2"/><path d="M16 9h4l3 3v5h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg> Delivery</div>
+            <div class="fd-seg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 0l3-3m-3 3L9 5"/><path d="M5 11h14l-1.5 9h-11z"/></svg> Pickup</div>
+            <div class="fd-seg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg> List</div>
+            <div class="fd-seg active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg> Map</div>
+          </div>
+
+          <div class="offer-map">
+            <span class="om-green" style="top:-20%;left:-12%;width:130px;height:150px"></span>
+            <span class="om-green" style="bottom:-18%;right:-10%;width:120px;height:120px"></span>
+            <span class="om-road om-r1"></span><span class="om-road om-r2"></span><span class="om-road om-r3"></span>
+            <div class="om-pin best" style="top:40%;left:32%" data-goto="menu"><div class="om-chip">🍔 Balboa Cafe</div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:24%;left:64%"><div class="om-chip">🍜</div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:60%;left:58%"><div class="om-chip">🍕</div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:54%;left:18%"><div class="om-chip">🥗</div><div class="om-dot"></div></div>
+            <div class="om-pop" data-goto="menu">
+              <div class="op-thumb food">🍔</div>
+              <div><div class="op-name">Balboa Cafe</div><div class="op-sub">American (new) · ★ 4.8 · 0.4 mi · Free delivery</div></div>
+              <div class="op-go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="fd-chips">
+            <div class="fd-chip active">All</div>
+            <div class="fd-chip">American</div>
+            <div class="fd-chip">Italian</div>
+            <div class="fd-chip">Japanese</div>
+            <div class="fd-chip">Pizza</div>
+            <div class="fd-chip">Grocery</div>
+          </div>
+
+          <div class="fd-section-title">Popular near you</div>
+
+          <div class="fd-rest-card" data-goto="menu">
+            <div class="fd-rest-img g1">🍔
+              <span class="fd-feat">💜 SHOP LOCAL</span>
+              <div class="fd-heart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z"/></svg></div>
+            </div>
+            <div class="fd-rest-body">
+              <div class="fd-rest-row">
+                <div class="fd-rest-name">Balboa Cafe</div>
+                <div class="fd-rest-rating"><span class="star">★</span> 4.8 <span class="ct">(1,240)</span></div>
+              </div>
+              <div class="fd-rest-sub">American (new) · 0.4 mi · 25–40 min</div>
+              <div class="fd-tags"><span>Free delivery</span><span>5% Shop Local Cash</span></div>
+            </div>
+          </div>
+
+          <div class="fd-rest-card" data-goto="menu">
+            <div class="fd-rest-img g2">🍜
+              <div class="fd-heart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z"/></svg></div>
+            </div>
+            <div class="fd-rest-body">
+              <div class="fd-rest-row">
+                <div class="fd-rest-name">Nopa Noodle House</div>
+                <div class="fd-rest-rating"><span class="star">★</span> 4.7 <span class="ct">(860)</span></div>
+              </div>
+              <div class="fd-rest-sub">Japanese · 0.6 mi · 30–45 min</div>
+              <div class="fd-tags"><span>Free delivery</span><span>5% Shop Local Cash</span></div>
+            </div>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>Order</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap a restaurant to view the menu</div>
+      </div>
+
+      <!-- ─────────── SCREEN 16: RESTAURANT MENU ─────────── -->
+      <div class="screen has-cta-dock" data-screen="menu" data-name="Balboa Cafe Menu" data-step="16">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="food"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2>Balboa Cafe</h2></div>
+          </div>
+          <div class="fd-menu-hero">🍔<span class="fd-feat">💜 SHOP LOCAL</span></div>
+          <div class="fd-rest-head">
+            <div class="fd-rest-meta"><span class="star">★ 4.8</span><span class="dot">·</span><span>American (new)</span><span class="dot">·</span><span>Free delivery</span><span class="dot">·</span><span>25–40 min</span></div>
+            <div class="fd-localbadge"><span>💜</span> Earn 5% Shop Local Cash on this order</div>
+          </div>
+
+          <div class="fd-chips">
+            <div class="fd-chip active">Lunch — Entrees</div>
+            <div class="fd-chip">Soups &amp; Salads</div>
+            <div class="fd-chip">To Share</div>
+            <div class="fd-chip">Sides</div>
+          </div>
+
+          <div class="fd-menu-cat">Lunch — Entrees</div>
+
+          <div class="fd-item" data-goto="item">
+            <div class="fd-item-thumb">🍔</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Balboa Burger on a Baguette</div>
+              <div class="fd-item-desc">Butter lettuce, housemade pickles and onions, shoestring fries</div>
+              <div class="fd-item-price">$16.50</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item" data-goto="item">
+            <div class="fd-item-thumb">🍝</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Daily Pasta</div>
+              <div class="fd-item-desc">Daily seasonal pasta selection</div>
+              <div class="fd-item-price">$23.50</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item" data-goto="item">
+            <div class="fd-item-thumb">🐟</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Pan Seared Salmon</div>
+              <div class="fd-item-desc">Coconut rice, fennel and orange salad, red pepper coulis</div>
+              <div class="fd-item-price">$19.50</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item" data-goto="item">
+            <div class="fd-item-thumb">🍗</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Roasted Chicken Breast</div>
+              <div class="fd-item-desc">Soft polenta, confit tomatoes, stewed peppers and onions</div>
+              <div class="fd-item-price">$22.50</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn btn-primary" data-goto="item">View item →</button>
+        </div>
+        <div class="reveal-banner">Tap an item to customize it</div>
+      </div>
+
+      <!-- ─────────── SCREEN 17: ITEM DETAIL ─────────── -->
+      <div class="screen has-cta-dock" data-screen="item" data-name="Balboa Burger" data-step="17">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-x" data-goto="menu"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+            <div class="fd-title"></div>
+          </div>
+          <div class="fd-item-hero">🍔</div>
+          <div class="fd-item-title">Balboa Burger on a Baguette</div>
+          <div class="fd-item-fulldesc">Butter lettuce, housemade pickles and onions, shoestring fries.</div>
+          <div class="fd-item-base">$16.50 base price</div>
+
+          <div class="fd-field-lab">Special instructions</div>
+          <textarea class="fd-textarea" rows="3" placeholder="e.g. no onions, extra crispy…" disabled></textarea>
+
+          <div class="fd-qty-row">
+            <div class="fd-qty">
+              <button type="button">−</button>
+              <span class="fd-qnum">1</span>
+              <button type="button">+</button>
+            </div>
+            <div style="font-size:11.5px;color:var(--loft-muted)">💜 Earns 5% Shop Local Cash</div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn btn-purple" data-goto="cart">Add to cart · $16.50</button>
+        </div>
+        <div class="reveal-banner">Tap “Add to cart” to continue</div>
+      </div>
+
+      <!-- ─────────── SCREEN 18: CART ─────────── -->
+      <div class="screen has-cta-dock" data-screen="cart" data-name="Your Cart" data-step="18">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2>Your cart</h2></div>
+          </div>
+          <div class="fd-cart-from">From <strong>Balboa Cafe</strong> · Delivery</div>
+
+          <div class="fd-cart-line">
+            <div class="fd-cl-thumb">🍔</div>
+            <div class="fd-cl-info">
+              <div class="fd-cl-name">Balboa Burger on a Baguette</div>
+              <div class="fd-cl-each">Qty 1 · $16.50 each</div>
+            </div>
+            <div class="fd-cl-price">$16.50</div>
+          </div>
+
+          <div class="fd-slc-card">
+            <div class="fd-slc-top">
+              <div class="fd-slc-lab">
+                <span class="heart">💜</span>
+                <div><div class="t">Apply Shop Local Cash</div><div class="s">$50.00 in your LOFT wallet</div></div>
+              </div>
+              <div class="fd-switch" id="cart-slc-switch"></div>
+            </div>
+            <div class="fd-slc-applied">−$10.00 applied to this order · $40.00 remaining</div>
+          </div>
+
+          <div class="fd-summary">
+            <div class="fd-row"><span>Subtotal</span><span>$16.50</span></div>
+            <div class="fd-row"><span>Delivery</span><span class="free">Free</span></div>
+            <div class="fd-row"><span>Service fee</span><span>$0.83</span></div>
+            <div class="fd-row"><span>Estimated tax</span><span>$1.44</span></div>
+            <div class="fd-row fd-credit"><span class="lab"><span class="heart">💜</span> Shop Local Cash credit</span><span>−$10.00</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row fd-total"><span>Total</span><span>$8.77</span></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn btn-primary" data-goto="checkout">Go to checkout · $8.77</button>
+        </div>
+        <div class="reveal-banner">Shop Local Cash already knocked $10 off — tap to check out</div>
+      </div>
+
+      <!-- ─────────── SCREEN 19: CHECKOUT ─────────── -->
+      <div class="screen has-cta-dock" data-screen="checkout" data-name="Checkout ★" data-step="19">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="cart"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2>Checkout</h2></div>
+          </div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg> Deliver to</div>
+            <div class="fd-input-grid">
+              <div class="fd-input full"><div class="fd-in-lab">Street address</div><div class="fd-in-val">3155 Broderick Street</div></div>
+              <div class="fd-input"><div class="fd-in-lab">Apt / Suite</div><div class="fd-in-val">01-36</div></div>
+              <div class="fd-input"><div class="fd-in-lab">City</div><div class="fd-in-val">San Francisco</div></div>
+            </div>
+          </div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Delivery time</div>
+            <div class="fd-time">
+              <div class="fd-radio"></div>
+              <div><div class="fd-t-name">ASAP</div><div class="fd-t-sub">Sent to courier on order · 25–40 min</div></div>
+            </div>
+          </div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> Courier tip</div>
+            <div class="fd-tips" id="fd-tips">
+              <div class="fd-tip active" data-tip="1.65">10% · $1.65</div>
+              <div class="fd-tip" data-tip="2.48">15% · $2.48</div>
+              <div class="fd-tip" data-tip="2.97">18% · $2.97</div>
+              <div class="fd-tip" data-tip="0">No tip</div>
+            </div>
+          </div>
+
+          <div class="fd-slc-card">
+            <div class="fd-slc-top">
+              <div class="fd-slc-lab">
+                <span class="heart">💜</span>
+                <div><div class="t">Shop Local Cash</div><div class="s">$50.00 available in LOFT wallet</div></div>
+              </div>
+              <div class="fd-switch" id="checkout-slc-switch"></div>
+            </div>
+            <div class="fd-slc-applied" id="checkout-slc-applied">−$10.00 applied · saves you $10 on this order</div>
+          </div>
+
+          <div class="fd-summary">
+            <div class="fd-row"><span>Subtotal</span><span>$16.50</span></div>
+            <div class="fd-row"><span>Delivery</span><span class="free">Free</span></div>
+            <div class="fd-row"><span>Service fee</span><span>$0.83</span></div>
+            <div class="fd-row"><span>Estimated tax</span><span>$1.44</span></div>
+            <div class="fd-row"><span>Courier tip</span><span id="fd-tip-line">$1.65</span></div>
+            <div class="fd-row fd-credit" id="fd-credit-row"><span class="lab"><span class="heart">💜</span> Shop Local Cash credit</span><span id="fd-credit-amt">−$10.00</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row fd-total"><span>Total</span><span id="fd-total-line">$10.42</span></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn btn-purple" data-goto="track"><span id="fd-place-line">Place order · $10.42</span></button>
+        </div>
+        <div class="reveal-banner">$10 Shop Local Cash is applied — tap to place the order</div>
+      </div>
+
+      <!-- ─────────── SCREEN 20: ORDER TRACKING ─────────── -->
+      <div class="screen" data-screen="track" data-name="Order Confirmed" data-step="20">
+        <div class="status-bar">
+          <span>9:42</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-track-head">
+            <div class="fd-ord-id">Order ORD_LFT8QJWIL · Balboa Cafe</div>
+            <h2>Order confirmed</h2>
+            <span class="fd-eta-pill">⏱ 40 min remaining · 25–40 min ETA</span>
+          </div>
+
+          <div class="fd-map">
+            <span class="road r1"></span><span class="road r2"></span><span class="road r3"></span>
+            <span class="dash"></span>
+            <span class="pin courier">🛵</span>
+            <span class="pin home">🏠</span>
+          </div>
+
+          <div class="fd-courier">
+            <div class="fd-c-avatar">P</div>
+            <div>
+              <div class="fd-c-name">Priya M.</div>
+              <div class="fd-c-sub">Your courier · ★ 4.9</div>
+            </div>
+          </div>
+
+          <div class="fd-progress">
+            <div class="fd-prog-title">Progress</div>
+            <div class="fd-step done"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg></div><div class="fd-step-lab">Order confirmed</div></div>
+            <div class="fd-step active"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4M5 11v8h14v-8"/></svg></div><div class="fd-step-lab">Kitchen is cooking</div></div>
+            <div class="fd-step"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12l-1 7H7z"/><path d="M5 9h14v11H5z"/></svg></div><div class="fd-step-lab">Ready for pickup</div></div>
+            <div class="fd-step"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M6 18h8l3-7h4"/></svg></div><div class="fd-step-lab">Courier on the way</div></div>
+            <div class="fd-step"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></div><div class="fd-step-lab">Delivered</div></div>
+          </div>
+
+          <div class="fd-summary" style="margin-bottom:12px">
+            <div class="fd-row"><span>1 × Balboa Burger on a Baguette</span><span>$16.50</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row"><span>Subtotal</span><span>$16.50</span></div>
+            <div class="fd-row"><span>Delivery</span><span class="free">Free</span></div>
+            <div class="fd-row"><span>Service</span><span>$0.83</span></div>
+            <div class="fd-row"><span>Tax</span><span>$1.44</span></div>
+            <div class="fd-row"><span>Tip</span><span>$1.65</span></div>
+            <div class="fd-row fd-credit"><span class="lab"><span class="heart">💜</span> Shop Local Cash credit</span><span>−$10.00</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row fd-total"><span>Total</span><span>$10.42</span></div>
+          </div>
+
+          <div class="fd-earn-banner">
+            <span class="heart">💜</span>
+            <div class="fd-earn-text">You earned <strong>$0.83 in Shop Local Cash</strong> (5% back) — now in your LOFT wallet.</div>
+          </div>
+
+          <div class="btn-row" style="margin-top:14px">
+            <button class="btn btn-secondary" data-goto="menu">Reorder</button>
+            <button class="btn btn-primary" data-goto="home">Done</button>
+          </div>
+        </div>
+        <div class="reveal-banner">Tap → to return Home</div>
+      </div>
+
+      <!-- ─────────── SCREEN 21: SAVE ON GAS ─────────── -->
+      <div class="screen" data-screen="gas" data-name="Save on Gas" data-step="21">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="home"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><div class="eyebrow">LOFT · Powered by Amenify</div><h2>Save on Gas</h2></div>
+          </div>
+          <div class="fd-addr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Offers near 94123
+          </div>
+
+          <div class="offer-map">
+            <span class="om-green" style="top:-22%;left:-14%;width:140px;height:160px"></span>
+            <span class="om-green" style="bottom:-20%;right:-12%;width:130px;height:130px"></span>
+            <span class="om-road om-r1"></span><span class="om-road om-r2"></span><span class="om-road om-r3"></span>
+            <div class="om-pin best" style="top:38%;left:30%" data-goto="gasoffer"><div class="om-chip">$6.05 <span class="cb">25¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:23%;left:62%"><div class="om-chip">$6.01 <span class="cb">25¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:63%;left:55%"><div class="om-chip">$5.76 <span class="cb">24¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:57%;left:19%"><div class="om-chip">$6.10 <span class="cb">20¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:29%;left:80%"><div class="om-chip">$5.74 <span class="cb">6¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pop" data-goto="gasoffer">
+              <div class="op-thumb gas">⛽</div>
+              <div><div class="op-name">Chevron · Best value</div><div class="op-sub">2070 Redwood Hwy · 1.2 mi · 💜 25¢/gal back</div></div>
+              <div class="op-go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-list-title">Offers near you</div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Chevron</div>
+              <div class="gr-addr">2070 Redwood Hwy · 1.2 mi</div>
+              <div class="gr-back">💜 25¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$6.05</div>
+              <div class="gr-was">$6.30</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Gas station</div>
+              <div class="gr-addr">921 Del Presidio Blvd · 2.1 mi</div>
+              <div class="gr-back">💜 25¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$6.01</div>
+              <div class="gr-was">$6.26</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Chevron</div>
+              <div class="gr-addr">901 W Cutting Blvd · 2.6 mi</div>
+              <div class="gr-back">💜 24¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$5.76</div>
+              <div class="gr-was">$6.00</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Chevron</div>
+              <div class="gr-addr">301 Sir Francis Drake Blvd · 3.0 mi</div>
+              <div class="gr-back">💜 20¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$6.10</div>
+              <div class="gr-was">$6.30</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Chevron</div>
+              <div class="gr-addr">340 Miller Ave · 3.4 mi</div>
+              <div class="gr-back">💜 6¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$5.74</div>
+              <div class="gr-was">$5.80</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-foot">Pump prices update in real time. Pay with your linked Visa and cash back lands in your LOFT wallet as Shop Local Cash 💜.</div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>Order</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap a pin or offer to see the Visa cash-back deal</div>
+      </div>
+
+      <!-- ─────────── SCREEN 22: GAS OFFER DETAIL ─────────── -->
+      <div class="screen has-cta-dock" data-screen="gasoffer" data-name="Gas Offer ★" data-step="22">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="gas"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><div class="eyebrow">Shop Local Cash offer 💜</div><h2>Gas offer</h2></div>
+          </div>
+
+          <div class="go-hero">
+            <div class="gh-top">
+              <div>
+                <div class="gh-name">Chevron</div>
+                <div class="gh-addr">2070 Redwood Hwy · 1.2 mi · Open now</div>
+              </div>
+              <div class="gh-price">
+                <div class="now">$6.05</div>
+                <div><span class="was">$6.30</span> <span class="unit">/gal</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="go-back-big">
+            <div class="gb-amt">25¢</div>
+            <div>
+              <div class="gb-lab">/gal back in Shop Local Cash</div>
+              <div class="gb-sub">Automatically credited to your LOFT wallet when you pay with your <strong>linked Visa</strong>.</div>
+            </div>
+          </div>
+
+          <div class="go-visa-row">
+            <div class="gv-chip"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+            <div>
+              <div class="gv-name">Visa · ending in 1234</div>
+              <div class="gv-sub">Sarah Thompson</div>
+            </div>
+            <span class="gv-tag">✓ Linked</span>
+          </div>
+
+          <div class="go-steps">
+            <div class="gs-title">How you get 25¢/gal back</div>
+            <div class="go-step"><div class="gs-num">1</div><div class="gs-text">Tap <strong>Open in Google Maps</strong> and drive to the Chevron on Redwood Hwy.</div></div>
+            <div class="go-step"><div class="gs-num">2</div><div class="gs-text">Fill up and pay with your <strong>linked Visa ending 1234</strong> — no coupon to scan.</div></div>
+            <div class="go-step"><div class="gs-num">3</div><div class="gs-text"><strong>25¢/gal</strong> posts to your wallet as Shop Local Cash within 24 hours.</div></div>
+          </div>
+
+          <div class="go-link-note">Want to use a different card? <a href="javascript:void(0)" data-goto="why">Manage linked Visa →</a></div>
+        </div>
+        <div class="cta-dock">
+          <a class="gas-maps-btn" href="https://www.google.com/maps/dir/?api=1&destination=Chevron%2C+2070+Redwood+Hwy%2C+San+Rafael%2C+CA" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Open in Google Maps · get 25¢/gal back
+          </a>
+        </div>
+        <div class="reveal-banner">Tap "Open in Google Maps" to navigate &amp; earn</div>
       </div>
 
     </div>
   </div>
 
-  <div class="thumbs">
-    <div class="thumb is-active" data-goto="home"><span class="tnum">1</span>Home</div>
-    <div class="thumb" data-goto="payments"><span class="tnum">2</span>Payments</div>
-    <div class="thumb" data-goto="make"><span class="tnum">3</span>Make</div>
-    <div class="thumb" data-goto="method"><span class="tnum">4</span>Method ★</div>
-    <div class="thumb" data-goto="summary"><span class="tnum">5</span>Summary</div>
-    <div class="thumb" data-goto="approved"><span class="tnum">6</span>Approved</div>
-    <div class="thumb alt" data-goto="ach"><span class="tnum">7</span>ACH alt</div>
-    <div class="thumb" data-goto="wallet"><span class="tnum">8</span>LOFT Wallet</div>
-    <div class="thumb" data-goto="why"><span class="tnum">9</span>Why Link</div>
-    <div class="thumb" data-goto="link"><span class="tnum">10</span>Link Card</div>
-    <div class="thumb" data-goto="set"><span class="tnum">11</span>All Set</div>
-    <div class="thumb" data-goto="maddie"><span class="tnum">12</span>Maddie</div>
+  <div class="thumbs-wrap">
+    <div class="thumbs">
+      <div class="thumb is-active" data-goto="survey"><span class="tnum">1</span>Survey</div>
+      <div class="thumb" data-goto="reward"><span class="tnum">2</span>Credit Added</div>
+      <div class="thumb" data-goto="home"><span class="tnum">3</span>Home</div>
+      <div class="thumb" data-goto="payments"><span class="tnum">4</span>Payments</div>
+      <div class="thumb" data-goto="make"><span class="tnum">5</span>Make</div>
+      <div class="thumb" data-goto="method"><span class="tnum">6</span>Method ★</div>
+      <div class="thumb" data-goto="summary"><span class="tnum">7</span>Summary</div>
+      <div class="thumb" data-goto="approved"><span class="tnum">8</span>Approved</div>
+      <div class="thumb alt" data-goto="ach"><span class="tnum">9</span>ACH alt</div>
+      <div class="thumb" data-goto="wallet"><span class="tnum">10</span>LOFT Wallet</div>
+      <div class="thumb" data-goto="why"><span class="tnum">11</span>Why Link</div>
+      <div class="thumb" data-goto="link"><span class="tnum">12</span>Link Card</div>
+      <div class="thumb" data-goto="set"><span class="tnum">13</span>All Set</div>
+      <div class="thumb" data-goto="maddie"><span class="tnum">14</span>Maddie</div>
+      <div class="thumb" data-goto="food"><span class="tnum">15</span>Food</div>
+      <div class="thumb" data-goto="menu"><span class="tnum">16</span>Menu</div>
+      <div class="thumb" data-goto="item"><span class="tnum">17</span>Item</div>
+      <div class="thumb" data-goto="cart"><span class="tnum">18</span>Cart</div>
+      <div class="thumb" data-goto="checkout"><span class="tnum">19</span>Checkout ★</div>
+      <div class="thumb" data-goto="track"><span class="tnum">20</span>Tracking</div>
+      <div class="thumb" data-goto="gas"><span class="tnum">21</span>Gas Map</div>
+      <div class="thumb" data-goto="gasoffer"><span class="tnum">22</span>Gas Offer ★</div>
+    </div>
   </div>
 
   <p class="footer-hint">Tap a button on the phone to advance — or tap anywhere on the screen to <strong>highlight clickable areas</strong>. Use <kbd>←</kbd> / <kbd>→</kbd> arrow keys to navigate.</p>
@@ -1901,7 +2831,7 @@
 (function(){
   const screens = Array.from(document.querySelectorAll('.screen'));
   const thumbs = Array.from(document.querySelectorAll('.thumb'));
-  const order = ['survey','reward','home','payments','make','method','summary','approved','ach','wallet','why','link','set','maddie'];
+  const order = ['survey','reward','home','payments','make','method','summary','approved','ach','wallet','why','link','set','maddie','food','menu','item','cart','checkout','track','gas','gasoffer'];
   const curNumEl = document.getElementById('cur-num');
   const curNameEl = document.getElementById('cur-name');
   const prevBtn = document.getElementById('prev');
@@ -1925,7 +2855,13 @@
     const label = target.dataset.name;
     curNumEl.textContent = step;
     curNameEl.textContent = label;
-    thumbs.forEach(t => t.classList.toggle('is-active', t.dataset.goto === name));
+    thumbs.forEach(t => {
+      const isActive = t.dataset.goto === name;
+      t.classList.toggle('is-active', isActive);
+      if (isActive && t.scrollIntoView) {
+        t.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+      }
+    });
     updateNav(name);
   }
 
@@ -2051,6 +2987,51 @@
       // The data-goto="reward" on the button itself triggers the screen change.
     });
   }
+
+  // ── Food delivery: tip + Shop Local Cash credit recompute (checkout) ──
+  (function(){
+    const checkout = document.querySelector('.screen[data-screen="checkout"]');
+    if (!checkout) return;
+    const BASE = 18.77; // subtotal 16.50 + service 0.83 + tax 1.44
+    const tipEls = Array.from(checkout.querySelectorAll('.fd-tip'));
+    const tipLine = document.getElementById('fd-tip-line');
+    const totalLine = document.getElementById('fd-total-line');
+    const placeLine = document.getElementById('fd-place-line');
+    const creditAmt = document.getElementById('fd-credit-amt');
+    const creditRow = document.getElementById('fd-credit-row');
+    const slcSwitch = document.getElementById('checkout-slc-switch');
+    const slcApplied = document.getElementById('checkout-slc-applied');
+    let tip = 1.65, creditOn = true;
+    const fmt = n => '$' + n.toFixed(2);
+    function render(){
+      const credit = creditOn ? 10 : 0;
+      const total = BASE + tip - credit;
+      tipLine.textContent = fmt(tip);
+      creditAmt.textContent = '−$10.00';
+      creditRow.style.display = creditOn ? '' : 'none';
+      totalLine.textContent = fmt(total);
+      placeLine.textContent = 'Place order · ' + fmt(total);
+      slcSwitch.classList.toggle('off', !creditOn);
+      slcApplied.textContent = creditOn
+        ? '−$10.00 applied · saves you $10 on this order'
+        : 'Tap to apply $10 Shop Local Cash from your wallet';
+    }
+    tipEls.forEach(el => el.addEventListener('click', e => {
+      e.stopPropagation();
+      tipEls.forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      tip = parseFloat(el.dataset.tip) || 0;
+      render();
+    }));
+    if (slcSwitch) slcSwitch.addEventListener('click', e => { e.stopPropagation(); creditOn = !creditOn; render(); });
+    render();
+  })();
+
+  // ── Food delivery: cart Shop Local Cash toggle ──
+  (function(){
+    const sw = document.getElementById('cart-slc-switch');
+    if (sw) sw.addEventListener('click', e => e.stopPropagation()); // applied by default, non-destructive
+  })();
 
   updateNav('survey');
 })();
