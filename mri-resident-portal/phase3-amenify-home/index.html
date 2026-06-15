@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Amenify Home — Phase 3 Prototype</title>
+<meta name="description" content="Amenify Home — the operating system for your home. Insurance, warranty, utilities, services. Built for single-family homeowners and new home buyers." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Amenify Home — premium light + warm accent */
+    --am-bg: #F4FAF6;            /* warm parchment background */
+    --am-bg-deep: #ECF4EE;       /* slightly deeper page wash */
+    --am-card: #FFFFFF;
+    --am-ink: #1B2336;           /* deep navy */
+    --am-ink-2: #2E3852;
+    --am-muted: #6A7388;
+    --am-faint: #9CA3B4;
+    --am-line: #E6F0E9;
+    --am-line-2: #DDD3BD;
+
+    --am-accent: #C97B4F;        /* warm terracotta */
+    --am-accent-dark: #A35F35;
+    --am-accent-soft: #F5E5D6;
+    --am-accent-soft-2: #EFD8C2;
+
+    --am-sage: #7B9579;
+    --am-sage-soft: #E6EEDD;
+    --am-gold: #D4A24E;
+    --am-gold-soft: #F8ECCF;
+
+    --am-success: #5C8C6B;
+    --am-success-soft: #DEEEDF;
+
+    --shadow-sm: 0 1px 2px rgba(27,35,54,0.05), 0 1px 3px rgba(27,35,54,0.06);
+    --shadow-md: 0 4px 12px rgba(27,35,54,0.06), 0 8px 24px rgba(27,35,54,0.05);
+    --shadow-lg: 0 12px 40px rgba(27,35,54,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--am-bg); color: var(--am-ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+  .stage { min-height: 100vh; display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 18px; padding: 28px 24px 32px; max-width: 1100px; margin: 0 auto; }
+  .stage-head { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  .stage-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 28px; line-height: 1.2; letter-spacing: -0.6px; margin-bottom: 12px; }
+  .stage-title .hl { background: linear-gradient(180deg, transparent 60%, var(--am-gold-soft) 60%, var(--am-gold-soft) 92%, transparent 92%); padding: 0 6px; }
+  .stage-meta { font-size: 12.5px; color: var(--am-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .stage-meta .dot { color: var(--am-line-2); font-weight: 700; }
+  .stage-meta a { color: var(--am-accent-dark); text-decoration: none; font-weight: 600; border-bottom: 1.5px solid var(--am-accent-dark); }
+
+  .controls { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .ctrl-btn { background: #FFF; color: var(--am-ink); border: 1px solid var(--am-line-2); padding: 9px 14px; border-radius: 999px; font-family: 'Inter'; font-weight: 600; font-size: 13px; cursor: pointer; }
+  .ctrl-btn:hover { border-color: var(--am-accent); color: var(--am-accent-dark); }
+  .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .ctrl-btn.primary { background: var(--am-ink); color: #FFF; border-color: var(--am-ink); }
+  .step-indicator { font-family: 'Fraunces', serif; font-size: 18px; color: var(--am-ink); padding: 0 12px; min-width: 280px; text-align: center; font-weight: 400; }
+  .step-indicator .num { color: var(--am-accent-dark); font-style: italic; }
+
+  .phone-stage { display: grid; place-items: center; padding: 12px 0; }
+  .phone { width: 380px; height: 780px; background: #000; border-radius: 48px; padding: 11px; box-shadow: var(--shadow-lg); position: relative; }
+  .phone::before { content: ''; position: absolute; left: 50%; top: 22px; transform: translateX(-50%); width: 110px; height: 32px; background: #000; border-radius: 20px; z-index: 5; }
+  .screen { width: 100%; height: 100%; background: var(--am-bg); border-radius: 38px; overflow: hidden; position: relative; display: none; flex-direction: column; }
+  .screen.is-active { display: flex; }
+
+  .status-bar { height: 48px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 4px; font-size: 14px; font-weight: 600; color: var(--am-ink); flex-shrink: 0; position: relative; z-index: 6; }
+  .status-bar .signal { display: flex; gap: 4px; align-items: center; }
+  .body { flex: 1; overflow-y: auto; padding: 4px 20px 100px; -webkit-overflow-scrolling: touch; }
+  .body::-webkit-scrollbar { width: 0; }
+  .body.no-tab { padding-bottom: 28px; }
+
+  .tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 78px; background: rgba(250, 246, 240, 0.94); backdrop-filter: blur(14px); border-top: 1px solid var(--am-line); display: flex; align-items: flex-start; justify-content: space-around; padding-top: 10px; z-index: 4; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--am-faint); font-size: 10px; font-weight: 500; padding: 4px 8px; border-radius: 8px; cursor: pointer; }
+  .tab svg { width: 22px; height: 22px; }
+  .tab.active { color: var(--am-accent-dark); }
+
+  /* Amenify brand */
+  .am-logo { display: inline-flex; align-items: center; gap: 4px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 22px; color: var(--am-ink); letter-spacing: -0.5px; line-height: 1; }
+  .am-logo .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--am-accent); margin-left: 1px; }
+  .am-logo.sm { font-size: 17px; }
+
+  /* Topbar */
+  .topbar { display: flex; align-items: center; gap: 12px; padding: 10px 0 18px; }
+  .topbar .back { width: 36px; height: 36px; border-radius: 50%; background: #FFF; border: 1px solid var(--am-line); display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .topbar h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 22px; flex: 1; letter-spacing: -0.4px; }
+  .topbar .x { width: 36px; height: 36px; border-radius: 50%; background: transparent; display: grid; place-items: center; color: var(--am-muted); cursor: pointer; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 14px; font-family: 'Inter'; font-weight: 600; font-size: 14px; border: none; cursor: pointer; width: 100%; transition: transform .1s ease; letter-spacing: 0.1px; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--am-ink); color: #FFF; }
+  .btn-secondary { background: #FFF; color: var(--am-ink); border: 1px solid var(--am-line-2); }
+  .btn-accent { background: var(--am-accent); color: #FFF; }
+  .btn-ghost { background: transparent; color: var(--am-muted); }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+
+  .sec-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: 17px; margin: 10px 0 10px; letter-spacing: -0.2px; }
+
+  /* Welcome hero */
+  .welcome-hero { padding: 30px 0 16px; text-align: center; }
+  .welcome-hero .am-logo { margin-bottom: 18px; }
+  .welcome-hero h1 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 38px; line-height: 1.1; letter-spacing: -1px; color: var(--am-ink); margin-bottom: 10px; }
+  .welcome-hero h1 .accent { color: var(--am-accent-dark); font-style: italic; }
+  .welcome-hero p { font-size: 14px; color: var(--am-muted); line-height: 1.55; max-width: 280px; margin: 0 auto 24px; }
+  .welcome-illustration { width: 200px; height: 180px; margin: 20px auto 24px; position: relative; }
+  .welcome-illustration .house { position: absolute; inset: 0; }
+  .welcome-illustration .glow { position: absolute; inset: -20px; background: radial-gradient(circle, var(--am-accent-soft) 0%, transparent 60%); border-radius: 50%; }
+
+  .progress-strip { display: flex; gap: 6px; margin: 0 auto 28px; max-width: 240px; justify-content: center; }
+  .progress-strip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--am-line-2); }
+  .progress-strip .dot.active { background: var(--am-accent); }
+  .progress-strip .dot.complete { background: var(--am-success); }
+
+  /* Card */
+  .card { background: #FFF; border-radius: 18px; padding: 20px; margin-bottom: 14px; border: 1px solid var(--am-line); box-shadow: var(--shadow-sm); }
+  .card-warm { background: linear-gradient(160deg, #FFFFFF 0%, var(--am-accent-soft) 100%); border: 1px solid var(--am-accent-soft-2); border-radius: 20px; padding: 22px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+  .card-sage { background: linear-gradient(160deg, #FFFFFF 0%, var(--am-sage-soft) 100%); border: 1px solid #C8D5BC; border-radius: 20px; padding: 22px; margin-bottom: 14px; }
+
+  /* Onboarding step */
+  .onb-step-num { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: var(--am-accent-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+  .onb-step-num .num { width: 22px; height: 22px; border-radius: 50%; background: var(--am-accent-soft); color: var(--am-accent-dark); display: grid; place-items: center; font-size: 11px; font-weight: 800; letter-spacing: 0; }
+  .onb-h { font-family: 'Fraunces', serif; font-weight: 400; font-size: 28px; line-height: 1.15; letter-spacing: -0.6px; margin-bottom: 8px; }
+  .onb-h .accent { color: var(--am-accent-dark); font-style: italic; }
+  .onb-sub { font-size: 13.5px; color: var(--am-muted); line-height: 1.55; margin-bottom: 22px; }
+
+  /* Form */
+  .field-group { background: #FFF; border-radius: 14px; padding: 14px 16px; border: 1px solid var(--am-line); margin-bottom: 12px; }
+  .field-group .lab { font-size: 10.5px; color: var(--am-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 4px; }
+  .field-group .val { font-family: 'Inter'; font-size: 15px; color: var(--am-ink); font-weight: 500; }
+  .field-group .val.placeholder { color: var(--am-faint); font-weight: 400; }
+
+  /* Choice tiles */
+  .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .choice-tile { background: #FFF; border: 1.5px solid var(--am-line); border-radius: 14px; padding: 14px 12px; text-align: left; cursor: pointer; transition: all 0.15s; }
+  .choice-tile.selected { border-color: var(--am-accent); background: var(--am-accent-soft); }
+  .choice-tile .ct-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--am-accent-soft); display: grid; place-items: center; margin-bottom: 8px; font-size: 17px; }
+  .choice-tile.selected .ct-icon { background: #FFF; }
+  .choice-tile .ct-name { font-weight: 600; font-size: 13px; color: var(--am-ink); }
+  .choice-tile .ct-meta { font-size: 11px; color: var(--am-muted); margin-top: 2px; line-height: 1.3; }
+
+  /* Insurance hero */
+  .insurance-hero { background: linear-gradient(165deg, var(--am-ink) 0%, #2E3852 70%, var(--am-accent-dark) 130%); border-radius: 24px; padding: 26px 22px 28px; color: #FFF; position: relative; overflow: hidden; margin-bottom: 18px; box-shadow: 0 20px 40px rgba(27,35,54,0.18); }
+  .insurance-hero::after { content: ''; position: absolute; top: -50px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(201,123,79,0.4) 0%, transparent 65%); }
+  .insurance-hero .lab { font-size: 11px; font-weight: 700; color: var(--am-accent-soft); text-transform: uppercase; letter-spacing: 1.5px; position: relative; z-index: 2; }
+  .insurance-hero h3 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 30px; line-height: 1.1; letter-spacing: -0.7px; margin-top: 10px; color: #FFF; position: relative; z-index: 2; }
+  .insurance-hero h3 .accent { color: var(--am-accent-soft); font-style: italic; }
+  .insurance-hero p { font-size: 13px; color: rgba(255,255,255,0.78); margin-top: 12px; line-height: 1.5; position: relative; z-index: 2; max-width: 260px; }
+  .insurance-hero .timer { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: 999px; font-size: 11px; color: #FFF; font-weight: 600; margin-top: 16px; position: relative; z-index: 2; }
+
+  .product-card { background: #FFF; border: 1px solid var(--am-line); border-radius: 18px; padding: 18px; margin-bottom: 12px; cursor: pointer; transition: all 0.15s; position: relative; }
+  .product-card:hover { border-color: var(--am-accent); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .product-card.selected { border-color: var(--am-accent); background: linear-gradient(160deg, #FFF 0%, var(--am-accent-soft) 100%); }
+  .product-card .pc-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .product-card .pc-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--am-accent-soft); display: grid; place-items: center; flex-shrink: 0; }
+  .product-card .pc-ic svg { color: var(--am-accent-dark); }
+  .product-card .pc-name { font-family: 'Fraunces', serif; font-size: 18px; line-height: 1.1; font-weight: 400; letter-spacing: -0.3px; }
+  .product-card .pc-sub { font-size: 11.5px; color: var(--am-muted); margin-top: 2px; }
+  .product-card .pc-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+  .product-card .pc-price .amt { font-family: 'Fraunces', serif; font-weight: 400; font-size: 26px; letter-spacing: -0.5px; color: var(--am-ink); }
+  .product-card .pc-price .per { font-size: 11px; color: var(--am-muted); }
+  .product-card .pc-features { font-size: 12px; color: var(--am-ink-2); line-height: 1.5; }
+  .product-card .pc-features div { padding: 3px 0 3px 18px; position: relative; }
+  .product-card .pc-features div::before { content: ''; position: absolute; left: 0; top: 9px; width: 8px; height: 8px; border-left: 2px solid var(--am-accent-dark); border-bottom: 2px solid var(--am-accent-dark); transform: rotate(-45deg); }
+  .product-card .pc-pill { position: absolute; top: 14px; right: 14px; background: var(--am-gold-soft); color: #6B5418; padding: 4px 10px; border-radius: 999px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; }
+
+  /* Coverage slider */
+  .coverage-card { background: #FFF; border: 1px solid var(--am-line); border-radius: 18px; padding: 18px; margin-bottom: 12px; }
+  .coverage-card .cc-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .coverage-card .cc-name { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; }
+  .coverage-card .cc-amt { font-family: 'Fraunces', serif; font-size: 18px; color: var(--am-accent-dark); }
+  .coverage-card .cc-track { background: var(--am-line); border-radius: 999px; height: 6px; position: relative; }
+  .coverage-card .cc-fill { background: linear-gradient(90deg, var(--am-accent) 0%, var(--am-accent-dark) 100%); border-radius: 999px; height: 100%; }
+  .coverage-card .cc-fill.f60 { width: 60%; }
+  .coverage-card .cc-fill.f75 { width: 75%; }
+  .coverage-card .cc-fill.f40 { width: 40%; }
+  .coverage-card .cc-handle { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: #FFF; border: 2px solid var(--am-accent); border-radius: 50%; box-shadow: var(--shadow-sm); }
+  .coverage-card .cc-range { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--am-muted); margin-top: 6px; font-weight: 600; }
+
+  /* Quote summary */
+  .quote-summary { background: linear-gradient(160deg, var(--am-card) 0%, var(--am-accent-soft) 100%); border: 1px solid var(--am-accent-soft-2); border-radius: 22px; padding: 24px 22px; margin-bottom: 14px; text-align: center; box-shadow: var(--shadow-sm); }
+  .quote-summary .lab { font-size: 11px; color: var(--am-accent-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+  .quote-summary .amt { font-family: 'Fraunces', serif; font-weight: 400; font-size: 56px; line-height: 1; letter-spacing: -1.5px; color: var(--am-ink); margin: 10px 0 4px; }
+  .quote-summary .amt .small { font-size: 28px; color: var(--am-muted); }
+  .quote-summary .per { font-size: 13px; color: var(--am-muted); }
+  .quote-summary .note { font-size: 11px; color: var(--am-muted); margin-top: 12px; font-style: italic; }
+
+  .line-row { display: flex; justify-content: space-between; padding: 11px 0; font-size: 13px; border-bottom: 1px solid var(--am-line); }
+  .line-row:last-child { border-bottom: none; }
+  .line-row.total { font-weight: 700; font-size: 15px; border-top: 2px solid var(--am-ink); margin-top: 4px; border-bottom: none; padding-top: 12px; }
+  .line-row .lab { color: var(--am-muted); }
+  .line-row.total .lab { color: var(--am-ink); }
+
+  /* Confirmed */
+  .confirmed-hero { background: linear-gradient(160deg, var(--am-success) 0%, #3F6E50 100%); border-radius: 24px; padding: 32px 22px 28px; margin: 8px 0 18px; color: #FFF; text-align: center; }
+  .confirmed-hero .check { width: 68px; height: 68px; border-radius: 50%; background: rgba(255,255,255,0.18); margin: 0 auto 16px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,0.35); }
+  .confirmed-hero h3 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 26px; letter-spacing: -.5px; margin-bottom: 6px; color: #FFF; }
+  .confirmed-hero p { font-size: 13px; opacity: .9; line-height: 1.5; }
+
+  /* Smart recs */
+  .rec-card { display: flex; gap: 14px; padding: 14px; background: #FFF; border: 1px solid var(--am-line); border-radius: 16px; margin-bottom: 10px; cursor: pointer; box-shadow: var(--shadow-sm); align-items: center; }
+  .rec-card .rec-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--am-accent-soft); display: grid; place-items: center; flex-shrink: 0; font-size: 19px; }
+  .rec-card.sage .rec-ic { background: var(--am-sage-soft); }
+  .rec-card.gold .rec-ic { background: var(--am-gold-soft); }
+  .rec-card .rec-name { font-weight: 700; font-size: 13.5px; color: var(--am-ink); }
+  .rec-card .rec-sub { font-size: 11.5px; color: var(--am-muted); margin-top: 2px; line-height: 1.4; }
+  .rec-card .rec-pill { background: var(--am-accent-soft); color: var(--am-accent-dark); padding: 4px 10px; border-radius: 999px; font-size: 10.5px; font-weight: 700; flex-shrink: 0; }
+  .rec-card.sage .rec-pill { background: var(--am-sage-soft); color: #3F6E50; }
+
+  /* Utility list */
+  .utility-row { background: #FFF; border: 1px solid var(--am-line); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+  .utility-row .u-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--am-accent-soft); display: grid; place-items: center; flex-shrink: 0; font-size: 19px; }
+  .utility-row.sage .u-ic { background: var(--am-sage-soft); }
+  .utility-row .u-meta { flex: 1; }
+  .utility-row .u-name { font-weight: 700; font-size: 14px; color: var(--am-ink); }
+  .utility-row .u-sub { font-size: 11.5px; color: var(--am-muted); margin-top: 2px; }
+  .utility-row .u-status { font-size: 11px; padding: 4px 10px; border-radius: 999px; font-weight: 700; }
+  .utility-row .u-status.done { background: var(--am-success-soft); color: var(--am-success); }
+  .utility-row .u-status.pending { background: var(--am-gold-soft); color: #6B5418; }
+  .utility-row .u-status.action { background: var(--am-accent-soft); color: var(--am-accent-dark); }
+
+  /* Dashboard greeting */
+  .home-greeting { padding: 18px 0 8px; }
+  .home-greeting .am-logo { margin-bottom: 14px; }
+  .home-greeting h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 28px; line-height: 1.1; letter-spacing: -0.5px; }
+  .home-greeting h2 .accent { color: var(--am-accent-dark); font-style: italic; }
+  .home-greeting p { font-size: 13px; color: var(--am-muted); margin-top: 4px; }
+
+  .home-status-tile { background: linear-gradient(165deg, var(--am-ink) 0%, #2E3852 70%, var(--am-accent-dark) 140%); border-radius: 22px; padding: 22px 22px 22px; color: #FFF; position: relative; overflow: hidden; margin-bottom: 14px; box-shadow: var(--shadow-md); }
+  .home-status-tile::after { content: ''; position: absolute; top: -40px; right: -40px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(201,123,79,0.35) 0%, transparent 65%); }
+  .home-status-tile .lab { font-size: 11px; font-weight: 700; color: var(--am-accent-soft); text-transform: uppercase; letter-spacing: 1.5px; position: relative; z-index: 2; }
+  .home-status-tile h3 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 22px; line-height: 1.15; margin-top: 8px; color: #FFF; position: relative; z-index: 2; }
+  .home-status-tile .stat-row { display: flex; gap: 16px; margin-top: 14px; position: relative; z-index: 2; }
+  .home-status-tile .stat { flex: 1; }
+  .home-status-tile .stat .sl { font-size: 10px; color: rgba(255,255,255,0.62); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+  .home-status-tile .stat .sv { font-family: 'Fraunces', serif; font-size: 17px; color: #FFF; letter-spacing: -0.3px; }
+
+  .quick-grid-home { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .quick-tile-home { background: #FFF; border-radius: 14px; padding: 14px 8px 12px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--am-line); cursor: pointer; }
+  .quick-tile-home .qt-ic { width: 32px; height: 32px; border-radius: 10px; background: var(--am-accent-soft); margin: 0 auto 8px; display: grid; place-items: center; font-size: 15px; }
+  .quick-tile-home .qt-name { font-weight: 700; font-size: 11px; color: var(--am-ink); line-height: 1.2; }
+  .quick-tile-home .qt-sub { font-size: 9.5px; color: var(--am-muted); margin-top: 3px; line-height: 1.3; }
+
+  /* Concierge chat */
+  .chat-header { display: flex; align-items: center; gap: 12px; padding: 12px 0 14px; }
+  .chat-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--am-accent-soft) 0%, var(--am-accent) 100%); display: grid; place-items: center; flex-shrink: 0; color: #FFF; border: 2px solid #FFF; box-shadow: 0 4px 12px rgba(201,123,79,0.25); font-weight: 800; font-size: 16px; }
+  .chat-meta { flex: 1; }
+  .chat-name { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; line-height: 1.15; }
+  .chat-status { font-size: 11px; color: var(--am-success); display: inline-flex; align-items: center; gap: 5px; margin-top: 3px; font-weight: 600; }
+  .chat-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--am-success); }
+  .msg-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-end; }
+  .msg-row.user { justify-content: flex-end; }
+  .msg-bubble { max-width: 78%; padding: 11px 14px; border-radius: 18px; font-size: 13.5px; line-height: 1.4; }
+  .msg-bubble.ai { background: #FFF; color: var(--am-ink); border-bottom-left-radius: 4px; border: 1px solid var(--am-line); }
+  .msg-bubble.user { background: var(--am-ink); color: #FFF; border-bottom-right-radius: 4px; }
+  .msg-bubble .strong { font-weight: 700; }
+  .quick-replies { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .qr-chip { background: #FFF; border: 1.5px solid var(--am-accent); color: var(--am-accent-dark); padding: 8px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+  .qr-chip:hover { background: var(--am-accent-soft); }
+  .qr-chip.solid { background: var(--am-accent); color: #FFF; }
+
+  /* Banner */
+  .banner-cta { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(135deg, var(--am-accent-soft) 0%, var(--am-accent-soft-2) 100%); color: var(--am-ink); border-radius: 18px; padding: 16px; margin: 12px 0 8px; cursor: pointer; border: 1px solid var(--am-accent-soft-2); }
+  .banner-cta .bc-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15.5px; line-height: 1.2; }
+  .banner-cta .bc-sub { font-size: 11.5px; color: var(--am-muted); margin-top: 3px; }
+  .banner-cta .bc-arrow { width: 30px; height: 30px; border-radius: 50%; background: var(--am-accent); color: #FFF; display: grid; place-items: center; flex-shrink: 0; }
+
+  /* Hotspot reveal */
+  [data-goto] { position: relative; cursor: pointer; }
+  .screen.reveal-hotspots [data-goto] { animation: hotspot-flash 1.4s ease-out 2; z-index: 50; }
+  @keyframes hotspot-flash {
+    0%, 100% { outline: 0 solid rgba(201,123,79,0); outline-offset: 0; }
+    40% { outline: 4px solid rgba(201,123,79,0.85); outline-offset: 4px; }
+    70% { outline: 4px solid rgba(201,123,79,0.5); outline-offset: 4px; }
+  }
+  .reveal-banner { position: absolute; bottom: 92px; left: 50%; transform: translateX(-50%); background: var(--am-ink); color: #FFF; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; box-shadow: 0 8px 24px rgba(27,35,54,0.3); opacity: 0; transition: opacity 0.25s; z-index: 100; pointer-events: none; white-space: nowrap; }
+  .screen.reveal-hotspots .reveal-banner { opacity: 1; }
+
+  /* Thumbs */
+  .thumbs { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .thumb { display: inline-flex; align-items: center; gap: 6px; background: #FFF; border: 1px solid var(--am-line-2); border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 500; color: var(--am-muted); cursor: pointer; }
+  .thumb:hover { border-color: var(--am-accent); color: var(--am-accent-dark); }
+  .thumb .tnum { background: var(--am-bg-deep); color: var(--am-ink); font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; }
+  .thumb.is-active { background: var(--am-ink); border-color: var(--am-ink); color: #FFF; }
+  .thumb.is-active .tnum { background: var(--am-accent); color: #FFF; }
+  .footer-hint { text-align: center; font-size: 12px; color: var(--am-muted); margin-top: 4px; line-height: 1.5; }
+  .footer-hint kbd { background: #FFF; border: 1px solid var(--am-line-2); border-radius: 4px; padding: 1px 6px; font-size: 11px; font-family: 'Inter'; }
+
+  /* Subtle separator */
+  .sep { height: 1px; background: var(--am-line); margin: 12px 0; }
+
+  /* Info chip */
+  .info-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: var(--am-sage-soft); color: #3F6E50; font-size: 11px; font-weight: 600; }
+
+  /* Welcome house SVG glow */
+  .welcome-illustration .glow { z-index: 0; }
+  .welcome-illustration svg { position: relative; z-index: 1; }
+
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="stage-head">
+    <div>
+      <div class="stage-title">Phase 3 · <span class="hl">Amenify Home</span> Prototype</div>
+      <div class="stage-meta">
+        <span>Standalone Amenify · not Resident Portal-branded</span> <span class="dot">·</span>
+        <span>Persona: Sarah Hines · new SFH homeowner · HOA · dog</span> <span class="dot">·</span>
+        <span>Centerpiece: Insurance + Home Warranty</span> <span class="dot">·</span>
+        <a href="../mockups/index.html">← Back to Resident Portal prototype index</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="prev-btn">← Prev</button>
+    <div class="step-indicator">Screen <span class="num" id="cur-num">1</span> · <span id="cur-name">Welcome</span></div>
+    <button class="ctrl-btn primary" id="next-btn">Next →</button>
+    <button class="ctrl-btn" id="restart-btn">⟲ Restart</button>
+  </div>
+
+  <div class="phone-stage">
+    <div class="phone">
+
+      <!-- ─────────── SCREEN 1: WELCOME ─────────── -->
+      <div class="screen is-active" data-screen="welcome" data-name="Welcome" data-step="1">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="welcome-hero">
+            <div class="am-logo">amenify<span class="dot"></span></div>
+            <div class="welcome-illustration">
+              <div class="glow"></div>
+              <svg viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+                <!-- Sun -->
+                <circle cx="160" cy="40" r="14" fill="#F8ECCF"/>
+                <!-- House silhouette -->
+                <path d="M40 95 L100 50 L160 95 L160 150 L40 150 Z" fill="#FFFFFF" stroke="#1B2336" stroke-width="2.5" stroke-linejoin="round"/>
+                <!-- Roof -->
+                <path d="M30 100 L100 45 L170 100" fill="none" stroke="#C97B4F" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+                <!-- Chimney -->
+                <rect x="125" y="58" width="12" height="22" fill="#1B2336"/>
+                <!-- Door -->
+                <rect x="88" y="115" width="24" height="35" rx="3" fill="#C97B4F"/>
+                <circle cx="106" cy="133" r="1.5" fill="#1B2336"/>
+                <!-- Windows -->
+                <rect x="55" y="108" width="22" height="22" rx="2" fill="#F8ECCF" stroke="#1B2336" stroke-width="1.5"/>
+                <line x1="66" y1="108" x2="66" y2="130" stroke="#1B2336" stroke-width="1.2"/>
+                <line x1="55" y1="119" x2="77" y2="119" stroke="#1B2336" stroke-width="1.2"/>
+                <rect x="123" y="108" width="22" height="22" rx="2" fill="#F8ECCF" stroke="#1B2336" stroke-width="1.5"/>
+                <line x1="134" y1="108" x2="134" y2="130" stroke="#1B2336" stroke-width="1.2"/>
+                <line x1="123" y1="119" x2="145" y2="119" stroke="#1B2336" stroke-width="1.2"/>
+                <!-- Ground -->
+                <line x1="20" y1="150" x2="180" y2="150" stroke="#1B2336" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- Plant -->
+                <path d="M30 150 Q28 140 32 138 Q34 142 32 150" fill="#7B9579"/>
+                <path d="M170 150 Q168 140 172 138 Q174 142 172 150" fill="#7B9579"/>
+              </svg>
+            </div>
+            <h1>Welcome <span class="accent">home</span>, Sarah.</h1>
+            <p>Amenify is the calm, all-in-one app for setting up and managing your new home.</p>
+            <div class="progress-strip">
+              <div class="dot active"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <button class="btn btn-primary" data-goto="movein">Let's set up your home</button>
+            <div style="margin-top:14px;font-size:12px;color:var(--am-muted)">Takes ~5 minutes · skip anytime</div>
+          </div>
+        </div>
+        <div class="reveal-banner">Tap "Let's set up" to begin ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 2: MOVE-IN SETUP ─────────── -->
+      <div class="screen" data-screen="movein" data-name="Move-in" data-step="2">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="welcome"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B2336" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="am-logo sm">amenify<span class="dot"></span></div>
+            <div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="progress-strip" style="margin: 4px auto 22px"><div class="dot complete"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="onb-step-num"><span class="num">1</span> Move-in</div>
+          <h2 class="onb-h">Where are you <span class="accent">moving</span>?</h2>
+          <p class="onb-sub">We'll use this to set up insurance, utilities, and recommend trusted services in your area.</p>
+
+          <div class="field-group">
+            <div class="lab">New home address</div>
+            <div class="val">412 Linden Way · Plano, TX 75024</div>
+          </div>
+          <div class="field-group">
+            <div class="lab">Move-in date</div>
+            <div class="val">Saturday · June 13, 2026</div>
+          </div>
+          <div class="field-group">
+            <div class="lab">HOA</div>
+            <div class="val">Linden Crossing HOA · we'll auto-share docs</div>
+          </div>
+          <div class="info-chip" style="margin-bottom:18px">✓ Closing on file — title company verified</div>
+          <button class="btn btn-primary" data-goto="profile">Continue</button>
+          <button class="btn btn-ghost" style="margin-top:8px">Skip for now</button>
+        </div>
+        <div class="reveal-banner">Tap Continue to build your home profile ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 3: HOME PROFILE ─────────── -->
+      <div class="screen" data-screen="profile" data-name="Home Profile" data-step="3">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="movein"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B2336" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="am-logo sm">amenify<span class="dot"></span></div>
+            <div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="progress-strip" style="margin: 4px auto 22px"><div class="dot complete"></div><div class="dot complete"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="onb-step-num"><span class="num">2</span> Your home</div>
+          <h2 class="onb-h">Tell us about your <span class="accent">home</span>.</h2>
+          <p class="onb-sub">A few quick details so we can tailor insurance, warranty, and the smart recommendations on your dashboard.</p>
+
+          <div class="sec-title">Home type</div>
+          <div class="choice-grid">
+            <div class="choice-tile selected"><div class="ct-icon">🏠</div><div class="ct-name">Single family</div><div class="ct-meta">Detached house</div></div>
+            <div class="choice-tile"><div class="ct-icon">🏘</div><div class="ct-name">Townhome</div><div class="ct-meta">Attached unit</div></div>
+            <div class="choice-tile"><div class="ct-icon">🏢</div><div class="ct-name">Condo</div><div class="ct-meta">Building unit</div></div>
+            <div class="choice-tile"><div class="ct-icon">🌾</div><div class="ct-name">New build</div><div class="ct-meta">Builder-direct</div></div>
+          </div>
+
+          <div class="sec-title">Bedrooms / Bathrooms</div>
+          <div class="field-group" style="margin-bottom:14px">
+            <div class="lab">Layout</div>
+            <div class="val">3 bedroom · 2 bath · 1,920 sq ft</div>
+          </div>
+
+          <div class="sec-title">Who lives here?</div>
+          <div class="choice-grid" style="margin-bottom:22px">
+            <div class="choice-tile selected"><div class="ct-icon">👤</div><div class="ct-name">Just me</div><div class="ct-meta">Solo</div></div>
+            <div class="choice-tile selected"><div class="ct-icon">🐶</div><div class="ct-name">+ Dog</div><div class="ct-meta">Pet on file</div></div>
+          </div>
+
+          <button class="btn btn-primary" data-goto="insurance-intro">Continue</button>
+        </div>
+        <div class="reveal-banner">Tap Continue — Insurance is next ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 4: INSURANCE + WARRANTY (CENTERPIECE) ─────────── -->
+      <div class="screen" data-screen="insurance-intro" data-name="Insurance + Warranty" data-step="4">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="profile"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B2336" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="am-logo sm">amenify<span class="dot"></span></div>
+            <div class="x"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="progress-strip" style="margin: 4px auto 22px"><div class="dot complete"></div><div class="dot complete"></div><div class="dot complete"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="insurance-hero">
+            <div class="lab">Step 3 · Protection</div>
+            <h3>Protect your home in <span class="accent">3 minutes</span>.</h3>
+            <p>One tailored bundle — homeowners insurance + a home warranty. We pre-filled everything we already know.</p>
+            <div class="timer">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+              Estimated time: 3 min
+            </div>
+          </div>
+
+          <div class="product-card selected">
+            <div class="pc-pill">Most chosen</div>
+            <div class="pc-head">
+              <div class="pc-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/></svg></div>
+              <div>
+                <div class="pc-name">Homeowners Insurance</div>
+                <div class="pc-sub">$300K dwelling · $100K personal property</div>
+              </div>
+            </div>
+            <div class="pc-price">
+              <span class="amt">$84</span>
+              <span class="per">/ month · billed monthly</span>
+            </div>
+            <div class="pc-features">
+              <div>Full dwelling, contents, and liability protection</div>
+              <div>One-tap claims with photo upload</div>
+              <div>Loss-of-use coverage if home becomes unlivable</div>
+            </div>
+          </div>
+
+          <div class="product-card selected">
+            <div class="pc-head">
+              <div class="pc-ic" style="background:var(--am-sage-soft)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3F6E50" stroke-width="2"><path d="M4 7h16v13H4z"/><path d="M9 7V4h6v3"/><path d="M8 12h8M8 16h5"/></svg></div>
+              <div>
+                <div class="pc-name">Home Warranty</div>
+                <div class="pc-sub">HVAC, plumbing, electrical, appliances</div>
+              </div>
+            </div>
+            <div class="pc-price">
+              <span class="amt">$48</span>
+              <span class="per">/ month · $75 service fee per visit</span>
+            </div>
+            <div class="pc-features">
+              <div>Covers repair or replacement on major systems</div>
+              <div>24/7 dispatch · vetted local technicians</div>
+              <div>Activates day one — no waiting period</div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" data-goto="insurance-coverage">Customize coverage →</button>
+          <div style="font-size:11.5px;color:var(--am-muted);text-align:center;margin-top:10px">Underwritten by partner carrier · Amenify-managed</div>
+        </div>
+        <div class="reveal-banner">Tap Customize to fine-tune coverage ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 5: COVERAGE CONFIG ─────────── -->
+      <div class="screen" data-screen="insurance-coverage" data-name="Customize" data-step="5">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="insurance-intro"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B2336" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Customize</h2>
+          </div>
+          <div class="onb-step-num"><span class="num">3</span> Coverage</div>
+          <h2 class="onb-h">Adjust to <span class="accent">match</span> your home.</h2>
+          <p class="onb-sub">These defaults are based on your address and home profile. Slide to adjust — we'll requote instantly.</p>
+
+          <div class="coverage-card">
+            <div class="cc-head"><span class="cc-name">Dwelling coverage</span><span class="cc-amt">$300K</span></div>
+            <div class="cc-track"><div class="cc-fill f60"></div><div class="cc-handle" style="left:60%"></div></div>
+            <div class="cc-range"><span>$200K</span><span>$500K</span></div>
+          </div>
+          <div class="coverage-card">
+            <div class="cc-head"><span class="cc-name">Personal property</span><span class="cc-amt">$100K</span></div>
+            <div class="cc-track"><div class="cc-fill f75"></div><div class="cc-handle" style="left:75%"></div></div>
+            <div class="cc-range"><span>$30K</span><span>$150K</span></div>
+          </div>
+          <div class="coverage-card">
+            <div class="cc-head"><span class="cc-name">Liability</span><span class="cc-amt">$300K</span></div>
+            <div class="cc-track"><div class="cc-fill f40"></div><div class="cc-handle" style="left:40%"></div></div>
+            <div class="cc-range"><span>$100K</span><span>$1M</span></div>
+          </div>
+          <div class="card-warm" style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:36px;height:36px;border-radius:10px;background:#FFF;display:grid;place-items:center;flex-shrink:0;font-size:18px">🐶</div>
+            <div>
+              <div style="font-weight:700;font-size:13.5px;margin-bottom:3px">Pet liability — included</div>
+              <div style="font-size:12px;color:var(--am-muted);line-height:1.45">We added pet-related liability since you have a dog. Most carriers exclude this by default.</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" data-goto="insurance-quote">See my quote</button>
+        </div>
+        <div class="reveal-banner">Tap to see your final quote ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 6: QUOTE / REVIEW ─────────── -->
+      <div class="screen" data-screen="insurance-quote" data-name="Quote" data-step="6">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="insurance-coverage"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B2336" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Review</h2>
+            <div class="x" data-goto="welcome"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="quote-summary">
+            <div class="lab">Your tailored quote</div>
+            <div class="amt">$132<span class="small">/mo</span></div>
+            <div class="per">Insurance + Warranty · combined</div>
+            <div class="note">Saves $46/mo vs. shopping separately</div>
+          </div>
+          <div class="card" style="padding:18px 20px">
+            <div class="line-row"><span class="lab">Homeowners Insurance</span><span>$84.00</span></div>
+            <div class="line-row"><span class="lab">Home Warranty</span><span>$48.00</span></div>
+            <div class="line-row"><span class="lab" style="color:var(--am-success)">Bundle discount</span><span style="color:var(--am-success)">−$15.00</span></div>
+            <div class="line-row total"><span class="lab">Monthly total</span><span>$117.00</span></div>
+          </div>
+
+          <div class="sec-title">Coverage at a glance</div>
+          <div class="card" style="padding:14px 16px">
+            <div class="line-row" style="border-bottom:1px solid var(--am-line);padding:8px 0"><span class="lab">Dwelling</span><span>$300,000</span></div>
+            <div class="line-row" style="border-bottom:1px solid var(--am-line);padding:8px 0"><span class="lab">Personal property</span><span>$100,000</span></div>
+            <div class="line-row" style="border-bottom:1px solid var(--am-line);padding:8px 0"><span class="lab">Liability</span><span>$300,000</span></div>
+            <div class="line-row" style="border-bottom:1px solid var(--am-line);padding:8px 0"><span class="lab">Deductible</span><span>$1,500</span></div>
+            <div class="line-row" style="padding:8px 0;border-bottom:none"><span class="lab">Warranty</span><span>HVAC + plumbing + electrical + 6 appliances</span></div>
+          </div>
+
+          <div class="info-chip" style="margin:10px 0 18px;background:var(--am-accent-soft);color:var(--am-accent-dark)">⚡ Activates June 13 — your move-in day</div>
+
+          <button class="btn btn-accent" data-goto="insurance-confirm">Activate protection · $117/mo</button>
+          <div style="font-size:11px;color:var(--am-muted);text-align:center;margin-top:10px;line-height:1.5">By activating, you agree to the policy terms. Underwritten by partner carrier · Cancel anytime.</div>
+        </div>
+        <div class="reveal-banner">Tap Activate to finish protection setup ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 7: CONFIRMED ─────────── -->
+      <div class="screen" data-screen="insurance-confirm" data-name="Protected" data-step="7">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="topbar" style="padding-top:14px"><h2 style="text-align:center;flex:1;font-family:'Fraunces',serif;font-weight:400">You're protected</h2></div>
+          <div class="confirmed-hero">
+            <div class="check"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.6"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3>Your home is covered.</h3>
+            <p>Insurance + warranty active from <strong>June 13, 2026</strong> — your move-in day.</p>
+          </div>
+          <div class="card" style="padding:16px 18px">
+            <div class="line-row"><span class="lab">Policy #</span><span>AMF-2026-018224</span></div>
+            <div class="line-row"><span class="lab">Address</span><span>412 Linden Way</span></div>
+            <div class="line-row"><span class="lab">Monthly premium</span><span>$117.00</span></div>
+            <div class="line-row"><span class="lab">Next bill</span><span>June 13, 2026</span></div>
+          </div>
+          <div class="banner-cta" data-goto="utilities">
+            <div>
+              <div class="bc-title">Next: set up your utilities</div>
+              <div class="bc-sub">Internet, electric, water — handled in 2 min</div>
+            </div>
+            <div class="bc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          </div>
+          <button class="btn btn-secondary" data-goto="dashboard" style="margin-top:6px">Skip to my home</button>
+        </div>
+        <div class="reveal-banner">Tap to set up utilities ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 8: UTILITIES ─────────── -->
+      <div class="screen" data-screen="utilities" data-name="Utilities" data-step="8">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="insurance-confirm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B2336" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Utilities</h2>
+          </div>
+          <div class="progress-strip" style="margin: 4px auto 22px"><div class="dot complete"></div><div class="dot complete"></div><div class="dot complete"></div><div class="dot complete"></div><div class="dot active"></div><div class="dot"></div></div>
+          <div class="onb-step-num"><span class="num">4</span> Utilities</div>
+          <h2 class="onb-h">Let's get your <span class="accent">lights on</span>.</h2>
+          <p class="onb-sub">We'll activate the right providers for your address — no phone calls, no on-hold music.</p>
+
+          <div class="utility-row">
+            <div class="u-ic" style="background:var(--am-gold-soft)">⚡</div>
+            <div class="u-meta">
+              <div class="u-name">Electric — Oncor</div>
+              <div class="u-sub">Auto-enrollment ready</div>
+            </div>
+            <div class="u-status action">Activate</div>
+          </div>
+          <div class="utility-row">
+            <div class="u-ic">💧</div>
+            <div class="u-meta">
+              <div class="u-name">Water — City of Plano</div>
+              <div class="u-sub">Setup form pre-filled</div>
+            </div>
+            <div class="u-status action">Activate</div>
+          </div>
+          <div class="utility-row sage">
+            <div class="u-ic">📡</div>
+            <div class="u-meta">
+              <div class="u-name">Internet — Spectrum 1 Gig</div>
+              <div class="u-sub">Best value for this address</div>
+            </div>
+            <div class="u-status action">Compare</div>
+          </div>
+          <div class="utility-row">
+            <div class="u-ic" style="background:#E0EAFB">🗑</div>
+            <div class="u-meta">
+              <div class="u-name">Trash + Recycling</div>
+              <div class="u-sub">Included in HOA dues</div>
+            </div>
+            <div class="u-status done">✓ Done</div>
+          </div>
+          <div class="utility-row">
+            <div class="u-ic" style="background:var(--am-sage-soft)">🔥</div>
+            <div class="u-meta">
+              <div class="u-name">Gas — Atmos</div>
+              <div class="u-sub">Auto-enrollment ready</div>
+            </div>
+            <div class="u-status action">Activate</div>
+          </div>
+
+          <button class="btn btn-primary" data-goto="recommendations" style="margin-top:14px">Activate all 4 → Continue</button>
+          <button class="btn btn-ghost" style="margin-top:6px">I'll do this later</button>
+        </div>
+        <div class="reveal-banner">Tap Activate all to continue ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 9: SMART RECOMMENDATIONS ─────────── -->
+      <div class="screen" data-screen="recommendations" data-name="Recommendations" data-step="9">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="utilities"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B2336" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>For You</h2>
+          </div>
+          <div class="progress-strip" style="margin: 4px auto 22px"><div class="dot complete"></div><div class="dot complete"></div><div class="dot complete"></div><div class="dot complete"></div><div class="dot complete"></div><div class="dot active"></div></div>
+          <div class="onb-step-num"><span class="num">5</span> Smart picks</div>
+          <h2 class="onb-h">A few things <span class="accent">to consider</span>.</h2>
+          <p class="onb-sub">Personalized to your home, neighborhood, and the time of year. Pick what's useful — skip the rest.</p>
+
+          <div class="rec-card">
+            <div class="rec-ic">🧹</div>
+            <div style="flex:1">
+              <div class="rec-name">Move-in deep clean</div>
+              <div class="rec-sub">Before-you-unpack scrub · highly recommended for resale closings</div>
+            </div>
+            <div class="rec-pill">From $189</div>
+          </div>
+          <div class="rec-card sage">
+            <div class="rec-ic">🌳</div>
+            <div style="flex:1">
+              <div class="rec-name">Yard service · monthly</div>
+              <div class="rec-sub">HOA-compliant care · vetted by Linden Crossing</div>
+            </div>
+            <div class="rec-pill">From $89/mo</div>
+          </div>
+          <div class="rec-card">
+            <div class="rec-ic">🔐</div>
+            <div style="flex:1">
+              <div class="rec-name">Rekey + smart lock install</div>
+              <div class="rec-sub">Always change locks on day one · 1-hour visit</div>
+            </div>
+            <div class="rec-pill">$229</div>
+          </div>
+          <div class="rec-card gold">
+            <div class="rec-ic">📦</div>
+            <div style="flex:1">
+              <div class="rec-name">Moving help · June 13</div>
+              <div class="rec-sub">3 movers · 4 hours · truck included · book by Sat</div>
+            </div>
+            <div class="rec-pill">$425</div>
+          </div>
+          <div class="rec-card sage">
+            <div class="rec-ic">🐶</div>
+            <div style="flex:1">
+              <div class="rec-name">Dog walker · weekday</div>
+              <div class="rec-sub">For Luna · 30-min walks · M/W/F · 3 vetted walkers</div>
+            </div>
+            <div class="rec-pill">From $22/walk</div>
+          </div>
+
+          <button class="btn btn-primary" data-goto="dashboard" style="margin-top:14px">Continue to my home →</button>
+        </div>
+        <div class="reveal-banner">Tap to enter your home dashboard ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 10: HOME DASHBOARD ─────────── -->
+      <div class="screen" data-screen="dashboard" data-name="Home Dashboard" data-step="10">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body">
+          <div class="home-greeting">
+            <div class="am-logo sm">amenify<span class="dot"></span></div>
+            <h2>Good morning, <span class="accent">Sarah</span>.</h2>
+            <p>18 days until move-in · 412 Linden Way</p>
+          </div>
+
+          <div class="home-status-tile">
+            <div class="lab">Your home is protected</div>
+            <h3>Insurance + Warranty active</h3>
+            <div class="stat-row">
+              <div class="stat"><div class="sl">Coverage</div><div class="sv">$300K</div></div>
+              <div class="stat"><div class="sl">Monthly</div><div class="sv">$117</div></div>
+              <div class="stat"><div class="sl">Starts</div><div class="sv">Jun 13</div></div>
+            </div>
+          </div>
+
+          <div class="sec-title">Quick actions</div>
+          <div class="quick-grid-home">
+            <div class="quick-tile-home" data-goto="concierge"><div class="qt-ic">💬</div><div class="qt-name">Ask concierge</div><div class="qt-sub">24/7</div></div>
+            <div class="quick-tile-home" data-goto="recommendations"><div class="qt-ic" style="background:var(--am-sage-soft)">🛠</div><div class="qt-name">Services</div><div class="qt-sub">25 nearby</div></div>
+            <div class="quick-tile-home" data-goto="insurance-confirm"><div class="qt-ic" style="background:var(--am-gold-soft)">📄</div><div class="qt-name">Policy</div><div class="qt-sub">View</div></div>
+          </div>
+
+          <div class="sec-title">Move-in checklist</div>
+          <div class="card" style="padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--am-line)">
+              <div style="width:20px;height:20px;border-radius:50%;background:var(--am-success);display:grid;place-items:center;flex-shrink:0;color:#FFF">✓</div>
+              <div style="flex:1;font-size:13.5px">Homeowners insurance activated</div>
+              <div style="font-size:11px;color:var(--am-success);font-weight:700">Done</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--am-line)">
+              <div style="width:20px;height:20px;border-radius:50%;background:var(--am-success);display:grid;place-items:center;flex-shrink:0;color:#FFF">✓</div>
+              <div style="flex:1;font-size:13.5px">Home warranty activated</div>
+              <div style="font-size:11px;color:var(--am-success);font-weight:700">Done</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--am-line)">
+              <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--am-accent);flex-shrink:0;background:#FFF"></div>
+              <div style="flex:1;font-size:13.5px">Activate utilities (3 left)</div>
+              <div style="font-size:11px;color:var(--am-accent-dark);font-weight:700;cursor:pointer" data-goto="utilities">Resume →</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--am-line)">
+              <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--am-line-2);flex-shrink:0"></div>
+              <div style="flex:1;font-size:13.5px">Book move-in cleaning</div>
+              <div style="font-size:11px;color:var(--am-muted);font-weight:700">Suggested</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+              <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--am-line-2);flex-shrink:0"></div>
+              <div style="flex:1;font-size:13.5px">Rekey locks + smart lock</div>
+              <div style="font-size:11px;color:var(--am-muted);font-weight:700">Day-of</div>
+            </div>
+          </div>
+
+          <div class="banner-cta" data-goto="concierge">
+            <div>
+              <div class="bc-title">Have a question? I'm here.</div>
+              <div class="bc-sub">Talk to your dedicated concierge — anytime.</div>
+            </div>
+            <div class="bc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab active" data-goto="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab" data-goto="recommendations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Services</div>
+          <div class="tab" data-goto="insurance-confirm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z"/></svg>Protect</div>
+          <div class="tab" data-goto="utilities"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V6h6"/><path d="M12 12h7"/><path d="M4 6h2M4 12h2M4 18h2"/></svg>Utilities</div>
+          <div class="tab" data-goto="concierge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Concierge</div>
+        </nav>
+        <div class="reveal-banner">Tap "Talk to concierge" to continue ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 11: CONCIERGE CHAT ─────────── -->
+      <div class="screen" data-screen="concierge" data-name="Concierge" data-step="11">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1B2336"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1B2336"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1B2336"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1B2336"/></svg></span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="dashboard"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B2336" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Concierge</h2>
+          </div>
+          <div class="chat-header" style="padding-top:0">
+            <div class="chat-avatar">EM</div>
+            <div class="chat-meta">
+              <div class="chat-name">Eliza · Your concierge</div>
+              <div class="chat-status">Online · usually replies in ~3 min</div>
+            </div>
+          </div>
+
+          <div class="msg-row"><div class="msg-bubble ai">Hi Sarah — welcome to Amenify! I'm Eliza, your dedicated home concierge. I'll be here through move-in and beyond. 🏡</div></div>
+          <div class="msg-row"><div class="msg-bubble ai">I see your insurance + warranty are set up. Anything you'd like me to handle before June 13?</div></div>
+          <div class="msg-row user"><div class="msg-bubble user">Can you book the move-in cleaning for the morning of the 13th?</div></div>
+          <div class="msg-row"><div class="msg-bubble ai">Of course. I'll book <span class="strong">Bright &amp; Tidy</span> for <span class="strong">9 AM on June 13</span> — they're highly rated by Linden Crossing residents. Want me to confirm?</div></div>
+
+          <div class="card" style="border:1.5px solid var(--am-accent);padding:14px;margin:4px 0 10px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div style="width:32px;height:32px;border-radius:10px;background:var(--am-accent-soft);display:grid;place-items:center">🧹</div>
+              <div>
+                <div style="font-weight:700;font-size:13.5px">Bright &amp; Tidy · move-in clean</div>
+                <div style="font-size:11px;color:var(--am-muted);margin-top:1px">June 13 · 9:00 AM</div>
+              </div>
+            </div>
+            <div class="line-row" style="padding:6px 0;font-size:12.5px"><span class="lab">Move-in deep clean · 1,920 sq ft</span><span>$189</span></div>
+            <div class="line-row" style="padding:6px 0;font-size:12.5px"><span class="lab" style="color:var(--am-accent-dark)">First-clean discount</span><span style="color:var(--am-accent-dark)">−$30</span></div>
+            <div class="line-row total" style="padding-top:8px;font-size:13.5px"><span>Total</span><span>$159</span></div>
+          </div>
+
+          <div class="quick-replies">
+            <span class="qr-chip solid" data-goto="dashboard">Yes, book it</span>
+            <span class="qr-chip">Pick a different time</span>
+            <span class="qr-chip">Show me other cleaners</span>
+          </div>
+
+          <div class="msg-row" style="margin-top:18px"><div class="msg-bubble ai">I can also handle the rekey, internet install, and your first month of yard care in one go. Just say the word.</div></div>
+          <div class="quick-replies">
+            <span class="qr-chip" data-goto="recommendations">Show me everything</span>
+            <span class="qr-chip" data-goto="dashboard">Just the cleaning for now</span>
+          </div>
+        </div>
+        <div class="reveal-banner">Tap a chip to continue ↑</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="thumbs" id="thumbs">
+    <div class="thumb is-active" data-goto="welcome"><span class="tnum">1</span>Welcome</div>
+    <div class="thumb" data-goto="movein"><span class="tnum">2</span>Move-in</div>
+    <div class="thumb" data-goto="profile"><span class="tnum">3</span>Profile</div>
+    <div class="thumb" data-goto="insurance-intro"><span class="tnum">4</span>Insurance</div>
+    <div class="thumb" data-goto="insurance-coverage"><span class="tnum">5</span>Customize</div>
+    <div class="thumb" data-goto="insurance-quote"><span class="tnum">6</span>Quote</div>
+    <div class="thumb" data-goto="insurance-confirm"><span class="tnum">7</span>Protected</div>
+    <div class="thumb" data-goto="utilities"><span class="tnum">8</span>Utilities</div>
+    <div class="thumb" data-goto="recommendations"><span class="tnum">9</span>For You</div>
+    <div class="thumb" data-goto="dashboard"><span class="tnum">10</span>Home</div>
+    <div class="thumb" data-goto="concierge"><span class="tnum">11</span>Concierge</div>
+  </div>
+
+  <div class="footer-hint">Tap any button to advance · tap anywhere to highlight clickable hotspots · use <kbd>←</kbd>/<kbd>→</kbd> arrow keys</div>
+</div>
+
+<script>
+(function(){
+  const screens = Array.from(document.querySelectorAll('.phone .screen'));
+  const order = screens.map(s => s.dataset.screen);
+  const thumbs = Array.from(document.querySelectorAll('.thumb'));
+  const curNumEl = document.getElementById('cur-num');
+  const curNameEl = document.getElementById('cur-name');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const restartBtn = document.getElementById('restart-btn');
+  function getActive() { return document.querySelector('.screen.is-active'); }
+  function go(name) {
+    const target = document.querySelector('.screen[data-screen="'+name+'"]');
+    if (!target) return;
+    screens.forEach(s => { s.classList.remove('is-active'); s.classList.remove('reveal-hotspots'); s.querySelector('.body').scrollTop = 0; });
+    target.classList.add('is-active');
+    curNumEl.textContent = target.dataset.step;
+    curNameEl.textContent = target.dataset.name;
+    thumbs.forEach(t => t.classList.toggle('is-active', t.dataset.goto === name));
+    updateNav(name);
+  }
+  function updateNav(name) {
+    const idx = order.indexOf(name);
+    prevBtn.disabled = idx <= 0;
+    nextBtn.disabled = idx >= order.length - 1;
+  }
+  function revealHotspots() {
+    const active = getActive(); if (!active) return;
+    active.classList.remove('reveal-hotspots');
+    void active.offsetWidth;
+    active.classList.add('reveal-hotspots');
+    clearTimeout(window.__revealTimer);
+    window.__revealTimer = setTimeout(() => { active.classList.remove('reveal-hotspots'); }, 2800);
+  }
+  document.querySelectorAll('.phone .screen').forEach(screen => {
+    screen.addEventListener('click', function(e){
+      const hot = e.target.closest('[data-goto]');
+      if (hot) { e.preventDefault(); e.stopPropagation(); const dest = hot.dataset.goto; if (dest) go(dest); }
+      else { revealHotspots(); }
+    });
+  });
+  thumbs.forEach(t => { t.addEventListener('click', e => { e.stopPropagation(); go(t.dataset.goto); }); });
+  prevBtn.addEventListener('click', () => { const cur = getActive().dataset.screen; const idx = order.indexOf(cur); if (idx > 0) go(order[idx-1]); });
+  nextBtn.addEventListener('click', () => { const cur = getActive().dataset.screen; const idx = order.indexOf(cur); if (idx < order.length - 1) go(order[idx+1]); });
+  restartBtn.addEventListener('click', () => go('welcome'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') nextBtn.click();
+    else if (e.key === 'ArrowLeft') prevBtn.click();
+    else if (e.key === 'r' || e.key === 'R') restartBtn.click();
+  });
+  updateNav('welcome');
+})();
+</script>
+</body>
+</html>

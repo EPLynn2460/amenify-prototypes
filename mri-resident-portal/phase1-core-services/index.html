@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resident Portal × Amenify — Phase 1: Core Services Prototype</title>
+<meta name="description" content="Phase 1 clickable prototype: Resident Portal residents earn Shop Local Credits on rent, browse services, book a cleaner, mount a TV, order pizza via agentic AI, and chat with concierge." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rp-lavender: #A7D7BE;
+    --rp-lavender-soft: #E3F2E9;
+    --rp-lavender-line: #8FCBA8;
+    --rp-purple: #2E8B62;
+    --rp-purple-dark: #14532D;
+    --rp-pink: #BCE3CC;
+    --rp-orange: #F5A24F;
+    --rp-yellow: #FFE15D;
+    --rp-cream: #EFF5F1;
+    --rp-card: #FFFFFF;
+    --rp-ink: #1A1A1A;
+    --rp-ink-2: #2D2D2D;
+    --rp-muted: #6B6B6B;
+    --rp-faint: #9B9B9B;
+    --rp-line: #E4EFE8;
+    --rp-line-strong: #CCDDD2;
+    --rp-success: #10B981;
+    --rp-danger: #DC2626;
+    --shadow-sm: 0 1px 2px rgba(20,20,20,0.04), 0 1px 3px rgba(20,20,20,0.06);
+    --shadow-md: 0 4px 12px rgba(20,20,20,0.06), 0 8px 24px rgba(20,20,20,0.06);
+    --shadow-lg: 0 12px 40px rgba(20,20,20,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #E9F2EC; color: var(--rp-ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+  /* Stage */
+  .stage { min-height: 100vh; display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 18px; padding: 28px 24px 32px; max-width: 1100px; margin: 0 auto; }
+  .stage-head { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  .stage-title { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.3; letter-spacing: -0.4px; margin-bottom: 12px; }
+  .stage-title .hl { background: linear-gradient(180deg, transparent 62%, var(--rp-yellow) 62%, var(--rp-yellow) 88%, transparent 88%); padding: 0 6px; }
+  .stage-meta { font-size: 12.5px; color: var(--rp-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .stage-meta .dot { color: var(--rp-line-strong); font-weight: 700; }
+  .stage-meta a { color: var(--rp-purple-dark); text-decoration: none; font-weight: 600; border-bottom: 1.5px solid var(--rp-purple-dark); }
+
+  .controls { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .ctrl-btn { background: #FFF; color: var(--rp-ink); border: 1px solid var(--rp-line-strong); padding: 9px 14px; border-radius: 999px; font-family: 'Inter'; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .ctrl-btn:hover { border-color: var(--rp-purple); color: var(--rp-purple-dark); }
+  .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .ctrl-btn.primary { background: var(--rp-ink); color: #FFF; border-color: var(--rp-ink); }
+  .ctrl-btn.primary:hover { background: var(--rp-purple-dark); border-color: var(--rp-purple-dark); color: #FFF; }
+  .step-indicator { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--rp-ink); padding: 0 12px; min-width: 260px; text-align: center; }
+  .step-indicator .num { color: var(--rp-purple-dark); font-style: italic; }
+
+  /* Phone */
+  .phone-stage { display: grid; place-items: center; padding: 12px 0; }
+  .phone { width: 380px; height: 780px; background: #000; border-radius: 48px; padding: 11px; box-shadow: var(--shadow-lg); position: relative; }
+  .phone::before { content: ''; position: absolute; left: 50%; top: 22px; transform: translateX(-50%); width: 110px; height: 32px; background: #000; border-radius: 20px; z-index: 5; }
+  .screen { width: 100%; height: 100%; background: #FFFFFF; border-radius: 38px; overflow: hidden; position: relative; display: none; flex-direction: column; }
+  .screen.is-active { display: flex; }
+
+  .status-bar { height: 48px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 4px; font-size: 14px; font-weight: 600; color: var(--rp-ink); flex-shrink: 0; position: relative; z-index: 6; }
+  .status-bar .signal { display: flex; gap: 4px; align-items: center; }
+  .body { flex: 1; overflow-y: auto; padding: 4px 18px 100px; -webkit-overflow-scrolling: touch; }
+  .body::-webkit-scrollbar { width: 0; }
+
+  .tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 78px; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--rp-line); display: flex; align-items: flex-start; justify-content: space-around; padding-top: 10px; z-index: 4; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--rp-faint); font-size: 10px; font-weight: 500; padding: 4px 8px; border-radius: 8px; cursor: pointer; }
+  .tab svg { width: 22px; height: 22px; }
+  .tab.active { color: var(--rp-purple); }
+
+  /* Primitives */
+  .rp-logo { display: inline-block; background: var(--rp-lavender); padding: 5px 12px; border-radius: 7px; font-weight: 800; font-size: 16px; letter-spacing: 2.5px; color: var(--rp-ink); line-height: 1; }
+  .greeting-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 4px 18px; }
+  .greeting h2 { font-family: 'DM Serif Display', serif; font-size: 19px; line-height: 1.1; }
+  .greeting p { font-size: 12px; color: var(--rp-muted); margin-top: 2px; }
+  .icon-row { display: flex; gap: 10px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 50%; background: #FFF; border: 1px solid var(--rp-line); display: grid; place-items: center; position: relative; }
+  .icon-btn .badge { position: absolute; top: -3px; right: -3px; background: var(--rp-danger); color: #FFF; font-size: 10px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; border: 2px solid #FFF; }
+
+  .card { background: #FFF; border-radius: 18px; padding: 20px; margin-bottom: 14px; border: 1px solid #E7F1EB; box-shadow: var(--shadow-sm); }
+  .card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; font-weight: 400; margin-bottom: 6px; }
+  .hero-tile { background: linear-gradient(135deg, var(--rp-lavender) 0%, #BFE2CD 100%); border-radius: 22px; padding: 22px 22px 24px; margin-bottom: 16px; color: var(--rp-ink); position: relative; overflow: hidden; }
+  .hero-tile h3 { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.05; letter-spacing: -0.4px; max-width: 80%; }
+  .hero-tile h3 .hl { background: linear-gradient(180deg, transparent 55%, var(--rp-yellow) 55%); padding: 0 4px; }
+  .hero-tile p { font-size: 12px; color: var(--rp-ink-2); margin-top: 10px; line-height: 1.4; max-width: 90%; }
+  .tier-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 12px; color: var(--rp-ink-2); flex-wrap: wrap; }
+  .tier-pill { background: #FFF; padding: 5px 10px; border-radius: 999px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; }
+  .tier-pill.gold { background: linear-gradient(135deg,#FFE9A8,#F5C66B); color: #5A3D00; border: 1px solid #E6B14A; }
+
+  .balance-card { background: #FFF; border-radius: 18px; padding: 20px; margin-bottom: 14px; box-shadow: var(--shadow-sm); border: 1px solid #E7F1EB; }
+  .balance-card .label { font-size: 11px; font-weight: 600; color: var(--rp-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  .balance-card .amount { font-family: 'DM Serif Display', serif; font-size: 38px; line-height: 1; margin-top: 6px; letter-spacing: -1px; }
+  .balance-card .due-sub { font-size: 12px; color: var(--rp-muted); margin-top: 6px; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 18px; border-radius: 14px; font-family: 'Inter'; font-weight: 600; font-size: 14px; border: none; cursor: pointer; width: 100%; transition: transform .1s ease; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--rp-ink); color: #FFF; }
+  .btn-secondary { background: #FFF; color: var(--rp-ink); border: 1px solid var(--rp-line-strong); }
+  .btn-purple { background: var(--rp-purple); color: #FFF; }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+
+  .rp-cash-card { background: linear-gradient(135deg, #E3F2E9 0%, #D6EDDF 100%); border-radius: 18px; padding: 18px; margin-bottom: 14px; border: 1px solid #C9E6D5; }
+  .rp-cash-card .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .rp-cash-card .brand { display: flex; align-items: center; gap: 6px; font-family: 'DM Serif Display', serif; font-size: 17px; }
+  .rp-cash-card .wallet-pill { background: #FFF; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .rp-cash-card .wallet-pill strong { color: var(--rp-purple); font-weight: 800; }
+  .rp-cash-card p { font-size: 12px; color: var(--rp-ink-2); line-height: 1.45; }
+  .rp-cash-card a { display: inline-block; margin-top: 10px; color: var(--rp-purple-dark); font-size: 12px; font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--rp-purple-dark); cursor: pointer; }
+
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .quick-tile { background: #FFF; border-radius: 16px; padding: 14px 10px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid #E7F1EB; cursor: pointer; transition: all 0.15s; }
+  .quick-tile:hover { border-color: var(--rp-purple); }
+  .quick-tile .num { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1; }
+  .quick-tile .lab { font-size: 10px; color: var(--rp-muted); margin-top: 6px; line-height: 1.3; }
+
+  .topbar { display: flex; align-items: center; gap: 12px; padding: 10px 4px 18px; }
+  .topbar .back { width: 36px; height: 36px; border-radius: 50%; background: #FFF; border: 1px solid var(--rp-line); display: grid; place-items: center; cursor: pointer; }
+  .topbar h2 { font-family: 'DM Serif Display', serif; font-size: 22px; flex: 1; }
+  .topbar .x { width: 36px; height: 36px; border-radius: 50%; background: transparent; display: grid; place-items: center; color: var(--rp-muted); cursor: pointer; }
+
+  .sec-title { font-family: 'DM Serif Display', serif; font-size: 16px; margin: 8px 4px 10px; }
+
+  .pm-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .pm-option { display: flex; align-items: center; gap: 12px; background: #FFF; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--rp-line); box-shadow: var(--shadow-sm); cursor: pointer; }
+  .pm-option.selected { border-color: var(--rp-purple); background: #F7FCF9; }
+  .pm-radio { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--rp-line-strong); display: grid; place-items: center; flex-shrink: 0; }
+  .pm-option.selected .pm-radio { border-color: var(--rp-purple); background: var(--rp-purple); }
+  .pm-option.selected .pm-radio::after { content: ''; width: 8px; height: 8px; background: #FFF; border-radius: 50%; }
+  .pm-icon { width: 36px; height: 26px; border-radius: 4px; background: #EDF5EF; display: grid; place-items: center; flex-shrink: 0; }
+  .pm-meta { flex: 1; }
+  .pm-meta .name { font-weight: 600; font-size: 14px; }
+  .pm-meta .sub { font-size: 11px; color: var(--rp-muted); margin-top: 2px; }
+
+  .approved-hero { background: linear-gradient(160deg, var(--rp-purple) 0%, #14532D 100%); border-radius: 22px; padding: 30px 22px 26px; margin: 8px 0 20px; color: #FFF; text-align: center; }
+  .approved-hero .check { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 14px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,0.4); }
+  .approved-hero h3 { font-family: 'DM Serif Display', serif; font-size: 24px; letter-spacing: -.3px; margin-bottom: 6px; color: #FFF; font-weight: 400; }
+  .approved-hero p { font-size: 13px; opacity: .9; line-height: 1.4; }
+
+  .reward-callout { background: linear-gradient(135deg, #E3F2E9 0%, #C9E6D5 100%); border: 1px solid var(--rp-lavender-line); border-radius: 14px; padding: 14px; margin: 14px 0; display: flex; align-items: center; gap: 12px; }
+  .reward-callout .ic { width: 32px; height: 32px; border-radius: 50%; background: var(--rp-purple); display: grid; place-items: center; flex-shrink: 0; }
+  .reward-callout p { font-size: 12.5px; line-height: 1.45; color: var(--rp-ink-2); }
+  .reward-callout p strong { color: var(--rp-purple-dark); font-weight: 800; }
+  .reward-callout.gold { background: linear-gradient(135deg,#FFF1DE 0%,#FCE3BC 100%); border-color: #F5C68A; }
+  .reward-callout.gold .ic { background: var(--rp-orange); }
+
+  /* Platinum */
+  .platinum-card { background: linear-gradient(155deg, #1A1A1A 0%, #2D2D2D 60%, #0F3D2A 100%); border-radius: 20px; padding: 22px 20px 20px; margin: 6px 0 14px; color: #FFF; position: relative; overflow: hidden; box-shadow: 0 12px 36px rgba(26,26,26,0.25); }
+  .platinum-card::after { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(199,184,240,0.25) 0%, transparent 65%); }
+  .platinum-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .platinum-brand .pl-logo { background: var(--rp-lavender); color: var(--rp-ink); padding: 4px 10px; border-radius: 6px; font-weight: 800; letter-spacing: 2.2px; font-size: 12px; line-height: 1; }
+  .platinum-brand .pl-tier { background: linear-gradient(135deg, #DDF0E5 0%, #A7D7BE 100%); color: var(--rp-purple-dark); padding: 4px 10px; border-radius: 6px; font-weight: 800; letter-spacing: 2.2px; font-size: 11px; line-height: 1; }
+  .platinum-card h4 { font-family: 'DM Serif Display', serif; font-size: 22px; line-height: 1.15; color: #FFF; font-weight: 400; margin-bottom: 8px; letter-spacing: -0.2px; position: relative; z-index: 2; }
+  .platinum-card .pl-sub { font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,0.78); margin-bottom: 16px; position: relative; z-index: 2; }
+  .platinum-benefits { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; margin-bottom: 16px; position: relative; z-index: 2; }
+  .platinum-benefits .pb-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .platinum-benefits .pb-row:last-child { border-bottom: none; }
+  .platinum-benefits .pb-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--rp-lavender); color: var(--rp-ink); display: grid; place-items: center; flex-shrink: 0; font-size: 11px; font-weight: 800; }
+  .platinum-benefits .pb-text { font-size: 12px; line-height: 1.45; color: rgba(255,255,255,0.92); }
+  .platinum-benefits .pb-text strong { color: var(--rp-lavender); font-weight: 700; }
+  .platinum-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 14px; position: relative; z-index: 2; }
+  .platinum-price .pp-amt { font-family: 'DM Serif Display', serif; font-size: 34px; line-height: 1; color: #FFF; letter-spacing: -0.6px; }
+  .platinum-price .pp-per { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .btn-platinum { background: var(--rp-lavender); color: var(--rp-ink); width: 100%; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; position: relative; z-index: 2; }
+
+  /* Wallet */
+  .wallet-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; padding: 16px; background: linear-gradient(135deg, var(--rp-lavender) 0%, #BFE2CD 100%); border-radius: 18px; position: relative; overflow: hidden; }
+  .wallet-stats::before { content: ''; position: absolute; right: -30px; top: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+  .ws-item { position: relative; z-index: 2; }
+  .ws-item .ws-lab { font-size: 10px; color: var(--rp-ink-2); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; opacity: 0.75; margin-bottom: 4px; }
+  .ws-item .ws-amt { font-family: 'DM Serif Display', serif; font-size: 22px; line-height: 1; letter-spacing: -0.3px; color: var(--rp-ink); display: inline-flex; align-items: baseline; gap: 4px; }
+  .ws-item .ws-amt.purple { color: var(--rp-purple-dark); }
+
+  .tier-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: linear-gradient(135deg,#FFE9A8,#F5C66B); color: #5A3D00; font-weight: 800; font-size: 12px; letter-spacing: 0.4px; border: 1px solid #E6B14A; margin-bottom: 10px; }
+  .tier-progress { background: rgba(255,255,255,0.5); border-radius: 999px; height: 6px; overflow: hidden; margin-top: 8px; }
+  .tier-progress .fill { background: var(--rp-purple); height: 100%; width: 32%; border-radius: 999px; }
+  .tier-progress-row { font-size: 11px; color: var(--rp-ink-2); display: flex; justify-content: space-between; margin-top: 6px; }
+
+  .market-section { font-family: 'DM Serif Display', serif; font-size: 18px; margin: 14px 4px 12px; line-height: 1.1; letter-spacing: -0.2px; }
+  .services-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .service-tile { background: #FFF; border: 1px solid #E7F1EB; border-radius: 14px; padding: 14px 8px 10px; text-align: center; box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.15s; }
+  .service-tile:hover { border-color: var(--rp-purple); transform: translateY(-1px); }
+  .service-tile .st-icon-wrap { width: 40px; height: 40px; border-radius: 50%; background: #E3F2E9; display: grid; place-items: center; margin: 0 auto 8px; font-size: 18px; }
+  .service-tile.s-pink .st-icon-wrap { background: #E6F4EC; }
+  .service-tile.s-orange .st-icon-wrap { background: #FFF1DE; }
+  .service-tile.s-blue .st-icon-wrap { background: #E0EAFB; }
+  .service-tile.s-green .st-icon-wrap { background: #DCF3E5; }
+  .service-tile.s-yellow .st-icon-wrap { background: #FFF6CC; }
+  .service-tile .st-name { font-weight: 700; font-size: 11.5px; line-height: 1.2; color: var(--rp-ink); }
+  .service-tile .st-meta { font-size: 9.5px; color: var(--rp-muted); margin-top: 4px; line-height: 1.3; }
+
+  .must-book-card { display: grid; grid-template-columns: 1fr 96px; background: linear-gradient(135deg, #E3F2E9 0%, #D6EDDF 100%); border-radius: 18px; padding: 16px; margin-bottom: 10px; align-items: center; gap: 12px; border: 1px solid #C9E6D5; cursor: pointer; }
+  .mbc-cat { font-size: 11px; color: var(--rp-purple-dark); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .mbc-name { font-family: 'DM Serif Display', serif; font-size: 20px; line-height: 1.05; margin: 6px 0 4px; display: flex; align-items: center; gap: 6px; }
+  .mbc-verified { background: var(--rp-purple); color: #FFF; width: 16px; height: 16px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10px; font-weight: 800; }
+  .mbc-rating { font-size: 12px; color: var(--rp-ink-2); margin-bottom: 12px; }
+  .mbc-rating .star { color: var(--rp-orange); }
+  .mbc-btn { background: var(--rp-purple); color: #FFF; border: none; padding: 9px 14px; border-radius: 999px; font-weight: 700; font-size: 12px; cursor: pointer; }
+  .mbc-photo { width: 96px; height: 110px; border-radius: 14px; background: linear-gradient(135deg, #BCE3CC 0%, #BFE0CB 60%, #A7D7BE 100%); position: relative; overflow: hidden; display: grid; place-items: center; font-size: 36px; }
+  .mbc-photo.orange { background: linear-gradient(135deg, #FFE0B8 0%, #FFB870 60%, #F5A24F 100%); }
+  .mbc-photo.green { background: linear-gradient(135deg, #B8E5C5 0%, #7FD49A 60%, #4FB573 100%); }
+
+  /* Booking */
+  .booking-hero { background: linear-gradient(160deg, var(--rp-lavender-soft) 0%, var(--rp-lavender) 100%); border-radius: 22px; padding: 18px; margin-bottom: 14px; position: relative; overflow: hidden; }
+  .booking-hero .bh-cat { font-size: 11px; color: var(--rp-purple-dark); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .booking-hero h3 { font-family: 'DM Serif Display', serif; font-size: 22px; line-height: 1.1; margin: 6px 0 4px; letter-spacing: -0.3px; }
+  .booking-hero .price { font-size: 13px; color: var(--rp-ink-2); }
+  .booking-hero .price strong { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--rp-ink); margin-right: 4px; }
+
+  .slot-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .slot { background: #FFF; border: 1.5px solid var(--rp-line); border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .slot.selected { border-color: var(--rp-purple); background: #F7FCF9; }
+  .slot .day { font-size: 10px; color: var(--rp-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+  .slot .date { font-family: 'DM Serif Display', serif; font-size: 18px; line-height: 1; margin: 4px 0 4px; }
+  .slot .time { font-size: 10px; color: var(--rp-ink-2); }
+
+  .summary-line { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13px; border-bottom: 1px solid var(--rp-line); }
+  .summary-line:last-child { border-bottom: none; }
+  .summary-line.total { font-weight: 700; font-size: 15px; border-top: 2px solid var(--rp-ink); margin-top: 4px; border-bottom: none; padding-top: 12px; }
+  .summary-line .label { color: var(--rp-muted); text-transform: uppercase; font-size: 11px; letter-spacing: .5px; font-weight: 600; }
+  .summary-line.total .label { color: var(--rp-ink); }
+  .summary-line.credit { color: var(--rp-purple-dark); }
+  .summary-line.credit span { color: var(--rp-purple-dark); }
+
+  /* Credit toggle */
+  .credit-toggle { background: linear-gradient(135deg, #E3F2E9 0%, #C9E6D5 100%); border: 1px solid var(--rp-lavender-line); border-radius: 14px; padding: 14px; margin: 12px 0; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .credit-toggle .ic { width: 32px; height: 32px; border-radius: 50%; background: var(--rp-purple); display: grid; place-items: center; flex-shrink: 0; color: #FFF; font-weight: 800; }
+  .credit-toggle .meta { flex: 1; }
+  .credit-toggle .ttl { font-weight: 700; font-size: 13px; color: var(--rp-ink); }
+  .credit-toggle .sub { font-size: 11px; color: var(--rp-muted); margin-top: 2px; }
+  .toggle-pill { width: 36px; height: 20px; background: var(--rp-purple); border-radius: 999px; position: relative; flex-shrink: 0; }
+  .toggle-pill::after { content: ''; position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: #FFF; border-radius: 50%; }
+
+  /* Pro card */
+  .pro-card { display: flex; align-items: center; gap: 12px; padding: 14px; background: #FFF; border: 1px solid var(--rp-line); border-radius: 14px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+  .pro-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--rp-lavender) 0%, var(--rp-pink) 100%); display: grid; place-items: center; font-weight: 800; color: var(--rp-purple-dark); flex-shrink: 0; font-size: 18px; }
+  .pro-meta { flex: 1; }
+  .pro-name { font-weight: 700; font-size: 14px; }
+  .pro-sub { font-size: 11px; color: var(--rp-muted); margin-top: 2px; }
+  .pro-rating { font-size: 11px; color: var(--rp-ink-2); margin-top: 4px; }
+  .pro-rating .star { color: var(--rp-orange); }
+  .pro-verified { background: var(--rp-success); color: #FFF; padding: 4px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
+
+  /* Chat */
+  .chat-header { display: flex; align-items: center; gap: 12px; padding: 12px 4px 14px; }
+  .chat-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--rp-lavender-soft) 0%, var(--rp-pink) 100%); display: grid; place-items: center; flex-shrink: 0; color: var(--rp-purple-dark); border: 2px solid #FFF; box-shadow: 0 4px 12px rgba(109,40,217,0.18); font-weight: 800; font-size: 16px; }
+  .chat-avatar.maddie { background: linear-gradient(135deg, #BCE3CC 0%, #BFE0CB 60%, #A7D7BE 100%); color: #FFF; }
+  .chat-avatar.concierge { background: linear-gradient(135deg, var(--rp-purple) 0%, var(--rp-purple-dark) 100%); color: #FFF; }
+  .chat-meta { flex: 1; }
+  .chat-name { font-family: 'DM Serif Display', serif; font-size: 17px; line-height: 1.15; }
+  .chat-status { font-size: 11px; color: var(--rp-success); display: inline-flex; align-items: center; gap: 5px; margin-top: 3px; font-weight: 600; }
+  .chat-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--rp-success); }
+
+  .msg-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: flex-end; }
+  .msg-row.user { justify-content: flex-end; }
+  .msg-bubble { max-width: 76%; padding: 10px 13px; border-radius: 18px; font-size: 13px; line-height: 1.4; }
+  .msg-bubble.ai { background: var(--rp-lavender-soft); color: var(--rp-ink); border-bottom-left-radius: 4px; }
+  .msg-bubble.user { background: var(--rp-ink); color: #FFF; border-bottom-right-radius: 4px; }
+  .msg-bubble .strong { font-weight: 700; }
+
+  .agent-card { background: #FFF; border: 1.5px solid var(--rp-purple); border-radius: 14px; padding: 12px; margin: 4px 0 10px; box-shadow: var(--shadow-sm); }
+  .agent-card .ac-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .agent-card .ac-logo { width: 28px; height: 28px; border-radius: 8px; background: #006491; color: #FFF; display: grid; place-items: center; font-weight: 800; font-size: 11px; flex-shrink: 0; }
+  .agent-card .ac-name { font-weight: 700; font-size: 13px; }
+  .agent-card .ac-sub { font-size: 11px; color: var(--rp-muted); margin-top: 1px; }
+  .agent-card .ac-line { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12px; border-bottom: 1px dashed var(--rp-line); }
+  .agent-card .ac-line:last-of-type { border-bottom: none; }
+  .agent-card .ac-line .lab { color: var(--rp-muted); }
+  .agent-card .ac-total { display: flex; justify-content: space-between; padding-top: 8px; margin-top: 4px; border-top: 2px solid var(--rp-ink); font-weight: 700; font-size: 13px; }
+  .agent-card .ac-credit { font-size: 11px; color: var(--rp-purple-dark); font-weight: 700; margin-top: 6px; padding: 6px 10px; background: var(--rp-lavender-soft); border-radius: 8px; text-align: center; }
+
+  .quick-replies { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .qr-chip { background: #FFF; border: 1.5px solid var(--rp-purple); color: var(--rp-purple-dark); padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .qr-chip:hover { background: var(--rp-lavender-soft); }
+
+  .chat-input { position: absolute; bottom: 78px; left: 18px; right: 18px; background: #FFF; border: 1px solid var(--rp-line-strong); border-radius: 22px; padding: 8px 10px 8px 16px; display: flex; align-items: center; gap: 8px; z-index: 5; box-shadow: var(--shadow-md); }
+  .chat-input .placeholder { flex: 1; color: var(--rp-faint); font-size: 13px; }
+  .chat-input .send-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--rp-purple); color: #FFF; display: grid; place-items: center; flex-shrink: 0; }
+
+  /* Confirmed booking */
+  .confirm-hero { background: linear-gradient(160deg, var(--rp-success) 0%, #047857 100%); border-radius: 22px; padding: 28px 22px 24px; margin: 8px 0 18px; color: #FFF; text-align: center; }
+  .confirm-hero .check { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 14px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,0.4); }
+  .confirm-hero h3 { font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -.3px; margin-bottom: 6px; color: #FFF; font-weight: 400; }
+  .confirm-hero p { font-size: 13px; opacity: .9; line-height: 1.4; }
+
+  /* Hotspot reveal */
+  [data-goto] { position: relative; cursor: pointer; }
+  .screen.reveal-hotspots [data-goto] { animation: hotspot-flash 1.4s ease-out 2; z-index: 50; }
+  @keyframes hotspot-flash {
+    0%, 100% { outline: 0 solid rgba(139,92,246,0); outline-offset: 0; }
+    40% { outline: 4px solid rgba(139,92,246,0.85); outline-offset: 4px; }
+    70% { outline: 4px solid rgba(139,92,246,0.5); outline-offset: 4px; }
+  }
+  .reveal-banner { position: absolute; bottom: 92px; left: 50%; transform: translateX(-50%); background: var(--rp-purple-dark); color: #FFF; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; box-shadow: 0 8px 24px rgba(109,40,217,0.4); opacity: 0; transition: opacity 0.25s; z-index: 100; pointer-events: none; white-space: nowrap; }
+  .screen.reveal-hotspots .reveal-banner { opacity: 1; }
+
+  /* Thumbs */
+  .thumbs { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .thumb { display: inline-flex; align-items: center; gap: 6px; background: #FFF; border: 1px solid var(--rp-line-strong); border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 500; color: var(--rp-muted); cursor: pointer; transition: all 0.15s; }
+  .thumb:hover { border-color: var(--rp-purple); color: var(--rp-purple-dark); }
+  .thumb .tnum { background: #E7F1EB; color: var(--rp-ink); font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; }
+  .thumb.is-active { background: var(--rp-ink); border-color: var(--rp-ink); color: #FFF; }
+  .thumb.is-active .tnum { background: var(--rp-purple); color: #FFF; }
+
+  .footer-hint { text-align: center; font-size: 12px; color: var(--rp-muted); margin-top: 4px; line-height: 1.5; }
+  .footer-hint kbd { background: #FFF; border: 1px solid var(--rp-line-strong); border-radius: 4px; padding: 1px 6px; font-size: 11px; font-family: 'Inter'; }
+
+  .input-field { background: #FFF; border-radius: 14px; padding: 14px 16px; border: 1px solid var(--rp-line); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .input-field .lab { font-size: 11px; color: var(--rp-muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+  .input-field .val { font-family: 'DM Serif Display', serif; font-size: 18px; }
+
+  .pizza-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+  .pizza-opt { background: #FFF; border: 1px solid var(--rp-line); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .pizza-opt.selected { border-color: var(--rp-purple); background: var(--rp-lavender-soft); font-weight: 700; }
+
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="stage-head">
+    <div>
+      <div class="stage-title">Phase 1 · <span class="hl">Core Services</span> Prototype</div>
+      <div class="stage-meta">
+        <span>Resident Portal × Amenify</span> <span class="dot">·</span>
+        <span>Rent rewards + Shop Local services</span> <span class="dot">·</span>
+        <span>Persona: Sarah · Villa Verano · $2,105 / mo</span> <span class="dot">·</span>
+        <a href="../mockups/index.html">← Back to Resident Portal prototype index</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="prev-btn">← Prev</button>
+    <div class="step-indicator">
+      Screen <span class="num" id="cur-num">1</span> · <span id="cur-name">Home</span>
+    </div>
+    <button class="ctrl-btn primary" id="next-btn">Next →</button>
+    <button class="ctrl-btn" id="restart-btn">⟲ Restart</button>
+  </div>
+
+  <div class="phone-stage">
+    <div class="phone">
+
+      <!-- ─────────── SCREEN 1: HOME ─────────── -->
+      <div class="screen is-active" data-screen="home" data-name="Home" data-step="1">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="greeting-row">
+            <div class="greeting">
+              <span class="rp-logo">Resident Portal</span>
+              <h2 style="margin-top:10px">Welcome,<br/>Sarah</h2>
+              <p>Villa Verano · 01-36</p>
+            </div>
+            <div class="icon-row">
+              <div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2"><path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="badge">2</span></div>
+              <div class="icon-btn" data-goto="concierge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+            </div>
+          </div>
+          <div class="hero-tile">
+            <h3>Use your services. <span class="hl">Earn back.</span></h3>
+            <p>Pay rent, book home services, order food — and pile up Shop Local Credits you can spend right here.</p>
+            <div class="tier-row">
+              <span class="tier-pill gold">⭐ Gold Tier · 1.0% back</span>
+              <span class="tier-pill">💚 Wallet $0.00</span>
+            </div>
+          </div>
+          <div class="balance-card">
+            <div class="label">Balance Due</div>
+            <div class="amount">$2,105<span style="font-size:22px;color:var(--rp-muted)">.00</span></div>
+            <div class="due-sub">Due May 31, 2026 · Pay now to earn $21.05 back 💚</div>
+            <div style="margin-top:14px"><button class="btn btn-primary" data-goto="payments">Pay Rent →</button></div>
+          </div>
+          <div class="rp-cash-card">
+            <div class="head">
+              <div class="brand">💚 Shop Local by Resident Portal<sup style="font-size:9px;font-weight:600">™</sup></div>
+              <div class="wallet-pill">Wallet <strong>$0.00</strong></div>
+            </div>
+            <p>Book cleaning, handyman, pet care, and pizza — pay with credit you've earned.</p>
+            <a data-goto="services">Browse services →</a>
+          </div>
+          <div class="quick-grid">
+            <div class="quick-tile" data-goto="wallet"><div class="num">$0</div><div class="lab">Shop Local<br/>Cash</div></div>
+            <div class="quick-tile" data-goto="services"><div class="num">28</div><div class="lab">Local<br/>Service Pros</div></div>
+            <div class="quick-tile" data-goto="concierge"><div class="num">24/7</div><div class="lab">Concierge<br/>Support</div></div>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab active" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab" data-goto="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Services</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><circle cx="18" cy="12" r="1.5"/></svg>Wallet</div>
+          <div class="tab" data-goto="concierge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Concierge</div>
+        </nav>
+        <div class="reveal-banner">Tap a highlighted area to continue ↓</div>
+      </div>
+
+      <!-- ─────────── SCREEN 2: PAYMENTS ─────────── -->
+      <div class="screen" data-screen="payments" data-name="Pay Rent" data-step="2">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="home"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Pay Rent</h2>
+          </div>
+          <div class="card" style="background:#E3F2E9;border:1px solid #C9E6D5">
+            <div style="font-size:11px;font-weight:600;color:var(--rp-muted);text-transform:uppercase;letter-spacing:.6px">Current Due</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1.05;letter-spacing:-.5px;margin-top:8px">$2,105.00</div>
+            <div style="font-size:11.5px;color:var(--rp-muted);margin-top:4px">Includes rent + utilities · Due May 31</div>
+          </div>
+          <div class="sec-title">Choose how to pay</div>
+          <div class="pm-list">
+            <div class="pm-option selected" data-goto="summary">
+              <div class="pm-radio"></div>
+              <div class="pm-icon" style="background:#1A1F71"><svg viewBox="0 0 60 18" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1" font-family="Inter">VISA</text></svg></div>
+              <div class="pm-meta"><div class="name">Visa Credit · 1234</div><div class="sub">Earns 1.0% Shop Local Credits 💚</div></div>
+            </div>
+            <div class="pm-option" data-goto="platinum">
+              <div class="pm-radio"></div>
+              <div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#6B6B6B" stroke-width="1.8"><path d="M3 6L12 1l9 5"/><path d="M5 6v9M9 6v9M15 6v9M19 6v9"/><path d="M2 17h20"/></svg></div>
+              <div class="pm-meta"><div class="name">Bank Account · ACH</div><div class="sub">No fee · See Resident Plus option</div></div>
+            </div>
+            <div class="pm-option">
+              <div class="pm-radio"></div>
+              <div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#6B6B6B" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 8h20"/></svg></div>
+              <div class="pm-meta"><div class="name">Debit Card</div><div class="sub">Add a new card</div></div>
+            </div>
+          </div>
+          <div style="background:#FFF;border:1px dashed var(--rp-line-strong);border-radius:14px;padding:14px;display:flex;gap:10px;align-items:center;margin-bottom:14px">
+            <span style="font-size:20px">💚</span>
+            <p style="font-size:11.5px;color:var(--rp-muted);line-height:1.4">Pay with Visa to earn <strong style="color:var(--rp-purple-dark)">$21.05 in Shop Local Credits</strong> on this payment.</p>
+          </div>
+          <button class="btn btn-primary" data-goto="summary">Continue →</button>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab" data-goto="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Services</div>
+          <div class="tab active" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><circle cx="18" cy="12" r="1.5"/></svg>Wallet</div>
+          <div class="tab" data-goto="concierge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Concierge</div>
+        </nav>
+        <div class="reveal-banner">Tap a payment method to continue ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 3: PLATINUM UPSELL (ACH PATH) ─────────── -->
+      <div class="screen" data-screen="platinum" data-name="Resident Plus ★" data-step="3">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="payments"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>For ACH Payers</h2>
+            <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div style="font-size:13px;color:var(--rp-muted);line-height:1.5;margin-bottom:14px">Pay rent from your bank account and still earn rewards. <strong style="color:var(--rp-ink)">Resident Plus</strong> unlocks the same benefits — without the card.</div>
+          <div class="platinum-card">
+            <div class="platinum-brand">
+              <span class="pl-logo">Resident Portal</span>
+              <span class="pl-tier">PLUS</span>
+            </div>
+            <h4>Get <span style="color:var(--rp-lavender)">$30+</span> back every month, automatically.</h4>
+            <div class="pl-sub">For ACH and bank-account payers. Skip the card fee — keep the rewards.</div>
+            <div class="platinum-benefits">
+              <div class="pb-row"><div class="pb-icon">💚</div><div class="pb-text"><strong>$30 Shop Local Credits</strong> deposited monthly into your wallet</div></div>
+              <div class="pb-row"><div class="pb-icon">⚡</div><div class="pb-text"><strong>Priority booking</strong> for cleaners, handymen, pet care</div></div>
+              <div class="pb-row"><div class="pb-icon">🎟</div><div class="pb-text"><strong>Free concierge</strong> requests, unlimited</div></div>
+              <div class="pb-row"><div class="pb-icon">⭐</div><div class="pb-text"><strong>Free service waiver</strong> ($25 value) every quarter</div></div>
+            </div>
+            <div class="platinum-price">
+              <span class="pp-amt">$9.99</span>
+              <span class="pp-per">/ month · cancel anytime</span>
+            </div>
+            <button class="btn-platinum" data-goto="summary">Start Resident Plus →</button>
+          </div>
+          <div style="font-size:11.5px;color:var(--rp-muted);text-align:center;margin-top:10px">Members typically earn $30–$60 in monthly value · Average rating ⭐ 4.8</div>
+          <div style="text-align:center;margin-top:14px"><a data-goto="summary" style="font-size:12.5px;color:var(--rp-muted);font-weight:600;text-decoration:none;border-bottom:1px solid var(--rp-line-strong);padding-bottom:1px">No thanks, continue with ACH</a></div>
+        </div>
+        <div class="reveal-banner">Tap to start Resident Plus or skip ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 4: SUMMARY ─────────── -->
+      <div class="screen" data-screen="summary" data-name="Summary" data-step="4">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="payments"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Review</h2>
+            <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="card" style="padding:18px 20px">
+            <div class="summary-line"><span class="label">Rent + Utilities</span><span>$2,105.00</span></div>
+            <div class="summary-line"><span class="label">Convenience Fee</span><span>$2.99</span></div>
+            <div class="summary-line total"><span class="label">Total</span><span>$2,107.99</span></div>
+          </div>
+          <div class="reward-callout">
+            <div class="ic"><span style="font-size:14px">💚</span></div>
+            <p>You'll earn <strong>$21.05 in Shop Local Credits</strong> on this payment — credited to your wallet instantly.</p>
+          </div>
+          <div style="font-size:12px;color:var(--rp-muted);margin:14px 4px 6px;text-transform:uppercase;letter-spacing:.5px;font-weight:700">Payment Method</div>
+          <div style="font-size:13.5px;color:var(--rp-ink);font-weight:500">Visa Credit Card · 1234</div>
+          <div style="font-size:12px;color:var(--rp-muted);margin:14px 4px 6px;text-transform:uppercase;letter-spacing:.5px;font-weight:700">Property</div>
+          <div style="font-size:13.5px;color:var(--rp-ink);font-weight:500">Sarah Thompson · Villa Verano 01-36</div>
+          <div style="margin-top:20px"><button class="btn btn-primary" data-goto="approved">Submit Payment</button></div>
+        </div>
+        <div class="reveal-banner">Tap Submit to continue ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 5: APPROVED ─────────── -->
+      <div class="screen" data-screen="approved" data-name="Payment Approved" data-step="5">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar" style="padding-top:14px"><h2 style="text-align:center;flex:1">Payment Approved</h2></div>
+          <div class="approved-hero">
+            <div class="check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.8"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3>Thank you, Sarah!</h3>
+            <p>Your payment of <strong>$2,107.99</strong> went through.</p>
+          </div>
+          <div class="reward-callout">
+            <div class="ic"><span style="font-size:14px">💚</span></div>
+            <p><strong>$21.05 in Shop Local Credits</strong> is now in your wallet. Spend it on cleaning, food, pet care — anything in Shop Local.</p>
+          </div>
+          <div class="reward-callout gold">
+            <div class="ic"><span style="font-size:14px">⭐</span></div>
+            <p>You're <strong>Gold Tier</strong> — keep paying on time to unlock Resident Plus perks.</p>
+          </div>
+          <div style="background:linear-gradient(135deg, var(--rp-lavender-soft) 0%, var(--rp-lavender) 100%);border-radius:16px;padding:14px 16px;margin:12px 0 8px;cursor:pointer;border:1px solid var(--rp-purple);box-shadow:0 6px 18px rgba(139,92,246,0.2)" data-goto="services">
+            <div style="font-family:'DM Serif Display',serif;font-size:16px;line-height:1.15">Spend your $21.05 now →</div>
+            <div style="font-size:11.5px;color:var(--rp-ink-2);margin-top:3px">Cleaning · TV mounting · Pet care · Local food</div>
+          </div>
+          <div style="margin-top:14px"><button class="btn btn-secondary" data-goto="wallet">View My Wallet</button></div>
+        </div>
+        <div class="reveal-banner">Tap "Spend your $21.05" to continue ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 6: WALLET ─────────── -->
+      <div class="screen" data-screen="wallet" data-name="Resident Portal Wallet" data-step="6">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="home"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Resident Portal Wallet</h2>
+          </div>
+          <div class="tier-badge">⭐ Gold Tier · 1.0% back on rent</div>
+          <div class="wallet-stats">
+            <div class="ws-item">
+              <div class="ws-lab">Shop Local Credits</div>
+              <div class="ws-amt purple">💚 $21.05</div>
+            </div>
+            <div class="ws-item">
+              <div class="ws-lab">Lifetime earned</div>
+              <div class="ws-amt">💚 $253.60</div>
+            </div>
+            <div style="grid-column:1/-1;position:relative;z-index:2">
+              <div class="tier-progress"><div class="fill"></div></div>
+              <div class="tier-progress-row"><span>Gold</span><span>$78.95 to Resident Plus perks</span></div>
+            </div>
+          </div>
+          <div style="background:linear-gradient(155deg, #1A1A1A 0%, #2D2D2D 60%, #0F3D2A 100%);border-radius:18px;padding:18px;color:#FFF;margin-bottom:14px;position:relative;overflow:hidden;cursor:pointer" data-goto="platinum">
+            <div style="font-size:11px;color:var(--rp-lavender);font-weight:800;letter-spacing:2px;text-transform:uppercase">UPGRADE</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:19px;line-height:1.15;margin-top:6px;letter-spacing:-0.3px">Get Resident Plus — $30/mo back for $9.99</div>
+            <div style="font-size:11.5px;color:rgba(255,255,255,0.7);margin-top:8px">Skip the card fee. Keep the rewards.</div>
+          </div>
+          <div class="market-section">Recent Activity</div>
+          <div class="card" style="padding:14px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:36px;height:36px;border-radius:10px;background:var(--rp-lavender-soft);display:grid;place-items:center;flex-shrink:0">💚</div>
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:13.5px">Rent payment cashback</div>
+                <div style="font-size:11px;color:var(--rp-muted);margin-top:2px">Today · Visa · 1234</div>
+              </div>
+              <div style="font-family:'DM Serif Display',serif;color:var(--rp-purple-dark);font-size:18px">+$21.05</div>
+            </div>
+          </div>
+          <button class="btn btn-purple" data-goto="services" style="margin-top:8px">Spend my $21.05 →</button>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab" data-goto="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Services</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab active" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><circle cx="18" cy="12" r="1.5"/></svg>Wallet</div>
+          <div class="tab" data-goto="concierge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Concierge</div>
+        </nav>
+        <div class="reveal-banner">Tap "Spend my $21.05" to continue ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 7: SERVICES (SHOP LOCAL) ─────────── -->
+      <div class="screen" data-screen="services" data-name="Shop Local" data-step="7">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:14px 4px 14px">
+            <div>
+              <span class="rp-logo" style="padding:4px 10px;font-size:13px;letter-spacing:2px">Resident Portal</span>
+              <h2 style="font-family:'DM Serif Display',serif;font-size:22px;line-height:1.1;margin-top:8px;letter-spacing:-0.3px">Shop Local</h2>
+              <div style="font-size:11.5px;color:var(--rp-muted);margin-top:3px">Curated pros · pay with credit</div>
+            </div>
+            <div class="icon-btn" data-goto="wallet" style="border-color:var(--rp-purple);background:var(--rp-lavender-soft)">
+              <span style="font-size:11px;font-weight:700;color:var(--rp-purple-dark)">$21</span>
+            </div>
+          </div>
+          <div style="background:linear-gradient(135deg, var(--rp-lavender) 0%, #BFE2CD 100%);border-radius:16px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:11px;color:var(--rp-ink-2);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Available to spend</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:24px;line-height:1;margin-top:4px;color:var(--rp-purple-dark)">💚 $21.05</div>
+            </div>
+            <div style="font-size:11px;color:var(--rp-ink-2);text-align:right;line-height:1.4">Shop Local<br/>Cash · Gold</div>
+          </div>
+          <div class="market-section">Most Booked This Week</div>
+          <div class="must-book-card" data-goto="book-clean">
+            <div>
+              <div class="mbc-cat">Home Cleaning</div>
+              <div class="mbc-name">Sparkle &amp; Co. <span class="mbc-verified">✓</span></div>
+              <div class="mbc-rating"><span class="star">★</span> 4.9 · 312 bookings</div>
+              <button class="mbc-btn">Book →</button>
+            </div>
+            <div class="mbc-photo">🧹</div>
+          </div>
+          <div class="must-book-card" data-goto="book-tv">
+            <div>
+              <div class="mbc-cat">Handyman · TV Mounting</div>
+              <div class="mbc-name">FixIt Now <span class="mbc-verified">✓</span></div>
+              <div class="mbc-rating"><span class="star">★</span> 4.8 · 187 jobs</div>
+              <button class="mbc-btn">Book →</button>
+            </div>
+            <div class="mbc-photo orange">🔨</div>
+          </div>
+          <div class="must-book-card" data-goto="maddie">
+            <div>
+              <div class="mbc-cat" style="color:#E11D48">Order with Maddie · AI</div>
+              <div class="mbc-name">Domino's Pizza</div>
+              <div class="mbc-rating"><span class="star">★</span> 4.7 · 25 min</div>
+              <button class="mbc-btn" style="background:var(--rp-orange)">Order →</button>
+            </div>
+            <div class="mbc-photo green">🍕</div>
+          </div>
+          <div class="market-section">All Services</div>
+          <div class="services-grid">
+            <div class="service-tile" data-goto="book-clean"><div class="st-icon-wrap">🧹</div><div class="st-name">Cleaning</div><div class="st-meta">From $60</div></div>
+            <div class="service-tile s-orange" data-goto="book-tv"><div class="st-icon-wrap">🔨</div><div class="st-name">Handyman</div><div class="st-meta">From $40</div></div>
+            <div class="service-tile s-pink"><div class="st-icon-wrap">🐶</div><div class="st-name">Pet Care</div><div class="st-meta">From $25</div></div>
+            <div class="service-tile s-blue"><div class="st-icon-wrap">🧺</div><div class="st-name">Laundry</div><div class="st-meta">From $30</div></div>
+            <div class="service-tile s-green" data-goto="maddie"><div class="st-icon-wrap">🍕</div><div class="st-name">Local Food</div><div class="st-meta">AI Order</div></div>
+            <div class="service-tile s-yellow"><div class="st-icon-wrap">🌿</div><div class="st-name">Plants</div><div class="st-meta">From $20</div></div>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab active" data-goto="services"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Services</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><circle cx="18" cy="12" r="1.5"/></svg>Wallet</div>
+          <div class="tab" data-goto="concierge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Concierge</div>
+        </nav>
+        <div class="reveal-banner">Tap a service to book ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 8: BOOK CLEANING ─────────── -->
+      <div class="screen" data-screen="book-clean" data-name="Book Cleaning" data-step="8">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="services"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Book Cleaning</h2>
+          </div>
+          <div class="booking-hero">
+            <div class="bh-cat">Home Cleaning · Sparkle &amp; Co.</div>
+            <h3>2 BR / 1 BA · Deep Clean</h3>
+            <div class="price"><strong>$89</strong> · 2 hrs · 1 cleaner</div>
+          </div>
+          <div class="pro-card">
+            <div class="pro-avatar">AC</div>
+            <div class="pro-meta">
+              <div class="pro-name">Anna C. · Sparkle &amp; Co.</div>
+              <div class="pro-sub">312 bookings · Background-checked</div>
+              <div class="pro-rating"><span class="star">★★★★★</span> 4.9</div>
+            </div>
+            <div class="pro-verified">✓ VERIFIED</div>
+          </div>
+          <div class="sec-title">Pick a time</div>
+          <div class="slot-grid">
+            <div class="slot"><div class="day">SAT</div><div class="date">17</div><div class="time">10 AM</div></div>
+            <div class="slot selected"><div class="day">SUN</div><div class="date">18</div><div class="time">2 PM</div></div>
+            <div class="slot"><div class="day">MON</div><div class="date">19</div><div class="time">9 AM</div></div>
+            <div class="slot"><div class="day">TUE</div><div class="date">20</div><div class="time">11 AM</div></div>
+            <div class="slot"><div class="day">WED</div><div class="date">21</div><div class="time">3 PM</div></div>
+            <div class="slot"><div class="day">THU</div><div class="date">22</div><div class="time">10 AM</div></div>
+          </div>
+          <div class="credit-toggle">
+            <div class="ic">💚</div>
+            <div class="meta">
+              <div class="ttl">Apply Shop Local Credits</div>
+              <div class="sub">$21.05 available in wallet</div>
+            </div>
+            <div class="toggle-pill"></div>
+          </div>
+          <div class="card" style="padding:14px 16px;margin-bottom:0">
+            <div class="summary-line"><span class="label">Cleaning · 2 hrs</span><span>$89.00</span></div>
+            <div class="summary-line credit"><span class="label">💚 Shop Local Credits</span><span>−$21.05</span></div>
+            <div class="summary-line"><span class="label">Charge to Visa · 1234</span><span>$67.95</span></div>
+            <div class="summary-line total"><span class="label">Total</span><span>$67.95</span></div>
+          </div>
+          <div style="margin-top:18px"><button class="btn btn-primary" data-goto="book-confirm">Confirm Booking →</button></div>
+        </div>
+        <div class="reveal-banner">Tap Confirm to book ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 9: BOOKING CONFIRMED ─────────── -->
+      <div class="screen" data-screen="book-confirm" data-name="Booking Confirmed" data-step="9">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar" style="padding-top:14px"><h2 style="text-align:center;flex:1">You're booked!</h2></div>
+          <div class="confirm-hero">
+            <div class="check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.8"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3>Anna's coming Sunday at 2 PM</h3>
+            <p>Sparkle &amp; Co. · Villa Verano 01-36</p>
+          </div>
+          <div class="card" style="padding:16px 18px">
+            <div class="summary-line"><span class="label">When</span><span>Sun, May 18 · 2:00 PM</span></div>
+            <div class="summary-line"><span class="label">Who</span><span>Anna C.</span></div>
+            <div class="summary-line"><span class="label">Paid w/ Shop Local Credits</span><span style="color:var(--rp-purple-dark)">$21.05</span></div>
+            <div class="summary-line"><span class="label">Paid w/ Visa · 1234</span><span>$67.95</span></div>
+            <div class="summary-line total"><span class="label">Total</span><span>$89.00</span></div>
+          </div>
+          <div style="background:#FFF;border:1px solid var(--rp-line);border-radius:14px;padding:14px;margin-top:12px;display:flex;align-items:center;gap:12px;cursor:pointer" data-goto="book-tv">
+            <div style="width:38px;height:38px;border-radius:10px;background:#FFF1DE;display:grid;place-items:center;flex-shrink:0;font-size:18px">🔨</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:13.5px">Need a TV mounted too?</div>
+              <div style="font-size:11.5px;color:var(--rp-muted);margin-top:2px">FixIt Now · From $40</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B9B9B" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+          <div style="background:#FFF;border:1px solid var(--rp-line);border-radius:14px;padding:14px;margin-top:8px;display:flex;align-items:center;gap:12px;cursor:pointer" data-goto="maddie">
+            <div style="width:38px;height:38px;border-radius:10px;background:#E6F4EC;display:grid;place-items:center;flex-shrink:0;font-size:18px">🍕</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:13.5px">Order dinner — ask Maddie</div>
+              <div style="font-size:11.5px;color:var(--rp-muted);margin-top:2px">AI assistant · Domino's, Chipotle, more</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B9B9B" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+          <div style="margin-top:18px"><button class="btn btn-secondary" data-goto="home">Back to Home</button></div>
+        </div>
+        <div class="reveal-banner">Tap to book TV mount or order food ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 10: BOOK TV MOUNTING ─────────── -->
+      <div class="screen" data-screen="book-tv" data-name="Book TV Mounting" data-step="10">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="services"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>TV Mounting</h2>
+          </div>
+          <div class="booking-hero" style="background:linear-gradient(160deg, #FFF1DE 0%, #FCE3BC 100%)">
+            <div class="bh-cat" style="color:#B45309">Handyman · FixIt Now</div>
+            <h3>Mount a TV (32"–65")</h3>
+            <div class="price"><strong>$79</strong> · 1 hr · includes hardware</div>
+          </div>
+          <div class="pro-card">
+            <div class="pro-avatar" style="background:linear-gradient(135deg,#FFE0B8 0%,#F5A24F 100%);color:#FFF">MR</div>
+            <div class="pro-meta">
+              <div class="pro-name">Marcus R. · FixIt Now</div>
+              <div class="pro-sub">187 jobs · Drywall &amp; stud certified</div>
+              <div class="pro-rating"><span class="star">★★★★★</span> 4.8</div>
+            </div>
+            <div class="pro-verified">✓ VERIFIED</div>
+          </div>
+          <div class="sec-title">Pick a time</div>
+          <div class="slot-grid">
+            <div class="slot"><div class="day">SAT</div><div class="date">17</div><div class="time">11 AM</div></div>
+            <div class="slot"><div class="day">SUN</div><div class="date">18</div><div class="time">5 PM</div></div>
+            <div class="slot selected"><div class="day">MON</div><div class="date">19</div><div class="time">6 PM</div></div>
+            <div class="slot"><div class="day">TUE</div><div class="date">20</div><div class="time">7 PM</div></div>
+            <div class="slot"><div class="day">WED</div><div class="date">21</div><div class="time">5 PM</div></div>
+            <div class="slot"><div class="day">THU</div><div class="date">22</div><div class="time">6 PM</div></div>
+          </div>
+          <div class="sec-title">TV Size</div>
+          <div class="pizza-options" style="margin-bottom:14px">
+            <div class="pizza-opt">32"–48"</div>
+            <div class="pizza-opt selected">49"–65" ✓</div>
+          </div>
+          <div class="credit-toggle">
+            <div class="ic">💚</div>
+            <div class="meta">
+              <div class="ttl">Apply Shop Local Credits</div>
+              <div class="sub">$0.00 left (used on cleaning)</div>
+            </div>
+            <div class="toggle-pill" style="background:#CCDDD2"></div>
+          </div>
+          <div class="card" style="padding:14px 16px;margin-bottom:0">
+            <div class="summary-line"><span class="label">TV mounting · 1 hr</span><span>$79.00</span></div>
+            <div class="summary-line"><span class="label">Charge to Visa · 1234</span><span>$79.00</span></div>
+            <div class="summary-line total"><span class="label">Total</span><span>$79.00</span></div>
+          </div>
+          <div style="margin-top:14px;font-size:11.5px;color:var(--rp-muted);text-align:center">Earns $0.79 in Shop Local Credits · paid with Visa</div>
+          <div style="margin-top:14px"><button class="btn btn-primary" data-goto="book-confirm">Confirm Booking →</button></div>
+        </div>
+        <div class="reveal-banner">Tap Confirm to book ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 11: MADDIE AI - DOMINO'S ORDER ─────────── -->
+      <div class="screen" data-screen="maddie" data-name="Maddie · Pizza" data-step="11">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body" style="padding-bottom:160px">
+          <div class="topbar">
+            <div class="back" data-goto="services"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2 style="font-size:20px">Maddie · Resident Portal AI</h2>
+          </div>
+          <div class="chat-header" style="padding-top:0">
+            <div class="chat-avatar maddie">M</div>
+            <div class="chat-meta">
+              <div class="chat-name">Maddie</div>
+              <div class="chat-status">Online · agentic ordering</div>
+            </div>
+          </div>
+
+          <div class="msg-row"><div class="msg-bubble ai">Hi Sarah! I can order food, schedule services, or check your wallet. What sounds good? 🍕</div></div>
+          <div class="msg-row user"><div class="msg-bubble user">Order me a pizza from Domino's</div></div>
+          <div class="msg-row"><div class="msg-bubble ai">On it. I see your usual order: <span class="strong">Large pepperoni + Coke Zero</span>. Want the same?</div></div>
+          <div class="quick-replies">
+            <span class="qr-chip">Yes, my usual</span>
+            <span class="qr-chip">Make it veggie</span>
+            <span class="qr-chip">Add wings</span>
+          </div>
+          <div class="msg-row user" style="margin-top:14px"><div class="msg-bubble user">Yes, my usual</div></div>
+          <div class="msg-row"><div class="msg-bubble ai">Delivering to <span class="strong">Villa Verano 01-36</span>. Estimated 25 min. Here's the order:</div></div>
+          <div class="agent-card">
+            <div class="ac-head">
+              <div class="ac-logo">D</div>
+              <div>
+                <div class="ac-name">Domino's · Cincinnati</div>
+                <div class="ac-sub">Estimated arrival: 9:48 PM</div>
+              </div>
+            </div>
+            <div class="ac-line"><span class="lab">Large Pepperoni</span><span>$14.99</span></div>
+            <div class="ac-line"><span class="lab">Coke Zero · 20oz</span><span>$2.99</span></div>
+            <div class="ac-line"><span class="lab">Delivery + fees</span><span>$5.49</span></div>
+            <div class="ac-total"><span>Total</span><span>$23.47</span></div>
+            <div class="ac-credit">💚 Pay $0 — use $23.47 from your Shop Local Credits next time</div>
+          </div>
+          <div class="msg-row"><div class="msg-bubble ai">Confirm and I'll place the order on your Visa · 1234.</div></div>
+          <div class="quick-replies">
+            <span class="qr-chip" data-goto="maddie-done" style="background:var(--rp-purple);color:#FFF">Confirm order →</span>
+            <span class="qr-chip">Change toppings</span>
+          </div>
+        </div>
+        <div class="reveal-banner">Tap "Confirm order" to place ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 12: MADDIE - ORDER CONFIRMED ─────────── -->
+      <div class="screen" data-screen="maddie-done" data-name="Order Placed" data-step="12">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body">
+          <div class="topbar" style="padding-top:14px"><h2 style="text-align:center;flex:1">Order Placed</h2></div>
+          <div class="confirm-hero" style="background:linear-gradient(160deg,#F5A24F 0%,#D97706 100%)">
+            <div class="check" style="font-size:30px">🍕</div>
+            <h3>Maddie ordered for you</h3>
+            <p>Domino's · Arrives ~9:48 PM</p>
+          </div>
+          <div class="card" style="padding:16px 18px">
+            <div class="summary-line"><span class="label">Large Pepperoni</span><span>$14.99</span></div>
+            <div class="summary-line"><span class="label">Coke Zero</span><span>$2.99</span></div>
+            <div class="summary-line"><span class="label">Delivery + fees</span><span>$5.49</span></div>
+            <div class="summary-line total"><span class="label">Visa · 1234</span><span>$23.47</span></div>
+          </div>
+          <div class="reward-callout" style="margin-top:14px">
+            <div class="ic"><span style="font-size:14px">💚</span></div>
+            <p>You'll earn <strong>$0.23 in Shop Local Credits</strong> on this order — credited when delivery confirms.</p>
+          </div>
+          <div style="background:#FFF;border:1px solid var(--rp-line);border-radius:14px;padding:14px;margin-top:12px;display:flex;align-items:center;gap:12px;cursor:pointer" data-goto="concierge">
+            <div style="width:38px;height:38px;border-radius:10px;background:var(--rp-lavender-soft);display:grid;place-items:center;flex-shrink:0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14532D" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:13.5px">Need help with anything else?</div>
+              <div style="font-size:11.5px;color:var(--rp-muted);margin-top:2px">Talk to a real concierge · 24/7</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B9B9B" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+          <div style="margin-top:18px"><button class="btn btn-secondary" data-goto="home">Back to Home</button></div>
+        </div>
+        <div class="reveal-banner">Tap "Need help" to meet the concierge ↑</div>
+      </div>
+
+      <!-- ─────────── SCREEN 13: CONCIERGE CHAT ─────────── -->
+      <div class="screen" data-screen="concierge" data-name="Concierge Support" data-step="13">
+        <div class="status-bar"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg><svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg><svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg></span></div>
+        <div class="body" style="padding-bottom:160px">
+          <div class="topbar">
+            <div class="back" data-goto="home"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2 style="font-size:20px">Concierge</h2>
+          </div>
+          <div class="chat-header" style="padding-top:0">
+            <div class="chat-avatar concierge">DJ</div>
+            <div class="chat-meta">
+              <div class="chat-name">Devon · Resident Portal Concierge</div>
+              <div class="chat-status">Online · replies in ~2 min</div>
+            </div>
+          </div>
+
+          <div class="msg-row"><div class="msg-bubble ai">Hi Sarah, this is Devon at Resident Portal Concierge. How can I help tonight? 🌙</div></div>
+          <div class="msg-row user"><div class="msg-bubble user">My dishwasher's leaking — what should I do?</div></div>
+          <div class="msg-row"><div class="msg-bubble ai">Got it. I'll file a maintenance ticket with Villa Verano right now. While you wait, can you turn off the water shut-off under the sink?</div></div>
+          <div class="msg-row user"><div class="msg-bubble user">Done. Towel's down too.</div></div>
+          <div class="msg-row"><div class="msg-bubble ai">Perfect. Maintenance will be there <span class="strong">tomorrow 8–10 AM</span>. I added <span class="strong">$25 in Shop Local Credits</span> to your wallet for the trouble — that's a Gold-tier perk.</div></div>
+
+          <div class="agent-card" style="border-color:var(--rp-success)">
+            <div class="ac-head">
+              <div class="ac-logo" style="background:var(--rp-success)">✓</div>
+              <div>
+                <div class="ac-name">Maintenance Ticket #4821</div>
+                <div class="ac-sub">Villa Verano · 01-36 · Kitchen</div>
+              </div>
+            </div>
+            <div class="ac-line"><span class="lab">Issue</span><span>Dishwasher leak</span></div>
+            <div class="ac-line"><span class="lab">Scheduled</span><span>Tue · 8–10 AM</span></div>
+            <div class="ac-line"><span class="lab">Tech</span><span>Building maint.</span></div>
+            <div class="ac-credit" style="background:#DCF3E5;color:#047857">+$25 Shop Local Credits added — Gold-tier perk 💚</div>
+          </div>
+
+          <div class="msg-row"><div class="msg-bubble ai">Anything else? I can also schedule the cleaning for after they fix it. ✨</div></div>
+          <div class="quick-replies">
+            <span class="qr-chip" data-goto="wallet">Check my wallet</span>
+            <span class="qr-chip" data-goto="services">Book a cleaning</span>
+            <span class="qr-chip" data-goto="home">Thanks, that's it</span>
+          </div>
+        </div>
+        <div class="reveal-banner">Tap a chip to continue ↑</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="thumbs" id="thumbs">
+    <div class="thumb is-active" data-goto="home"><span class="tnum">1</span>Home</div>
+    <div class="thumb" data-goto="payments"><span class="tnum">2</span>Pay Rent</div>
+    <div class="thumb" data-goto="platinum"><span class="tnum">3</span>Resident Plus</div>
+    <div class="thumb" data-goto="summary"><span class="tnum">4</span>Review</div>
+    <div class="thumb" data-goto="approved"><span class="tnum">5</span>Approved</div>
+    <div class="thumb" data-goto="wallet"><span class="tnum">6</span>Wallet</div>
+    <div class="thumb" data-goto="services"><span class="tnum">7</span>Shop Local</div>
+    <div class="thumb" data-goto="book-clean"><span class="tnum">8</span>Cleaning</div>
+    <div class="thumb" data-goto="book-confirm"><span class="tnum">9</span>Confirmed</div>
+    <div class="thumb" data-goto="book-tv"><span class="tnum">10</span>TV Mount</div>
+    <div class="thumb" data-goto="maddie"><span class="tnum">11</span>Maddie</div>
+    <div class="thumb" data-goto="maddie-done"><span class="tnum">12</span>Order</div>
+    <div class="thumb" data-goto="concierge"><span class="tnum">13</span>Concierge</div>
+  </div>
+
+  <div class="footer-hint">
+    Tap any button to advance · tap anywhere to highlight clickable hotspots · use <kbd>←</kbd>/<kbd>→</kbd> arrow keys
+  </div>
+</div>
+
+<script>
+(function(){
+  const screens = Array.from(document.querySelectorAll('.phone .screen'));
+  const order = screens.map(s => s.dataset.screen);
+  const thumbs = Array.from(document.querySelectorAll('.thumb'));
+  const curNumEl = document.getElementById('cur-num');
+  const curNameEl = document.getElementById('cur-name');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const restartBtn = document.getElementById('restart-btn');
+
+  function getActive() { return document.querySelector('.screen.is-active'); }
+  function go(name) {
+    const target = document.querySelector('.screen[data-screen="'+name+'"]');
+    if (!target) return;
+    screens.forEach(s => { s.classList.remove('is-active'); s.classList.remove('reveal-hotspots'); s.querySelector('.body').scrollTop = 0; });
+    target.classList.add('is-active');
+    curNumEl.textContent = target.dataset.step;
+    curNameEl.textContent = target.dataset.name;
+    thumbs.forEach(t => t.classList.toggle('is-active', t.dataset.goto === name));
+    updateNav(name);
+  }
+  function updateNav(name) {
+    const idx = order.indexOf(name);
+    prevBtn.disabled = idx <= 0;
+    nextBtn.disabled = idx >= order.length - 1;
+  }
+  function revealHotspots() {
+    const active = getActive(); if (!active) return;
+    active.classList.remove('reveal-hotspots');
+    void active.offsetWidth;
+    active.classList.add('reveal-hotspots');
+    clearTimeout(window.__revealTimer);
+    window.__revealTimer = setTimeout(() => { active.classList.remove('reveal-hotspots'); }, 2800);
+  }
+  document.querySelectorAll('.phone .screen').forEach(screen => {
+    screen.addEventListener('click', function(e){
+      const hot = e.target.closest('[data-goto]');
+      if (hot) { e.preventDefault(); e.stopPropagation(); const dest = hot.dataset.goto; if (dest) go(dest); }
+      else { revealHotspots(); }
+    });
+  });
+  thumbs.forEach(t => { t.addEventListener('click', e => { e.stopPropagation(); go(t.dataset.goto); }); });
+  prevBtn.addEventListener('click', () => { const cur = getActive().dataset.screen; const idx = order.indexOf(cur); if (idx > 0) go(order[idx-1]); });
+  nextBtn.addEventListener('click', () => { const cur = getActive().dataset.screen; const idx = order.indexOf(cur); if (idx < order.length - 1) go(order[idx+1]); });
+  restartBtn.addEventListener('click', () => go('home'));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') nextBtn.click();
+    else if (e.key === 'ArrowLeft') prevBtn.click();
+    else if (e.key === 'r' || e.key === 'R') restartBtn.click();
+  });
+  updateNav('home');
+})();
+</script>
+</body>
+</html>

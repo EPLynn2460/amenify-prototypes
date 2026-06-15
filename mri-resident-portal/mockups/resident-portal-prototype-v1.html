@@ -1,0 +1,3036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Resident Portal × Amenify — Clickable Prototype v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rp-lavender: #A7D7BE;
+    --rp-lavender-soft: #E3F2E9;
+    --rp-lavender-line: #8FCBA8;
+    --rp-purple: #2E8B62;
+    --rp-purple-dark: #14532D;
+    --rp-pink: #BCE3CC;
+    --rp-orange: #F5A24F;
+    --rp-yellow: #FFE15D;
+    --rp-cream: #EFF5F1;
+    --rp-card: #FFFFFF;
+    --rp-ink: #1A1A1A;
+    --rp-ink-2: #2D2D2D;
+    --rp-muted: #6B6B6B;
+    --rp-faint: #9B9B9B;
+    --rp-line: #E4EFE8;
+    --rp-line-strong: #CCDDD2;
+    --rp-success: #10B981;
+    --rp-danger: #DC2626;
+    --shadow-sm: 0 1px 2px rgba(20,20,20,0.04), 0 1px 3px rgba(20,20,20,0.06);
+    --shadow-md: 0 4px 12px rgba(20,20,20,0.06), 0 8px 24px rgba(20,20,20,0.06);
+    --shadow-lg: 0 12px 40px rgba(20,20,20,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #E9F2EC; color: var(--rp-ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; }
+
+  /* ─────────── Stage / page chrome ─────────── */
+  .stage {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    padding: 28px 24px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .stage-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 18px; flex-wrap: wrap;
+  }
+  .stage-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; line-height: 1.3;
+    letter-spacing: -0.4px;
+    margin-bottom: 12px;
+  }
+  .stage-title .hl {
+    background: linear-gradient(180deg, transparent 62%, var(--rp-yellow) 62%, var(--rp-yellow) 88%, transparent 88%);
+    padding: 0 6px;
+  }
+  .stage-meta {
+    font-size: 12.5px; color: var(--rp-muted);
+    display: flex; align-items: center; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .stage-meta .dot { color: var(--rp-line-strong); font-weight: 700; }
+  .stage-meta a { color: var(--rp-purple-dark); text-decoration: none; font-weight: 600; border-bottom: 1.5px solid var(--rp-purple-dark); }
+
+  .controls {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    flex-wrap: wrap;
+  }
+  .ctrl-btn {
+    background: #FFF; color: var(--rp-ink);
+    border: 1px solid var(--rp-line-strong);
+    padding: 9px 14px; border-radius: 999px;
+    font-family: 'Inter'; font-weight: 600; font-size: 13px;
+    cursor: pointer; transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .ctrl-btn:hover { border-color: var(--rp-purple); color: var(--rp-purple-dark); }
+  .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .ctrl-btn.primary { background: var(--rp-ink); color: #FFF; border-color: var(--rp-ink); }
+  .ctrl-btn.primary:hover { background: var(--rp-purple-dark); border-color: var(--rp-purple-dark); color: #FFF; }
+  .step-indicator {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--rp-ink);
+    padding: 0 12px;
+    min-width: 240px; text-align: center;
+  }
+  .step-indicator .num { color: var(--rp-purple-dark); font-style: italic; }
+  .step-indicator .star { color: var(--rp-orange); margin-left: 4px; }
+
+  /* ─────────── Phone stage ─────────── */
+  .phone-stage {
+    display: grid; place-items: center;
+    padding: 12px 0;
+  }
+  .phone {
+    width: 380px;
+    height: 780px;
+    background: #000;
+    border-radius: 48px;
+    padding: 11px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+  }
+  .phone::before {
+    content: ''; position: absolute; left: 50%; top: 22px;
+    transform: translateX(-50%);
+    width: 110px; height: 32px; background: #000;
+    border-radius: 20px; z-index: 5;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    background: #FFFFFF;
+    border-radius: 38px;
+    overflow: hidden;
+    position: relative;
+    display: none;
+    flex-direction: column;
+  }
+  .screen.is-active { display: flex; }
+
+  .status-bar {
+    height: 48px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 28px 4px;
+    font-size: 14px; font-weight: 600; color: var(--rp-ink);
+    flex-shrink: 0; position: relative; z-index: 6;
+  }
+  .status-bar .signal { display: flex; gap: 4px; align-items: center; }
+  .body {
+    flex: 1; overflow-y: auto;
+    padding: 4px 18px 100px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .body::-webkit-scrollbar { width: 0; }
+
+  .tabbar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 78px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--rp-line);
+    display: flex; align-items: flex-start; justify-content: space-around;
+    padding-top: 10px; z-index: 4;
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--rp-faint); font-size: 10px; font-weight: 500;
+    padding: 4px 8px; border-radius: 8px; cursor: pointer;
+  }
+  .tab svg { width: 22px; height: 22px; }
+  .tab.active { color: var(--rp-purple); }
+
+  /* ─────────── Resident Portal primitives (re-used from v1) ─────────── */
+  .rp-logo {
+    display: inline-block;
+    background: var(--rp-lavender);
+    padding: 5px 12px; border-radius: 7px;
+    font-weight: 800; font-size: 16px; letter-spacing: 2.5px;
+    color: var(--rp-ink); line-height: 1;
+  }
+  .greeting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 4px 18px;
+  }
+  .greeting h2 { font-family: 'DM Serif Display', serif; font-size: 19px; line-height: 1.1; }
+  .greeting p { font-size: 12px; color: var(--rp-muted); margin-top: 2px; }
+  .icon-row { display: flex; gap: 10px; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #FFF; border: 1px solid var(--rp-line);
+    display: grid; place-items: center; position: relative;
+  }
+  .icon-btn .badge {
+    position: absolute; top: -3px; right: -3px;
+    background: var(--rp-danger); color: #FFF;
+    font-size: 10px; font-weight: 700;
+    width: 16px; height: 16px; border-radius: 50%;
+    display: grid; place-items: center;
+    border: 2px solid #FFF;
+  }
+  .card { background: #FFF; border-radius: 18px; padding: 20px; margin-bottom: 14px; border: 1px solid #E7F1EB; box-shadow: var(--shadow-sm); }
+  .card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; font-weight: 400; margin-bottom: 6px; }
+  .hero-tile {
+    background: linear-gradient(135deg, var(--rp-lavender) 0%, #BFE2CD 100%);
+    border-radius: 22px; padding: 22px 22px 24px; margin-bottom: 16px; color: var(--rp-ink); position: relative; overflow: hidden;
+  }
+  .hero-tile h3 { font-family: 'DM Serif Display', serif; font-size: 28px; line-height: 1.05; letter-spacing: -0.4px; max-width: 78%; }
+  .hero-tile h3 .hl { background: linear-gradient(180deg, transparent 55%, var(--rp-yellow) 55%); padding: 0 4px; }
+  .tier-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 12px; color: var(--rp-ink-2); }
+  .tier-pill { background: #FFF; padding: 5px 10px; border-radius: 999px; font-weight: 600; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; }
+  .balance-card { background: #FFF; border-radius: 18px; padding: 20px; margin-bottom: 14px; box-shadow: var(--shadow-sm); border: 1px solid #E7F1EB; }
+  .balance-card .label { font-size: 11px; font-weight: 600; color: var(--rp-muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  .balance-card .amount { font-family: 'DM Serif Display', serif; font-size: 38px; line-height: 1; margin-top: 6px; letter-spacing: -1px; }
+  .balance-card .due-sub { font-size: 12px; color: var(--rp-muted); margin-top: 6px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 14px 18px; border-radius: 14px;
+    font-family: 'Inter'; font-weight: 600; font-size: 14px;
+    border: none; cursor: pointer; width: 100%;
+    transition: transform .1s ease;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--rp-ink); color: #FFF; }
+  .btn-secondary { background: #FFF; color: var(--rp-ink); border: 1px solid var(--rp-line-strong); }
+  .btn-purple { background: var(--rp-purple); color: #FFF; }
+  .btn-purple-disabled { background: #C9E6D5; color: #FFF; cursor: not-allowed; }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+
+  .rp-cash-card {
+    background: linear-gradient(135deg, #E3F2E9 0%, #D6EDDF 100%);
+    border-radius: 18px; padding: 18px; margin-bottom: 14px; border: 1px solid #C9E6D5;
+  }
+  .rp-cash-card .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .rp-cash-card .brand { display: flex; align-items: center; gap: 6px; font-family: 'DM Serif Display', serif; font-size: 17px; }
+  .rp-cash-card .heart { font-size: 16px; }
+  .rp-cash-card .wallet-pill { background: #FFF; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .rp-cash-card .wallet-pill strong { color: var(--rp-purple); font-weight: 800; }
+  .rp-cash-card p { font-size: 12px; color: var(--rp-ink-2); line-height: 1.45; }
+  .rp-cash-card a { display: inline-block; margin-top: 10px; color: var(--rp-purple-dark); font-size: 12px; font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--rp-purple-dark); }
+
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .quick-tile { background: #FFF; border-radius: 16px; padding: 14px 10px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid #E7F1EB; }
+  .quick-tile .num { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1; }
+  .quick-tile .lab { font-size: 10px; color: var(--rp-muted); margin-top: 6px; line-height: 1.3; }
+
+  .topbar { display: flex; align-items: center; gap: 12px; padding: 10px 4px 18px; }
+  .topbar .back {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #FFF; border: 1px solid var(--rp-line);
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .topbar h2 { font-family: 'DM Serif Display', serif; font-size: 22px; flex: 1; }
+  .topbar .x { width: 36px; height: 36px; border-radius: 50%; background: transparent; display: grid; place-items: center; color: var(--rp-muted); cursor: pointer; }
+
+  .sec-title { font-family: 'DM Serif Display', serif; font-size: 16px; margin: 8px 4px 10px; }
+
+  /* Payment method options */
+  .pm-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .pm-option { display: flex; align-items: center; gap: 12px; background: #FFF; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--rp-line); box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.15s; }
+  .pm-option.selected { border-color: var(--rp-purple); background: #F7FCF9; }
+  .pm-radio { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--rp-line-strong); display: grid; place-items: center; flex-shrink: 0; }
+  .pm-option.selected .pm-radio { border-color: var(--rp-purple); background: var(--rp-purple); }
+  .pm-option.selected .pm-radio::after { content: ''; width: 8px; height: 8px; background: #FFF; border-radius: 50%; }
+  .pm-icon { width: 36px; height: 26px; border-radius: 4px; background: #EDF5EF; display: grid; place-items: center; flex-shrink: 0; }
+  .pm-meta { flex: 1; }
+  .pm-meta .name { font-weight: 600; font-size: 14px; }
+  .pm-meta .sub { font-size: 11px; color: var(--rp-muted); margin-top: 2px; }
+
+  .offer {
+    background: linear-gradient(160deg, #E3F2E9 0%, #D6EDDF 60%, #C9E6D5 100%);
+    border: 1.5px solid var(--rp-purple);
+    border-radius: 20px; padding: 20px; margin-bottom: 18px;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.18);
+  }
+  .offer .head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .offer .heart-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--rp-purple); display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(139,92,246,0.4); }
+  .offer .heart-circle span { font-size: 18px; }
+  .offer h4 { font-family: 'DM Serif Display', serif; font-size: 19px; line-height: 1.15; letter-spacing: -0.2px; }
+  .offer .sub { font-size: 12.5px; color: var(--rp-ink-2); line-height: 1.45; margin-bottom: 14px; }
+  .reward-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .reward-tile { background: rgba(255,255,255,0.7); border: 1px solid rgba(139,92,246,0.2); border-radius: 12px; padding: 12px; text-align: left; }
+  .reward-tile .rt-icon { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .reward-tile .rt-icon span { font-size: 14px; }
+  .reward-tile .rt-amt { font-family: 'DM Serif Display', serif; font-size: 22px; line-height: 1; letter-spacing: -0.4px; color: var(--rp-purple-dark); }
+  .reward-tile .rt-lab { font-size: 11px; color: var(--rp-ink-2); margin-top: 4px; font-weight: 600; }
+  .offer ul { list-style: none; padding: 0; background: rgba(255,255,255,0.55); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
+  .offer li { font-size: 12px; color: var(--rp-ink-2); line-height: 1.5; padding-left: 16px; position: relative; }
+  .offer li:before { content: ''; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--rp-purple); }
+  .offer li + li { margin-top: 6px; }
+  .offer li strong { color: var(--rp-purple-dark); font-weight: 800; }
+  .offer .agree-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+  .offer .checkbox { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--rp-purple-dark); background: #FFF; flex-shrink: 0; margin-top: 1px; display: grid; place-items: center; cursor: pointer; }
+  .offer .checkbox.checked { background: var(--rp-purple); }
+  .offer .checkbox.checked::after { content: '✓'; color: #FFF; font-size: 12px; font-weight: 800; }
+  .offer .agree-text { font-size: 11.5px; color: var(--rp-ink-2); line-height: 1.4; }
+
+  .summary-line { display: flex; justify-content: space-between; padding: 11px 0; font-size: 13px; border-bottom: 1px solid var(--rp-line); }
+  .summary-line:last-child { border-bottom: none; }
+  .summary-line.total { font-weight: 700; font-size: 15px; border-top: 2px solid var(--rp-ink); margin-top: 4px; border-bottom: none; }
+  .summary-line .label { color: var(--rp-muted); text-transform: uppercase; font-size: 11px; letter-spacing: .5px; font-weight: 600; }
+  .summary-line.total .label { color: var(--rp-ink); }
+
+  .reward-callout { background: linear-gradient(135deg, #E3F2E9 0%, #C9E6D5 100%); border: 1px solid var(--rp-lavender-line); border-radius: 14px; padding: 14px; margin: 14px 0; display: flex; align-items: center; gap: 12px; }
+  .reward-callout .ic { width: 32px; height: 32px; border-radius: 50%; background: var(--rp-purple); display: grid; place-items: center; flex-shrink: 0; }
+  .reward-callout p { font-size: 12.5px; line-height: 1.45; color: var(--rp-ink-2); }
+  .reward-callout p strong { color: var(--rp-purple-dark); font-weight: 800; }
+  .meta-block { font-size: 12px; color: var(--rp-muted); margin: 12px 0; }
+  .meta-block .lab { text-transform: uppercase; font-size: 10px; letter-spacing: .5px; font-weight: 700; color: var(--rp-faint); margin-bottom: 4px; }
+  .meta-block .val { color: var(--rp-ink); font-size: 13px; line-height: 1.4; font-weight: 500; }
+  .approved-hero { background: linear-gradient(160deg, var(--rp-purple) 0%, #14532D 100%); border-radius: 22px; padding: 30px 22px 26px; margin: 8px 0 20px; color: #FFF; text-align: center; }
+  .approved-hero .check { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 14px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,0.4); }
+  .approved-hero h3 { font-family: 'DM Serif Display', serif; font-size: 24px; letter-spacing: -.3px; margin-bottom: 6px; color: #FFF; font-weight: 400; }
+  .approved-hero p { font-size: 13px; opacity: .9; line-height: 1.4; }
+
+  .input-field { background: #FFF; border-radius: 14px; padding: 14px 16px; border: 1px solid var(--rp-line); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .input-field .lab { font-size: 11px; color: var(--rp-muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+  .input-field .val { font-family: 'DM Serif Display', serif; font-size: 18px; }
+
+  .notif-card { background: rgba(237, 231, 251, 0.95); border: 1px solid #C9E6D5; border-radius: 18px; padding: 14px; margin: 14px auto 0; max-width: 320px; backdrop-filter: blur(12px); box-shadow: var(--shadow-md); display: flex; gap: 10px; align-items: flex-start; }
+  .notif-card .app-icon { width: 36px; height: 36px; border-radius: 9px; background: var(--rp-ink); display: grid; place-items: center; flex-shrink: 0; }
+  .notif-card .app-icon::after { content: ''; width: 14px; height: 14px; background: var(--rp-purple); border-radius: 3px; }
+  .notif-card .meta { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--rp-muted); margin-bottom: 4px; }
+  .notif-card .body-txt { font-size: 12.5px; color: var(--rp-ink-2); line-height: 1.4; margin-top: 2px; }
+
+  /* Platinum offer */
+  .platinum-card { background: linear-gradient(155deg, #1A1A1A 0%, #2D2D2D 60%, #0F3D2A 100%); border-radius: 20px; padding: 22px 20px 20px; margin: 6px 0 14px; color: #FFF; position: relative; overflow: hidden; box-shadow: 0 12px 36px rgba(26,26,26,0.25); }
+  .platinum-card::after { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(199,184,240,0.25) 0%, transparent 65%); }
+  .platinum-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .platinum-brand .pl-logo { background: var(--rp-lavender); color: var(--rp-ink); padding: 4px 10px; border-radius: 6px; font-weight: 800; letter-spacing: 2.2px; font-size: 12px; line-height: 1; }
+  .platinum-brand .pl-tier { background: linear-gradient(135deg, #DDF0E5 0%, #A7D7BE 100%); color: var(--rp-purple-dark); padding: 4px 10px; border-radius: 6px; font-weight: 800; letter-spacing: 2.2px; font-size: 11px; line-height: 1; }
+  .platinum-card h4 { font-family: 'DM Serif Display', serif; font-size: 22px; line-height: 1.15; color: #FFF; font-weight: 400; margin-bottom: 8px; letter-spacing: -0.2px; position: relative; z-index: 2; }
+  .platinum-card .pl-sub { font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,0.78); margin-bottom: 16px; position: relative; z-index: 2; }
+  .platinum-benefits { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; margin-bottom: 16px; position: relative; z-index: 2; }
+  .platinum-benefits .pb-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .platinum-benefits .pb-row:last-child { border-bottom: none; }
+  .platinum-benefits .pb-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--rp-lavender); color: var(--rp-ink); display: grid; place-items: center; flex-shrink: 0; font-size: 11px; font-weight: 800; }
+  .platinum-benefits .pb-text { font-size: 12px; line-height: 1.45; color: rgba(255,255,255,0.92); }
+  .platinum-benefits .pb-text strong { color: var(--rp-lavender); font-weight: 700; }
+  .platinum-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 14px; position: relative; z-index: 2; }
+  .platinum-price .pp-amt { font-family: 'DM Serif Display', serif; font-size: 34px; line-height: 1; color: #FFF; letter-spacing: -0.6px; }
+  .platinum-price .pp-per { font-size: 12px; color: rgba(255,255,255,0.6); }
+  .btn-platinum { background: var(--rp-lavender); color: var(--rp-ink); width: 100%; border: none; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 14px; cursor: pointer; position: relative; z-index: 2; }
+  .ach-confirm-pill { display: flex; align-items: center; gap: 8px; background: #F0F0F0; border-radius: 999px; padding: 6px 12px; margin: 8px 0 14px; font-size: 11px; color: var(--rp-muted); width: fit-content; }
+  .ach-confirm-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--rp-success); }
+
+  /* ─────────── Marketplace / Wallet screen ─────────── */
+  .market-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 14px 4px 14px;
+  }
+  .market-top h2 {
+    font-family: 'DM Serif Display', serif; font-size: 22px;
+    line-height: 1.1; margin-top: 8px; letter-spacing: -0.3px;
+  }
+  .rp-logo.small { padding: 4px 10px; font-size: 13px; letter-spacing: 2px; }
+
+  .wallet-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 18px; padding: 16px;
+    background: linear-gradient(135deg, var(--rp-lavender) 0%, #BFE2CD 100%);
+    border-radius: 18px;
+    position: relative; overflow: hidden;
+  }
+  .wallet-stats::before {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+  }
+  .ws-item { position: relative; z-index: 2; }
+  .ws-item .ws-lab {
+    font-size: 10px; color: var(--rp-ink-2);
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: .5px; opacity: 0.75; margin-bottom: 4px;
+  }
+  .ws-item .ws-amt {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; line-height: 1; letter-spacing: -0.3px;
+    color: var(--rp-ink); display: inline-flex; align-items: baseline; gap: 4px;
+  }
+  .ws-item .ws-amt.purple {
+    color: var(--rp-purple-dark);
+  }
+  .ws-item .ws-amt .heart { font-size: 16px; }
+
+  .market-section {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; margin: 18px 4px 12px;
+    line-height: 1.1; letter-spacing: -0.2px;
+  }
+
+  .must-book-card {
+    display: grid; grid-template-columns: 1fr 96px;
+    background: linear-gradient(135deg, #E3F2E9 0%, #D6EDDF 100%);
+    border-radius: 18px; padding: 16px; margin-bottom: 8px;
+    align-items: center; gap: 12px;
+    border: 1px solid #C9E6D5;
+  }
+  .mbc-cat { font-size: 11px; color: var(--rp-purple-dark); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .mbc-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; line-height: 1.05;
+    margin: 6px 0 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .mbc-verified {
+    background: var(--rp-purple); color: #FFF;
+    width: 16px; height: 16px; border-radius: 50%;
+    display: inline-grid; place-items: center;
+    font-size: 10px; font-weight: 800;
+  }
+  .mbc-rating { font-size: 12px; color: var(--rp-ink-2); margin-bottom: 12px; }
+  .mbc-rating .star { color: var(--rp-orange); }
+  .mbc-btn {
+    background: var(--rp-purple); color: #FFF; border: none;
+    padding: 9px 14px; border-radius: 999px;
+    font-weight: 700; font-size: 12px; cursor: pointer;
+  }
+  .mbc-photo {
+    width: 96px; height: 110px; border-radius: 14px;
+    background: linear-gradient(135deg, #BCE3CC 0%, #BFE0CB 60%, #A7D7BE 100%);
+    position: relative; overflow: hidden;
+  }
+  .mbc-photo img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .mbc-photo .photo-tag {
+    position: absolute; bottom: 6px; right: 6px;
+    background: rgba(0,0,0,0.55); color: #FFF;
+    padding: 3px 7px; border-radius: 4px;
+    font-size: 8px; font-weight: 800; letter-spacing: .8px;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+  }
+
+  .services-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; margin-bottom: 8px;
+  }
+  .service-tile {
+    background: #FFF; border: 1px solid #E7F1EB;
+    border-radius: 14px; padding: 14px 8px 10px;
+    text-align: center; box-shadow: var(--shadow-sm);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .service-tile:hover { border-color: var(--rp-purple); }
+  .service-tile .st-icon-wrap {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #E3F2E9; display: grid; place-items: center;
+    margin: 0 auto 8px;
+  }
+  .service-tile.s-pink .st-icon-wrap { background: #E6F4EC; }
+  .service-tile.s-orange .st-icon-wrap { background: #FFF1DE; }
+  .service-tile.s-blue .st-icon-wrap { background: #E0EAFB; }
+  .service-tile .st-icon { font-size: 17px; line-height: 1; }
+  .service-tile .st-name {
+    font-weight: 700; font-size: 11px;
+    line-height: 1.2; color: var(--rp-ink);
+  }
+  .service-tile .st-meta {
+    font-size: 9px; color: var(--rp-muted);
+    margin-top: 4px; line-height: 1.3;
+  }
+
+  /* ─────────── Survey + Reward (intro flow) ─────────── */
+  .reward-hero {
+    background: linear-gradient(135deg, #E3F2E9 0%, #CDE8D8 55%, #A7D7BE 100%);
+    border: 1px solid #C2E2D0;
+    border-radius: 22px;
+    padding: 18px 18px 16px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .reward-hero::after {
+    content: ''; position: absolute;
+    right: -30px; top: -30px;
+    width: 130px; height: 130px;
+    background: radial-gradient(circle, rgba(255,225,93,0.55) 0%, rgba(255,225,93,0) 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .rh-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(109,40,217,0.18);
+    color: var(--rp-purple-dark);
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 5px 10px; border-radius: 999px;
+    margin-bottom: 10px; position: relative; z-index: 2;
+  }
+  .rh-pill .heart { font-size: 11px; }
+  .rh-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; line-height: 1.1;
+    letter-spacing: -0.4px; color: var(--rp-ink);
+    margin-bottom: 8px; position: relative; z-index: 2;
+  }
+  .rh-title .amt {
+    color: var(--rp-purple-dark);
+    background: linear-gradient(180deg, transparent 65%, var(--rp-yellow) 65%, var(--rp-yellow) 92%, transparent 92%);
+    padding: 0 4px;
+  }
+  .rh-sub {
+    font-size: 12.5px; color: var(--rp-ink-2); line-height: 1.45;
+    position: relative; z-index: 2; max-width: 280px;
+  }
+  .rh-sub strong { font-weight: 700; }
+
+  .q-prompt { margin: 4px 4px 12px; }
+  .q-eyebrow {
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.8px;
+    color: var(--rp-purple-dark); text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .q-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; line-height: 1.25; letter-spacing: -0.2px;
+    color: var(--rp-ink);
+  }
+  .q-text .hl {
+    background: linear-gradient(180deg, transparent 62%, var(--rp-yellow) 62%, var(--rp-yellow) 92%, transparent 92%);
+    padding: 0 4px;
+  }
+  .q-hint { font-size: 11.5px; color: var(--rp-muted); margin-top: 6px; }
+
+  /* survey tile select state (extends existing .service-tile) */
+  .service-tile .check {
+    position: absolute; top: 6px; right: 6px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #FFF; border: 1.5px solid #D6E5DC;
+    display: grid; place-items: center;
+    transition: all 0.18s ease;
+  }
+  .service-tile .check svg { opacity: 0; transition: opacity 0.15s ease; }
+  .service-tile { position: relative; }
+  .service-tile.selected {
+    border-color: var(--rp-purple);
+    background: linear-gradient(180deg, #FFFFFF 0%, #F2FAF5 100%);
+    box-shadow: 0 4px 12px rgba(139,92,246,0.18), 0 1px 3px rgba(20,20,20,0.06);
+    transform: translateY(-1px);
+  }
+  .service-tile.selected .st-icon-wrap {
+    background: var(--rp-purple);
+    box-shadow: 0 4px 10px rgba(139,92,246,0.35);
+  }
+  .service-tile.selected .check {
+    background: var(--rp-purple); border-color: var(--rp-purple);
+  }
+  .service-tile.selected .check svg { opacity: 1; }
+
+  /* CTA dock — pinned to bottom of screen so it never floats mid-viewport.
+     Lives at .screen level (absolute) so it isn't trapped by .body's scroll. */
+  .cta-dock {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: #FFFFFF;
+    padding: 14px 18px 16px;
+    border-top: 1px solid var(--rp-line);
+    box-shadow: 0 -22px 24px -8px rgba(255,255,255,0.98), 0 -36px 36px -16px rgba(255,255,255,0.85);
+    z-index: 30;
+  }
+  /* Screens that include a .cta-dock need their scroll body to clear the dock height */
+  .screen.has-cta-dock .body { padding-bottom: 150px; }
+  .selected-count {
+    font-size: 11.5px; color: var(--rp-muted);
+    margin-bottom: 8px; text-align: center; font-weight: 600;
+  }
+  .selected-count strong { color: var(--rp-purple-dark); font-weight: 800; }
+  .btn-primary:disabled { background: #BDCDC3; color: #FFF; cursor: not-allowed; opacity: 0.6; }
+  .skip {
+    display: block; text-align: center; margin-top: 8px;
+    font-size: 12px; color: var(--rp-muted);
+    text-decoration: none; font-weight: 500; cursor: pointer;
+  }
+
+  /* Thank-you / reward screen */
+  .thanks-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; padding: 24px 14px 16px;
+  }
+  .checkmark-bubble {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: linear-gradient(135deg, #E3F2E9 0%, #A7D7BE 100%);
+    display: grid; place-items: center;
+    margin-bottom: 20px;
+    box-shadow: 0 14px 32px rgba(139,92,246,0.28);
+    position: relative;
+  }
+  .checkmark-bubble::after {
+    content: ''; position: absolute; inset: -8px;
+    border-radius: 50%;
+    border: 1.5px dashed rgba(139,92,246,0.35);
+    animation: spin 14s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .thanks-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; line-height: 1.15;
+    letter-spacing: -0.4px; margin-bottom: 10px;
+  }
+  .thanks-title .hl {
+    background: linear-gradient(180deg, transparent 62%, var(--rp-yellow) 62%, var(--rp-yellow) 92%, transparent 92%);
+    padding: 0 5px;
+  }
+  .thanks-sub {
+    font-size: 13px; color: var(--rp-muted); line-height: 1.5;
+    margin-bottom: 18px; max-width: 290px;
+  }
+  .credit-card {
+    width: 100%;
+    background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+    color: #FFF; border-radius: 18px;
+    padding: 16px 18px; margin-bottom: 14px;
+    text-align: left; position: relative; overflow: hidden;
+  }
+  .credit-card::after {
+    content: ''; position: absolute;
+    right: -40px; top: -40px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(199,184,240,0.4) 0%, rgba(199,184,240,0) 70%);
+    border-radius: 50%;
+  }
+  .cc-lab {
+    font-size: 10.5px; letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--rp-lavender); font-weight: 700; margin-bottom: 6px;
+  }
+  .cc-amt {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px; line-height: 1; margin-bottom: 4px;
+  }
+  .cc-sub { font-size: 11.5px; color: #8FCBA8; font-weight: 500; }
+  .you-picked {
+    font-size: 10.5px; font-weight: 800; letter-spacing: 0.8px;
+    color: var(--rp-muted); text-transform: uppercase;
+    margin: 4px 0 8px; align-self: flex-start;
+  }
+  .picked-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 16px; width: 100%; justify-content: center;
+  }
+  .pchip {
+    background: var(--rp-lavender-soft);
+    border: 1px solid #CBE6D6;
+    color: var(--rp-purple-dark);
+    font-size: 11px; font-weight: 600;
+    padding: 5px 10px; border-radius: 999px;
+  }
+  .pchip .ico { margin-right: 4px; }
+
+  /* ─────────── HOTSPOT REVEAL EFFECT ─────────── */
+  [data-goto] {
+    position: relative;
+    cursor: pointer;
+  }
+  .screen.reveal-hotspots [data-goto] {
+    animation: hotspot-flash 1.4s ease-out 2;
+    z-index: 50;
+  }
+  @keyframes hotspot-flash {
+    0%, 100% {
+      outline: 0 solid rgba(139,92,246,0);
+      outline-offset: 0;
+    }
+    40% {
+      outline: 4px solid rgba(139,92,246,0.85);
+      outline-offset: 4px;
+    }
+    70% {
+      outline: 4px solid rgba(139,92,246,0.5);
+      outline-offset: 4px;
+    }
+  }
+  .reveal-banner {
+    /* Top-anchored toast — below the status bar, never collides with scrolled content cards */
+    position: absolute; top: 56px; left: 50%; transform: translate(-50%, -6px);
+    background: var(--rp-purple-dark); color: #FFF;
+    padding: 8px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    box-shadow: 0 10px 28px rgba(109,40,217,0.35);
+    border: 1px solid rgba(199,184,240,0.32);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 100; pointer-events: none;
+    white-space: nowrap;
+    max-width: calc(100% - 32px);
+  }
+  .screen.reveal-hotspots .reveal-banner { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ─────────── Thumbnail strip ─────────── */
+  .thumbs-wrap {
+    position: relative;
+    margin-top: 4px;
+  }
+  .thumbs {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 6px 12px;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .thumbs::-webkit-scrollbar { display: none; }
+  .thumb {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #FFF;
+    border: 1px solid var(--rp-line-strong);
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 12px; font-weight: 500;
+    color: var(--rp-muted);
+    cursor: pointer; transition: all 0.15s;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .thumb:hover { border-color: var(--rp-purple); color: var(--rp-purple-dark); }
+  .thumb .tnum {
+    background: #E7F1EB; color: var(--rp-ink); font-weight: 700;
+    width: 18px; height: 18px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 10px;
+    flex-shrink: 0;
+  }
+  .thumb.is-active {
+    background: var(--rp-ink); border-color: var(--rp-ink); color: #FFF;
+  }
+  .thumb.is-active .tnum { background: var(--rp-purple); color: #FFF; }
+  .thumb.alt { border-style: dashed; }
+  .thumb.alt .tnum { background: var(--rp-purple); color: #FFF; }
+
+  .footer-hint {
+    text-align: center; font-size: 12px; color: var(--rp-muted);
+    margin-top: 4px; line-height: 1.5;
+  }
+  .footer-hint kbd {
+    background: #FFF; border: 1px solid var(--rp-line-strong);
+    border-radius: 4px; padding: 1px 6px; font-size: 11px;
+    font-family: 'Inter';
+  }
+
+  /* ─────────── Banner CTA (Approved → Why link) ─────────── */
+  .banner-cta {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    background: linear-gradient(135deg, var(--rp-lavender-soft) 0%, var(--rp-lavender) 100%);
+    color: var(--rp-ink); border-radius: 16px; padding: 14px 16px;
+    margin: 12px 0 8px; cursor: pointer;
+    box-shadow: 0 6px 18px rgba(139,92,246,0.25);
+    border: 1px solid var(--rp-purple);
+  }
+  .banner-cta .bc-meta { flex: 1; }
+  .banner-cta .bc-title { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 16px; line-height: 1.15; letter-spacing: -0.3px; color: var(--rp-ink); }
+  .banner-cta .bc-sub { font-size: 11.5px; color: var(--rp-ink-2); margin-top: 3px; }
+  .banner-cta .bc-arrow { width: 28px; height: 28px; border-radius: 50%; background: var(--rp-purple); color: #FFF; display: grid; place-items: center; flex-shrink: 0; }
+
+  /* ─────────── Why link card screen ─────────── */
+  .why-headline { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.1; letter-spacing: -0.5px; color: var(--rp-ink); margin-bottom: 8px; }
+  .why-headline .hl { background: linear-gradient(180deg, transparent 60%, var(--rp-yellow) 60%); padding: 0 4px; }
+  .why-sub { font-size: 13px; color: var(--rp-ink-2); line-height: 1.5; margin-bottom: 18px; }
+  .why-sub strong { color: var(--rp-purple-dark); font-weight: 700; }
+
+  .why-hero-card {
+    background: linear-gradient(155deg, var(--rp-purple) 0%, var(--rp-purple-dark) 100%);
+    border-radius: 20px; padding: 18px; color: #FFF; margin-bottom: 14px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 12px 36px rgba(109,40,217,0.28);
+  }
+  .why-hero-card::after { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(199,184,240,0.4) 0%, transparent 65%); }
+  .why-hero-card .lab { font-size: 11px; color: rgba(255,255,255,0.78); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; position: relative; z-index: 2; }
+  .why-hero-card .pct { font-family: 'DM Serif Display', serif; font-size: 46px; line-height: 1; letter-spacing: -1.2px; margin-top: 6px; position: relative; z-index: 2; }
+  .why-hero-card .pct .small { font-size: 22px; opacity: 0.85; }
+  .why-hero-card p { font-size: 12.5px; color: rgba(255,255,255,0.88); line-height: 1.4; margin-top: 10px; position: relative; z-index: 2; max-width: 240px; }
+
+  .place-section { font-family: 'DM Serif Display', serif; font-size: 17px; margin: 14px 4px 10px; color: var(--rp-ink); }
+  .place-list { display: flex; flex-direction: column; background: #FFF; border: 1px solid var(--rp-line); border-radius: 14px; box-shadow: var(--shadow-sm); overflow: hidden; }
+  .place-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--rp-line); cursor: pointer; }
+  .place-row:last-child { border-bottom: none; }
+  .place-row .pr-meta { flex: 1; }
+  .place-row .pr-name { font-weight: 700; font-size: 13.5px; color: var(--rp-ink); }
+  .place-row .pr-sub { font-size: 11px; color: var(--rp-muted); margin-top: 2px; }
+  .place-row .pr-pct { background: var(--rp-lavender-soft); color: var(--rp-purple-dark); font-weight: 800; font-size: 12px; padding: 5px 11px; border-radius: 999px; border: 1px solid rgba(139,92,246,0.18); }
+  .place-row .pr-pct.high { background: var(--rp-yellow); color: var(--rp-ink); border-color: rgba(26,26,26,0.18); }
+  .brand-chip { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .brand-chip svg { width: 100%; height: 100%; display: block; }
+  .brand-chip.white-bg { background: #FFFFFF; border: 1px solid var(--rp-line); }
+
+  /* Visa-card hero on Why screen */
+  .why-card-hero {
+    position: relative;
+    margin: 4px 0 26px;
+    display: flex; justify-content: center;
+    padding-top: 8px;
+  }
+  .why-card-hero .rp-visa-card { margin-bottom: 0; max-width: 280px; }
+  .back-badge {
+    position: absolute; top: -10px; right: 18px; z-index: 10;
+    background: var(--rp-yellow);
+    border: 2px solid var(--rp-ink);
+    padding: 10px 14px; border-radius: 14px;
+    transform: rotate(7deg);
+    box-shadow: 0 8px 22px rgba(26,26,26,0.22);
+    text-align: center; min-width: 70px;
+  }
+  .back-badge .bb-up { font-size: 8.5px; font-weight: 800; letter-spacing: 1.2px; color: var(--rp-ink); margin-bottom: 1px; }
+  .back-badge .bb-pct { font-family: 'DM Serif Display', serif; font-size: 28px; line-height: 0.85; color: var(--rp-ink); letter-spacing: -1.2px; }
+  .back-badge .bb-lab { font-size: 9px; font-weight: 800; color: var(--rp-ink); letter-spacing: 0.9px; margin-top: 2px; }
+
+  .why-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0 12px; }
+  .why-stat { background: #FFF; border: 1px solid var(--rp-line); border-radius: 14px; padding: 12px 14px; box-shadow: var(--shadow-sm); }
+  .why-stat .ws-lab { font-size: 10.5px; color: var(--rp-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .why-stat .ws-val { font-family: 'DM Serif Display', serif; font-size: 24px; line-height: 1; color: var(--rp-ink); letter-spacing: -0.5px; margin-top: 6px; }
+
+  /* ─────────── Link your card / All set ─────────── */
+  .link-hero { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.08; letter-spacing: -0.5px; color: var(--rp-ink); margin: 4px 4px 8px; text-align: center; }
+  .link-sub { font-size: 13px; color: var(--rp-muted); line-height: 1.45; text-align: center; margin: 0 12px 18px; }
+
+  .rp-visa-card {
+    background: linear-gradient(135deg, var(--rp-purple) 0%, var(--rp-purple-dark) 100%);
+    border-radius: 16px; padding: 18px 18px 16px; color: #FFF;
+    width: 100%; max-width: 280px; margin: 0 auto 22px;
+    position: relative; overflow: hidden; aspect-ratio: 1.586 / 1;
+    box-shadow: 0 16px 40px rgba(109,40,217,0.35);
+    border: 1px solid rgba(199,184,240,0.3);
+  }
+  .rp-visa-card::after {
+    content: ''; position: absolute; top: -50px; right: -30px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(199,184,240,0.35) 0%, transparent 65%);
+  }
+  .rp-visa-card .top-row { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+  .rp-visa-card .pill {
+    background: var(--rp-lavender); color: var(--rp-ink);
+    padding: 4px 10px; border-radius: 6px;
+    font-weight: 800; font-size: 12px; letter-spacing: 2.5px; line-height: 1;
+  }
+  .rp-visa-card .heart { font-size: 20px; line-height: 1; }
+  .rp-visa-card .chip {
+    width: 36px; height: 26px; border-radius: 5px;
+    background: linear-gradient(135deg, #D4D4D4 0%, #A0A0A0 100%);
+    margin-top: 16px; position: relative; z-index: 2;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .rp-visa-card .chip::after {
+    content: ''; position: absolute; inset: 4px;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0 1px, transparent 1px 4px),
+                repeating-linear-gradient(90deg, rgba(0,0,0,0.15) 0 1px, transparent 1px 4px);
+    border-radius: 2px;
+  }
+  .rp-visa-card .num {
+    font-family: 'Courier New', monospace; font-size: 13px; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.88); margin-top: 10px; position: relative; z-index: 2;
+  }
+  .rp-visa-card .footer-row {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    position: absolute; bottom: 14px; left: 18px; right: 18px; z-index: 2;
+  }
+  .rp-visa-card .name { font-size: 11px; color: rgba(255,255,255,0.9); font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; }
+
+  .link-option-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .link-option {
+    background: #FFF; border: 1.5px solid var(--rp-line); border-radius: 14px;
+    padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+    cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s;
+  }
+  .link-option.selected { border-color: var(--rp-purple); background: #F7FCF9; }
+  .link-option .lo-radio { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--rp-line-strong); flex-shrink: 0; display: grid; place-items: center; }
+  .link-option.selected .lo-radio { border-color: var(--rp-purple); background: var(--rp-purple); }
+  .link-option.selected .lo-radio::after { content: ''; width: 8px; height: 8px; background: #FFF; border-radius: 50%; }
+  .link-option .lo-icon { width: 36px; height: 26px; border-radius: 4px; background: #1A1F71; display: grid; place-items: center; flex-shrink: 0; }
+  .link-option .lo-meta { flex: 1; }
+  .link-option .lo-name { font-weight: 600; font-size: 14px; color: var(--rp-ink); }
+  .link-option .lo-sub { font-size: 11px; color: var(--rp-muted); margin-top: 2px; }
+  .link-option.add .lo-icon { background: var(--rp-lavender-soft); }
+  .link-option.add .lo-icon::after { content: '+'; color: var(--rp-purple-dark); font-size: 18px; font-weight: 700; }
+
+  /* All set */
+  .allset-card-wrap { position: relative; max-width: 280px; margin: 14px auto 8px; }
+  .allset-card-wrap .check-overlay {
+    position: absolute; right: -6px; bottom: -6px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--rp-purple); border: 4px solid #FFFFFF;
+    display: grid; place-items: center; z-index: 5; color: #FFF;
+    box-shadow: 0 6px 18px rgba(109,40,217,0.5);
+  }
+  .allset-headline { font-family: 'DM Serif Display', serif; font-size: 28px; line-height: 1.1; letter-spacing: -0.5px; color: var(--rp-ink); text-align: center; margin: 18px 0 8px; }
+  .allset-sub { font-size: 13px; color: var(--rp-ink-2); line-height: 1.5; text-align: center; margin: 0 16px 22px; }
+  .allset-sub strong { color: var(--rp-purple-dark); font-weight: 700; }
+
+  .benefit-list { display: flex; flex-direction: column; gap: 16px; margin: 0 6px 22px; }
+  .benefit-row { display: flex; gap: 14px; align-items: flex-start; }
+  .benefit-row .br-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--rp-lavender-soft);
+    border: 1.5px solid #C9E6D5;
+    display: grid; place-items: center; flex-shrink: 0;
+    color: var(--rp-purple-dark);
+  }
+  .benefit-row .br-meta { flex: 1; }
+  .benefit-row .br-title { font-weight: 700; font-size: 14px; color: var(--rp-ink); line-height: 1.2; }
+  .benefit-row .br-body { font-size: 12px; color: var(--rp-muted); line-height: 1.4; margin-top: 3px; }
+
+  /* ─────────── Maddie chat screen ─────────── */
+  .maddie-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 4px 14px;
+  }
+  .maddie-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--rp-lavender-soft) 0%, var(--rp-pink) 100%);
+    display: grid; place-items: center; flex-shrink: 0;
+    color: var(--rp-purple-dark); border: 2px solid #FFF;
+    box-shadow: 0 4px 12px rgba(109,40,217,0.18);
+    position: relative; overflow: hidden;
+  }
+  .maddie-avatar::before {
+    content: ''; position: absolute; bottom: 0; left: 25%; right: 25%; top: 60%;
+    background: var(--rp-purple-dark); border-radius: 50% 50% 0 0;
+  }
+  .maddie-avatar::after {
+    content: ''; position: absolute; top: 22%; left: 27%; right: 27%; bottom: 50%;
+    background: linear-gradient(135deg, #E5C9A0 0%, #D4B485 100%);
+    border-radius: 50%;
+  }
+  .maddie-meta { flex: 1; }
+  .maddie-meta .name {
+    font-family: 'Inter', sans-serif; font-weight: 700; font-size: 16px; color: var(--rp-ink);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .maddie-meta .ai-tag { background: var(--rp-purple); color: #FFF; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px; }
+  .maddie-meta .status { font-size: 11.5px; color: var(--rp-muted); margin-top: 2px; }
+  .maddie-actions { display: flex; gap: 8px; align-items: center; }
+  .maddie-actions .ma-pill { background: var(--rp-lavender-soft); color: var(--rp-purple-dark); font-weight: 700; font-size: 11px; padding: 5px 9px; border-radius: 999px; }
+  .maddie-actions .ma-dots { width: 28px; height: 28px; border-radius: 50%; background: #E7F1EB; display: grid; place-items: center; cursor: pointer; }
+
+  .chat-body { display: flex; flex-direction: column; gap: 10px; padding: 8px 0; }
+  .chat-msg { max-width: 78%; display: flex; flex-direction: column; gap: 4px; }
+  .chat-msg.out { align-self: flex-end; align-items: flex-end; }
+  .chat-msg.in { align-self: flex-start; align-items: flex-start; }
+  .chat-bubble { padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; }
+  .chat-msg.out .chat-bubble { background: var(--rp-purple); color: #FFF; border-bottom-right-radius: 4px; }
+  .chat-msg.in .chat-bubble { background: #FFF; color: var(--rp-ink); border: 1px solid var(--rp-line); border-bottom-left-radius: 4px; }
+  .chat-time { font-size: 10px; color: var(--rp-faint); padding: 0 4px; }
+
+  .chat-card-order {
+    background: #FFF; border: 1px solid var(--rp-line); border-radius: 14px;
+    padding: 12px 14px; align-self: flex-start; max-width: 88%; box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chat-card-order .order-logo { width: 42px; height: 42px; border-radius: 10px; background: #006491; display: grid; place-items: center; flex-shrink: 0; color: #FFF; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -1px; }
+  .chat-card-order .order-meta { flex: 1; }
+  .chat-card-order .order-name { font-weight: 700; font-size: 13px; color: var(--rp-ink); line-height: 1.2; }
+  .chat-card-order .order-items { font-size: 11px; color: var(--rp-muted); margin-top: 3px; line-height: 1.4; }
+  .chat-card-order .order-price { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--rp-ink); letter-spacing: -0.2px; }
+
+  .chat-earn {
+    align-self: flex-start; max-width: 88%;
+    background: linear-gradient(135deg, var(--rp-purple) 0%, var(--rp-purple-dark) 100%);
+    color: #FFF; padding: 10px 14px; border-radius: 14px;
+    border-bottom-left-radius: 4px; display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 6px 18px rgba(109,40,217,0.28);
+  }
+  .chat-earn .ce-heart { font-size: 18px; line-height: 1; flex-shrink: 0; }
+  .chat-earn .ce-text { font-size: 12.5px; line-height: 1.4; }
+  .chat-earn .ce-text strong { color: var(--rp-lavender); font-weight: 700; }
+
+  .chat-input-bar {
+    margin-top: 14px;
+    background: #FFF; border: 1px solid var(--rp-line); border-radius: 999px;
+    padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+    box-shadow: var(--shadow-sm);
+  }
+  .chat-input-bar input {
+    flex: 1; border: none; outline: none; background: transparent;
+    font-family: 'Inter'; font-size: 13px; color: var(--rp-ink);
+  }
+  .chat-input-bar input::placeholder { color: var(--rp-faint); }
+  .chat-input-bar .send-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--rp-purple); color: #FFF; display: grid; place-items: center; flex-shrink: 0; cursor: pointer; border: none; }
+
+  /* Visa wordmark */
+  .visa-svg { display: inline-block; line-height: 1; vertical-align: middle; }
+  .visa-svg.lg { width: 56px; height: 18px; }
+  .visa-svg.sm { width: 32px; height: 12px; }
+  .visa-svg text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-style: italic; font-weight: 900; }
+
+  /* ═══════════ Food Delivery flow (screens 15–20) ═══════════ */
+  .fd-topbar { display: flex; align-items: center; gap: 10px; padding: 8px 2px 14px; }
+  .fd-topbar .fd-back, .fd-topbar .fd-x {
+    width: 34px; height: 34px; border-radius: 50%; background: #FFF;
+    border: 1px solid var(--rp-line); display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+  }
+  .fd-topbar .fd-title { flex: 1; min-width: 0; }
+  .fd-topbar .fd-title .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--rp-purple-dark); text-transform: uppercase; }
+  .fd-topbar .fd-title h2 { font-family: 'DM Serif Display', serif; font-size: 19px; line-height: 1.1; }
+  .fd-addr { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--rp-muted); background: #FFF; border: 1px solid var(--rp-line); padding: 6px 11px; border-radius: 999px; margin-bottom: 12px; }
+  .fd-addr svg { width: 12px; height: 12px; }
+
+  /* Shop Local Credits promo banner */
+  .fd-promo {
+    border-radius: 18px; padding: 18px; margin-bottom: 14px; color: var(--rp-ink);
+    background: linear-gradient(135deg, #E3F2E9 0%, #C8E7D5 55%, #A7D7BE 100%);
+    border: 1px solid #ABDABF; position: relative; overflow: hidden;
+  }
+  .fd-promo .fd-promo-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; color: var(--rp-purple-dark); }
+  .fd-promo h3 { font-family: 'DM Serif Display', serif; font-size: 21px; line-height: 1.12; margin: 5px 0 6px; }
+  .fd-promo p { font-size: 11.5px; color: var(--rp-ink-2); line-height: 1.4; max-width: 86%; }
+  .fd-promo .fd-promo-chips { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .fd-promo .fd-promo-chips span { background: rgba(255,255,255,0.7); font-size: 10px; font-weight: 600; padding: 5px 9px; border-radius: 999px; }
+  .fd-promo .heart { font-size: 15px; }
+
+  /* Delivery / pickup toggle */
+  .fd-toggle { display: flex; background: #FFF; border: 1px solid var(--rp-line); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 12px; }
+  .fd-toggle .fd-seg { flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: var(--rp-muted); padding: 8px 6px; border-radius: 9px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+  .fd-toggle .fd-seg svg { width: 14px; height: 14px; }
+  .fd-toggle .fd-seg.active { background: var(--rp-ink); color: #FFF; }
+
+  .fd-chips { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
+  .fd-chips::-webkit-scrollbar { display: none; }
+  .fd-chips .fd-chip { flex-shrink: 0; font-size: 12px; font-weight: 600; padding: 7px 13px; border-radius: 999px; background: #FFF; border: 1px solid var(--rp-line); color: var(--rp-ink-2); cursor: pointer; }
+  .fd-chips .fd-chip.active { background: var(--rp-lavender-soft); border-color: var(--rp-lavender-line); color: var(--rp-purple-dark); }
+
+  .fd-section-title { font-family: 'DM Serif Display', serif; font-size: 17px; margin: 4px 0 10px; }
+
+  /* Restaurant card */
+  .fd-rest-card { background: #FFF; border: 1px solid var(--rp-line); border-radius: 18px; overflow: hidden; margin-bottom: 12px; box-shadow: var(--shadow-sm); cursor: pointer; }
+  .fd-rest-card .fd-rest-img { height: 116px; position: relative; display: grid; place-items: center; font-size: 46px; }
+  .fd-rest-card .fd-rest-img.g1 { background: linear-gradient(135deg,#BCE3CC,#F5A24F); }
+  .fd-rest-card .fd-rest-img.g2 { background: linear-gradient(135deg,#A7D7BE,#2E8B62); }
+  .fd-rest-card .fd-rest-img.g3 { background: linear-gradient(135deg,#FFE15D,#F5A24F); }
+  .fd-rest-card .fd-feat { position: absolute; top: 10px; left: 10px; background: var(--rp-purple-dark); color: #FFF; font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 4px 9px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; }
+  .fd-rest-card .fd-heart { position: absolute; top: 9px; right: 9px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.92); display: grid; place-items: center; }
+  .fd-rest-card .fd-rest-body { padding: 12px 14px 14px; }
+  .fd-rest-card .fd-rest-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .fd-rest-card .fd-rest-name { font-weight: 700; font-size: 14.5px; }
+  .fd-rest-card .fd-rest-rating { font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .fd-rest-card .fd-rest-rating .star { color: var(--rp-orange); }
+  .fd-rest-card .fd-rest-rating .ct { color: var(--rp-faint); font-weight: 500; }
+  .fd-rest-card .fd-rest-sub { font-size: 11.5px; color: var(--rp-muted); margin-top: 3px; }
+  .fd-rest-card .fd-tags { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
+  .fd-rest-card .fd-tags span { font-size: 10px; font-weight: 600; color: var(--rp-ink-2); background: var(--rp-cream); padding: 4px 8px; border-radius: 999px; }
+
+  /* Menu header */
+  .fd-menu-hero { height: 120px; border-radius: 18px; background: linear-gradient(135deg,#BCE3CC,#F5A24F); display: grid; place-items: center; font-size: 50px; margin-bottom: 12px; position: relative; }
+  .fd-menu-hero .fd-feat { position: absolute; top: 10px; left: 10px; background: var(--rp-purple-dark); color: #FFF; font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 4px 9px; border-radius: 999px; }
+  .fd-rest-head { margin-bottom: 14px; }
+  .fd-rest-head h2 { font-family: 'DM Serif Display', serif; font-size: 22px; }
+  .fd-rest-head .fd-rest-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: var(--rp-muted); margin-top: 5px; }
+  .fd-rest-head .fd-rest-meta .star { color: var(--rp-orange); font-weight: 700; }
+  .fd-rest-head .fd-rest-meta .dot { color: var(--rp-line-strong); }
+  .fd-localbadge { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700; color: var(--rp-purple-dark); background: var(--rp-lavender-soft); border: 1px solid var(--rp-lavender-line); padding: 5px 10px; border-radius: 999px; margin-top: 10px; }
+
+  .fd-menu-cat { font-family: 'DM Serif Display', serif; font-size: 16px; margin: 6px 0 10px; }
+  .fd-item { display: flex; gap: 12px; align-items: center; background: #FFF; border: 1px solid var(--rp-line); border-radius: 16px; padding: 11px; margin-bottom: 10px; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .fd-item .fd-item-thumb { width: 62px; height: 62px; border-radius: 12px; flex-shrink: 0; display: grid; place-items: center; font-size: 30px; background: var(--rp-cream); }
+  .fd-item .fd-item-info { flex: 1; min-width: 0; }
+  .fd-item .fd-item-name { font-weight: 700; font-size: 13.5px; }
+  .fd-item .fd-item-desc { font-size: 11px; color: var(--rp-muted); line-height: 1.35; margin: 3px 0 5px; }
+  .fd-item .fd-item-price { font-weight: 700; font-size: 13px; }
+  .fd-item .fd-add { width: 32px; height: 32px; border-radius: 50%; background: var(--rp-ink); color: #FFF; display: grid; place-items: center; flex-shrink: 0; align-self: center; }
+  .fd-item .fd-add svg { width: 15px; height: 15px; }
+
+  /* Item detail sheet */
+  .fd-item-hero { height: 168px; border-radius: 18px; background: linear-gradient(135deg,#BCE3CC,#F5A24F); display: grid; place-items: center; font-size: 72px; margin-bottom: 14px; }
+  .fd-item-title { font-family: 'DM Serif Display', serif; font-size: 24px; line-height: 1.1; }
+  .fd-item-fulldesc { font-size: 12.5px; color: var(--rp-muted); line-height: 1.45; margin: 7px 0 9px; }
+  .fd-item-base { font-size: 14px; font-weight: 700; color: var(--rp-purple-dark); }
+  .fd-field-lab { font-size: 12px; font-weight: 600; margin: 16px 0 7px; }
+  .fd-textarea { width: 100%; border: 1px solid var(--rp-line-strong); border-radius: 12px; padding: 11px; font-family: 'Inter'; font-size: 12.5px; color: var(--rp-ink); resize: none; background: #FFF; }
+  .fd-textarea::placeholder { color: var(--rp-faint); }
+  .fd-qty-row { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+  .fd-qty { display: inline-flex; align-items: center; gap: 16px; border: 1px solid var(--rp-line-strong); border-radius: 999px; padding: 7px 14px; }
+  .fd-qty button { width: 26px; height: 26px; border-radius: 50%; border: none; background: var(--rp-lavender-soft); color: var(--rp-purple-dark); font-size: 18px; font-weight: 700; cursor: pointer; display: grid; place-items: center; line-height: 1; }
+  .fd-qty .fd-qnum { font-weight: 700; font-size: 15px; min-width: 16px; text-align: center; }
+
+  /* Cart */
+  .fd-cart-from { font-size: 12px; color: var(--rp-muted); margin-bottom: 14px; }
+  .fd-cart-from strong { color: var(--rp-purple-dark); }
+  .fd-cart-line { display: flex; gap: 12px; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--rp-line); margin-bottom: 14px; }
+  .fd-cart-line .fd-cl-thumb { width: 50px; height: 50px; border-radius: 11px; background: var(--rp-cream); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+  .fd-cart-line .fd-cl-info { flex: 1; min-width: 0; }
+  .fd-cart-line .fd-cl-name { font-weight: 700; font-size: 13px; }
+  .fd-cart-line .fd-cl-each { font-size: 11px; color: var(--rp-muted); margin-top: 2px; }
+  .fd-cart-line .fd-cl-price { font-weight: 700; font-size: 13px; white-space: nowrap; }
+
+  .fd-summary { background: #FFF; border: 1px solid var(--rp-line); border-radius: 16px; padding: 15px; }
+  .fd-summary .fd-row { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--rp-ink-2); margin-bottom: 9px; }
+  .fd-summary .fd-row .free { color: var(--rp-success); font-weight: 700; }
+  .fd-summary .fd-row.fd-credit { color: var(--rp-purple-dark); font-weight: 700; align-items: center; }
+  .fd-summary .fd-row.fd-credit .lab { display: inline-flex; align-items: center; gap: 5px; }
+  .fd-summary .fd-divider { height: 1px; background: var(--rp-line); margin: 12px 0; }
+  .fd-summary .fd-row.fd-total { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--rp-ink); margin-bottom: 0; }
+
+  /* Shop Local Credits apply card */
+  .fd-slc-card { background: linear-gradient(135deg,#E3F2E9,#D6EDDF); border: 1px solid #C9E6D5; border-radius: 16px; padding: 14px 15px; margin: 14px 0; }
+  .fd-slc-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .fd-slc-top .fd-slc-lab { display: flex; align-items: center; gap: 7px; }
+  .fd-slc-top .fd-slc-lab .heart { font-size: 16px; }
+  .fd-slc-top .fd-slc-lab .t { font-weight: 700; font-size: 13px; }
+  .fd-slc-top .fd-slc-lab .s { font-size: 10.5px; color: var(--rp-muted); margin-top: 1px; }
+  .fd-switch { width: 44px; height: 26px; border-radius: 999px; background: var(--rp-purple); position: relative; flex-shrink: 0; cursor: pointer; transition: background .15s; }
+  .fd-switch::after { content: ''; position: absolute; top: 3px; left: 21px; width: 20px; height: 20px; border-radius: 50%; background: #FFF; transition: left .15s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .fd-switch.off { background: #C4E0CE; }
+  .fd-switch.off::after { left: 3px; }
+  .fd-slc-applied { font-size: 11px; color: var(--rp-purple-dark); font-weight: 600; margin-top: 9px; padding-top: 9px; border-top: 1px solid #C9E6D5; }
+
+  /* Checkout cards */
+  .fd-card { background: #FFF; border: 1px solid var(--rp-line); border-radius: 16px; padding: 15px; margin-bottom: 12px; }
+  .fd-card .fd-card-head { display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: 13px; margin-bottom: 11px; }
+  .fd-card .fd-card-head svg { width: 15px; height: 15px; }
+  .fd-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .fd-input { border: 1px solid var(--rp-line-strong); border-radius: 11px; padding: 10px 11px; font-size: 12px; color: var(--rp-ink); background: #FFF; }
+  .fd-input .fd-in-lab { font-size: 9.5px; font-weight: 600; color: var(--rp-faint); text-transform: uppercase; letter-spacing: .5px; }
+  .fd-input .fd-in-val { font-size: 12.5px; margin-top: 2px; }
+  .fd-input.full { grid-column: 1 / -1; }
+  .fd-time { display: flex; align-items: center; gap: 11px; border: 1.5px solid var(--rp-purple); background: var(--rp-lavender-soft); border-radius: 12px; padding: 12px; }
+  .fd-radio { width: 18px; height: 18px; border-radius: 50%; border: 5px solid var(--rp-purple); background: #FFF; flex-shrink: 0; }
+  .fd-time .fd-t-name { font-weight: 700; font-size: 13px; }
+  .fd-time .fd-t-sub { font-size: 11px; color: var(--rp-muted); }
+  .fd-tips { display: flex; gap: 7px; flex-wrap: wrap; }
+  .fd-tip { font-size: 12px; font-weight: 600; padding: 9px 13px; border-radius: 999px; border: 1px solid var(--rp-line-strong); background: #FFF; color: var(--rp-ink-2); cursor: pointer; }
+  .fd-tip.active { background: var(--rp-ink); color: #FFF; border-color: var(--rp-ink); }
+
+  /* Order tracking */
+  .fd-track-head { border-radius: 18px; padding: 18px; color: #FFF; background: linear-gradient(135deg,#2D2D2D,#1A1A1A); margin-bottom: 14px; }
+  .fd-track-head .fd-ord-id { font-size: 9.5px; letter-spacing: 1.5px; opacity: .65; text-transform: uppercase; }
+  .fd-track-head h2 { font-family: 'DM Serif Display', serif; font-size: 24px; margin: 4px 0 10px; }
+  .fd-track-head .fd-eta-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.14); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .fd-map { height: 130px; border-radius: 16px; margin-bottom: 14px; position: relative; overflow: hidden; background:
+      linear-gradient(135deg, #DDE7D8 0%, #E8EDE0 45%, #DCE6EC 100%); border: 1px solid var(--rp-line); }
+  .fd-map .road { position: absolute; background: rgba(255,255,255,0.7); }
+  .fd-map .r1 { top: 38%; left: 0; right: 0; height: 7px; transform: rotate(-4deg); }
+  .fd-map .r2 { top: 0; bottom: 0; left: 60%; width: 7px; }
+  .fd-map .r3 { top: 70%; left: 0; right: 0; height: 5px; transform: rotate(3deg); }
+  .fd-map .pin { position: absolute; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; border: 3px solid #FFF; box-shadow: var(--shadow-sm); }
+  .fd-map .pin.courier { top: 32%; left: 22%; background: var(--rp-orange); }
+  .fd-map .pin.home { top: 60%; left: 64%; background: var(--rp-purple); }
+  .fd-map .dash { position: absolute; top: 40%; left: 28%; width: 40%; border-top: 2.5px dashed #6B6B6B; transform: rotate(18deg); }
+
+  .fd-progress { background: #FFF; border: 1px solid var(--rp-line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+  .fd-progress .fd-prog-title { font-family: 'DM Serif Display', serif; font-size: 16px; margin-bottom: 12px; }
+  .fd-step { display: flex; align-items: center; gap: 12px; padding: 7px 0; }
+  .fd-step .fd-dot { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--rp-line); color: var(--rp-faint); flex-shrink: 0; }
+  .fd-step .fd-dot svg { width: 15px; height: 15px; }
+  .fd-step.done .fd-dot { background: var(--rp-orange); color: #FFF; }
+  .fd-step.active .fd-dot { background: var(--rp-purple); color: #FFF; }
+  .fd-step .fd-step-lab { font-size: 13px; font-weight: 600; color: var(--rp-ink-2); }
+  .fd-step:not(.done):not(.active) .fd-step-lab { color: var(--rp-faint); font-weight: 500; }
+
+  .fd-courier { display: flex; align-items: center; gap: 11px; background: #FFF; border: 1px solid var(--rp-line); border-radius: 16px; padding: 13px; margin-bottom: 12px; }
+  .fd-courier .fd-c-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--rp-orange); color: #FFF; display: grid; place-items: center; font-weight: 700; }
+  .fd-courier .fd-c-name { font-weight: 700; font-size: 13px; }
+  .fd-courier .fd-c-sub { font-size: 11px; color: var(--rp-muted); }
+
+  .fd-earn-banner { display: flex; align-items: center; gap: 9px; background: var(--rp-lavender-soft); border: 1px solid var(--rp-lavender-line); border-radius: 14px; padding: 12px 14px; }
+  .fd-earn-banner .heart { font-size: 17px; }
+  .fd-earn-banner .fd-earn-text { font-size: 12px; color: var(--rp-ink-2); line-height: 1.4; }
+  .fd-earn-banner .fd-earn-text strong { color: var(--rp-purple-dark); }
+
+  /* Home food entry tile */
+  .fd-home-tile { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg,#FFF 0%,#F6FCF9 100%); border: 1px solid var(--rp-lavender-line); border-radius: 18px; padding: 14px; margin-bottom: 14px; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .fd-home-tile .fd-ht-icon { width: 44px; height: 44px; border-radius: 13px; background: linear-gradient(135deg,#BCE3CC,#F5A24F); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+  .fd-home-tile .fd-ht-name { font-weight: 700; font-size: 14px; }
+  .fd-home-tile .fd-ht-sub { font-size: 11.5px; color: var(--rp-muted); margin-top: 2px; }
+  .fd-home-tile .fd-ht-arrow { margin-left: auto; color: var(--rp-purple); }
+
+  /* Home quick-action row (Food / Cleaning / Gas) */
+  .fd-quick-head { font-size: 12px; font-weight: 700; color: var(--rp-ink-2); margin: 2px 2px 9px; }
+  .fd-quick3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; margin-bottom: 14px; }
+  .fd-qtile { background: #FFF; border: 1px solid var(--rp-line); border-radius: 16px; padding: 12px 7px 11px; text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .fd-qtile .ic { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 22px; margin: 0 auto 8px; }
+  .fd-qtile .ic.g-food { background: linear-gradient(135deg,#BCE3CC,#F5A24F); }
+  .fd-qtile .ic.g-clean { background: linear-gradient(135deg,#A7D7BE,#2E8B62); }
+  .fd-qtile .ic.g-gas { background: linear-gradient(135deg,#FFE15D,#F5A24F); }
+  .fd-qtile .nm { font-size: 11.5px; font-weight: 700; line-height: 1.15; }
+  .fd-qtile .sb { font-size: 9.5px; color: var(--rp-purple-dark); font-weight: 600; margin-top: 3px; }
+
+  /* Gas screen */
+  .gas-feat { border-radius: 18px; padding: 16px; margin-bottom: 14px; border: 1px solid #C9E6D5; background: linear-gradient(135deg,#E3F2E9 0%,#D6EDDF 100%); }
+  .gas-feat .gf-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--rp-purple-dark); color: #FFF; font-size: 9px; font-weight: 800; letter-spacing: 1px; padding: 4px 9px; border-radius: 999px; }
+  .gas-feat .gf-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-top: 10px; }
+  .gas-feat .gf-name { font-weight: 700; font-size: 15px; }
+  .gas-feat .gf-addr { font-size: 11.5px; color: var(--rp-muted); margin-top: 2px; }
+  .gas-feat .gf-price { text-align: right; white-space: nowrap; }
+  .gas-feat .gf-price .now { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--rp-ink); }
+  .gas-feat .gf-price .was { font-size: 12px; color: var(--rp-faint); text-decoration: line-through; }
+  .gas-feat .gf-price .unit { font-size: 10px; color: var(--rp-muted); }
+  .gas-feat .gf-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--rp-purple-dark); background: #FFF; border: 1px solid #C9E6D5; padding: 7px 11px; border-radius: 999px; margin: 12px 0 4px; }
+  .gas-maps-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; padding: 13px 16px; border-radius: 14px; background: var(--rp-ink); color: #FFF; font-weight: 600; font-size: 13.5px; text-decoration: none; }
+  .gas-maps-btn:active { transform: scale(0.98); }
+  .gas-maps-btn svg { width: 16px; height: 16px; }
+
+  .gas-list-title { font-family: 'DM Serif Display', serif; font-size: 16px; margin: 6px 0 10px; }
+  .gas-row { display: flex; align-items: center; gap: 11px; background: #FFF; border: 1px solid var(--rp-line); border-radius: 16px; padding: 11px 12px; margin-bottom: 10px; box-shadow: var(--shadow-sm); text-decoration: none; color: inherit; }
+  .gas-row:active { transform: scale(0.995); }
+  .gas-row .gr-logo { width: 40px; height: 40px; border-radius: 11px; background: #1E40AF; color: #FFF; font-size: 18px; display: grid; place-items: center; flex-shrink: 0; }
+  .gas-row .gr-info { flex: 1; min-width: 0; }
+  .gas-row .gr-name { font-weight: 700; font-size: 13px; }
+  .gas-row .gr-addr { font-size: 11px; color: var(--rp-muted); margin-top: 1px; }
+  .gas-row .gr-back { font-size: 10.5px; font-weight: 700; color: var(--rp-purple-dark); margin-top: 4px; }
+  .gas-row .gr-right { text-align: right; white-space: nowrap; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .gas-row .gr-now { font-weight: 800; font-size: 14px; }
+  .gas-row .gr-was { font-size: 10.5px; color: var(--rp-faint); text-decoration: line-through; }
+  .gas-row .gr-nav { width: 30px; height: 30px; border-radius: 50%; background: var(--rp-lavender-soft); display: grid; place-items: center; color: var(--rp-purple-dark); }
+  .gas-row .gr-nav svg { width: 15px; height: 15px; }
+  .gas-foot { font-size: 10.5px; color: var(--rp-faint); text-align: center; line-height: 1.4; margin-top: 6px; padding: 0 8px; }
+
+  /* Gas highlight on card-linking */
+  .gas-link-feat { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg,#FFF7E0 0%,#FFE7C2 100%); border: 1px solid #F3D08A; border-radius: 16px; padding: 13px 14px; margin: 14px 0 4px; cursor: pointer; box-shadow: var(--shadow-sm); }
+  .gas-link-feat .glf-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg,#FFE15D,#F5A24F); display: grid; place-items: center; font-size: 22px; flex-shrink: 0; }
+  .gas-link-feat .glf-title { font-weight: 700; font-size: 13px; }
+  .gas-link-feat .glf-sub { font-size: 11px; color: var(--rp-ink-2); margin-top: 2px; line-height: 1.35; }
+  .gas-link-feat .glf-sub strong { color: var(--rp-purple-dark); }
+  .gas-link-feat .glf-arrow { margin-left: auto; color: var(--rp-orange); }
+
+  /* Offer map (Food + Gas) */
+  .offer-map { position: relative; height: 220px; border-radius: 18px; overflow: hidden; border: 1px solid var(--rp-line); margin-bottom: 14px; background: linear-gradient(135deg,#E3EBDD 0%,#EAEFE2 45%,#DCE7EC 100%); }
+  .offer-map .om-road { position: absolute; background: rgba(255,255,255,0.8); }
+  .offer-map .om-r1 { top: 28%; left: -5%; right: -5%; height: 8px; transform: rotate(-5deg); }
+  .offer-map .om-r2 { top: 0; bottom: 0; left: 46%; width: 8px; transform: rotate(4deg); }
+  .offer-map .om-r3 { top: 66%; left: -5%; right: -5%; height: 6px; transform: rotate(3deg); }
+  .offer-map .om-green { position: absolute; border-radius: 48%; background: rgba(150,190,140,0.45); }
+  .om-pin { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 2; }
+  .om-chip { background: #FFF; border: 1.5px solid var(--rp-line-strong); border-radius: 999px; padding: 4px 9px; font-size: 10.5px; font-weight: 800; white-space: nowrap; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 5px; }
+  .om-chip .cb { color: var(--rp-purple-dark); font-weight: 800; }
+  .om-pin.best { z-index: 3; }
+  .om-pin.best .om-chip { background: var(--rp-purple); border-color: var(--rp-purple); color: #FFF; }
+  .om-pin.best .om-chip .cb { color: #FFE15D; }
+  .om-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--rp-ink); border: 2px solid #FFF; margin-top: -1px; box-shadow: var(--shadow-sm); }
+  .om-pin.best .om-dot { background: var(--rp-purple); }
+  .om-pop { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: 86%; background: #FFF; border-radius: 14px; box-shadow: var(--shadow-md); padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid var(--rp-line); z-index: 4; }
+  .om-pop .op-thumb { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; font-size: 21px; flex-shrink: 0; }
+  .om-pop .op-thumb.food { background: linear-gradient(135deg,#BCE3CC,#F5A24F); }
+  .om-pop .op-thumb.gas { background: linear-gradient(135deg,#FFE15D,#F5A24F); }
+  .om-pop .op-name { font-weight: 700; font-size: 13px; }
+  .om-pop .op-sub { font-size: 11px; color: var(--rp-muted); margin-top: 1px; }
+  .om-pop .op-go { margin-left: auto; color: var(--rp-purple); display: grid; place-items: center; }
+
+  /* Gas offer detail */
+  .go-hero { border-radius: 18px; padding: 16px; margin-bottom: 14px; background: linear-gradient(135deg,#FFF7E0 0%,#FFE7C2 100%); border: 1px solid #F3D08A; }
+  .go-hero .gh-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .go-hero .gh-name { font-family: 'DM Serif Display', serif; font-size: 20px; }
+  .go-hero .gh-addr { font-size: 11.5px; color: var(--rp-muted); margin-top: 2px; }
+  .go-hero .gh-price .now { font-family: 'DM Serif Display', serif; font-size: 24px; text-align: right; }
+  .go-hero .gh-price .was { font-size: 12px; color: var(--rp-faint); text-decoration: line-through; }
+  .go-hero .gh-price .unit { font-size: 10px; color: var(--rp-muted); }
+  .go-back-big { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg,#E3F2E9,#D6EDDF); border: 1px solid #C9E6D5; border-radius: 16px; padding: 15px; margin-bottom: 14px; }
+  .go-back-big .gb-amt { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--rp-purple-dark); line-height: 1; flex-shrink: 0; }
+  .go-back-big .gb-lab { font-weight: 700; font-size: 13px; }
+  .go-back-big .gb-sub { font-size: 11.5px; color: var(--rp-ink-2); margin-top: 3px; line-height: 1.35; }
+  .go-visa-row { display: flex; align-items: center; gap: 10px; background: #FFF; border: 1px solid var(--rp-line); border-radius: 14px; padding: 12px; margin-bottom: 14px; }
+  .go-visa-row .gv-chip { width: 46px; height: 30px; border-radius: 6px; background: #1A1F71; display: grid; place-items: center; flex-shrink: 0; }
+  .go-visa-row .gv-name { font-weight: 700; font-size: 12.5px; }
+  .go-visa-row .gv-sub { font-size: 11px; color: var(--rp-muted); margin-top: 1px; }
+  .go-visa-row .gv-tag { margin-left: auto; font-size: 10px; font-weight: 700; color: var(--rp-success); background: #E7F7F0; border-radius: 999px; padding: 4px 9px; white-space: nowrap; }
+  .go-steps { background: #FFF; border: 1px solid var(--rp-line); border-radius: 16px; padding: 15px; margin-bottom: 14px; }
+  .go-steps .gs-title { font-weight: 700; font-size: 13px; margin-bottom: 11px; }
+  .go-step { display: flex; align-items: flex-start; gap: 11px; padding: 6px 0; }
+  .go-step .gs-num { width: 24px; height: 24px; border-radius: 50%; background: var(--rp-lavender-soft); color: var(--rp-purple-dark); font-weight: 800; font-size: 12px; display: grid; place-items: center; flex-shrink: 0; }
+  .go-step .gs-text { font-size: 12.5px; color: var(--rp-ink-2); line-height: 1.4; }
+  .go-step .gs-text strong { color: var(--rp-ink); }
+  .go-link-note { text-align: center; font-size: 12px; margin-top: 12px; }
+  .go-link-note a { color: var(--rp-purple-dark); font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--rp-purple-dark); }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <header class="stage-head">
+    <div>
+      <h1 class="stage-title">Resident Portal × Amenify — <span class="hl">Clickable Prototype</span></h1>
+      <div class="stage-meta">
+        <span>Sarah Thompson</span>
+        <span class="dot">·</span>
+        <span>Villa Verano</span>
+        <span class="dot">·</span>
+        <span>$2,105.00 rent</span>
+        <span class="dot">·</span>
+        <span>v1 prototype</span>
+        <span class="dot">·</span>
+        <a href="resident-portal-rent-payment-flow-v1.html">View grid layout →</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="prev">← Prev</button>
+    <div class="step-indicator">
+      <span class="num" id="cur-num">1</span> · <span id="cur-name">Interest Survey</span>
+    </div>
+    <button class="ctrl-btn primary" id="next">Next →</button>
+    <button class="ctrl-btn" id="restart">↻ Restart</button>
+  </div>
+
+  <div class="phone-stage">
+    <div class="phone">
+
+      <!-- ─────────── SCREEN 1: INTEREST SURVEY ─────────── -->
+      <div class="screen is-active has-cta-dock" data-screen="survey" data-name="Interest Survey" data-step="1">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="home"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Quick question</h2>
+            <div class="x" data-goto="home" style="width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--rp-muted);cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+
+          <div class="reward-hero">
+            <div class="rh-pill"><span class="heart">💚</span> RESIDENT PERKS</div>
+            <div class="rh-title">Get <span class="amt">$50</span> in Resident Portal credit.</div>
+            <div class="rh-sub">Tell us what you'd actually use — we'll drop the credit into your wallet within 24 hours.</div>
+          </div>
+
+          <div class="q-prompt">
+            <div class="q-eyebrow">One question</div>
+            <div class="q-text">Which of these would you <span class="hl">use at Villa Verano</span>?</div>
+            <div class="q-hint">Pick as many as you want · we'll only send what fits</div>
+          </div>
+
+          <div class="services-grid" id="survey-tiles">
+            <div class="service-tile" data-survey-tile data-id="cleaning">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🧽</span></div>
+              <div class="st-name">Cleaning</div>
+              <div class="st-meta">Top Pros<br/>hired for you</div>
+            </div>
+            <div class="service-tile s-blue" data-survey-tile data-id="handyman">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🔧</span></div>
+              <div class="st-name">Handyman</div>
+              <div class="st-meta">Mounting, fixes,<br/>install</div>
+            </div>
+            <div class="service-tile s-orange" data-survey-tile data-id="shop-local">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🍽️</span></div>
+              <div class="st-name">Earn — Shop Local</div>
+              <div class="st-meta">Cash back at<br/>nearby spots</div>
+            </div>
+
+            <div class="service-tile s-pink" data-survey-tile data-id="shop-online">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🛍️</span></div>
+              <div class="st-name">Earn — Shop Online</div>
+              <div class="st-meta">Cash back at<br/>3,400+ brands</div>
+            </div>
+            <div class="service-tile s-orange" data-survey-tile data-id="grocery">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🛒</span></div>
+              <div class="st-name">Grocery</div>
+              <div class="st-meta">Delivery &amp;<br/>pickup</div>
+            </div>
+            <div class="service-tile s-pink" data-survey-tile data-id="design-home">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🛋️</span></div>
+              <div class="st-name">Design my Home</div>
+              <div class="st-meta">Furnishings,<br/>decor, styling</div>
+            </div>
+
+            <div class="service-tile" data-survey-tile data-id="pet">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🐾</span></div>
+              <div class="st-name">Pet Care</div>
+              <div class="st-meta">Walks, sitters,<br/>grooming</div>
+            </div>
+            <div class="service-tile s-orange" data-survey-tile data-id="events">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🎟️</span></div>
+              <div class="st-name">Local Events</div>
+              <div class="st-meta">Community<br/>happenings</div>
+            </div>
+            <div class="service-tile s-blue" data-survey-tile data-id="fitness">
+              <div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg></div>
+              <div class="st-icon-wrap"><span class="st-icon">🧘</span></div>
+              <div class="st-name">Fitness &amp; Wellness</div>
+              <div class="st-meta">Classes, gyms,<br/>spa perks</div>
+            </div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <div class="selected-count" id="survey-count">Pick at least one to claim your <strong>$50 credit</strong></div>
+          <button class="btn btn-primary" id="survey-submit" data-goto="reward" disabled>Claim my $50 credit →</button>
+          <a class="skip" data-goto="home">Maybe later</a>
+        </div>
+      </div>
+
+      <!-- ─────────── SCREEN 2: REWARD CONFIRMED ─────────── -->
+      <div class="screen" data-screen="reward" data-name="$50 Credit Added" data-step="2">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar" style="padding-bottom:4px">
+            <div style="width:36px"></div>
+            <h2 style="text-align:center;flex:1;font-size:20px">You're in</h2>
+            <div class="x" data-goto="home" style="width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--rp-muted);cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+
+          <div class="thanks-wrap">
+            <div class="checkmark-bubble">
+              <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#14532D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg>
+            </div>
+            <div class="thanks-title">Thanks, Sarah —<br/><span class="hl">your $50 is in.</span></div>
+            <div class="thanks-sub">We added <strong>$50 in Resident Portal credit</strong> to your wallet. Use it on anything below — it never expires.</div>
+
+            <div class="credit-card">
+              <div class="cc-lab">Resident Portal Wallet · Credit added</div>
+              <div class="cc-amt">+ $50.00</div>
+              <div class="cc-sub">Available now · 💚 Shop Local Credits</div>
+            </div>
+
+            <div class="you-picked">You're interested in</div>
+            <div class="picked-chips" id="reward-chips">
+              <span class="pchip"><span class="ico">🧽</span>Cleaning</span>
+              <span class="pchip"><span class="ico">🔧</span>Handyman</span>
+              <span class="pchip"><span class="ico">🍽️</span>Earn — Shop Local</span>
+            </div>
+
+            <button class="btn btn-primary" data-goto="home" style="margin-top:4px">Take me to my Home →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────────── SCREEN 3: HOME ─────────── -->
+      <div class="screen" data-screen="home" data-name="Home" data-step="3">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="greeting-row">
+            <div class="greeting">
+              <span class="rp-logo">Resident Portal</span>
+              <h2 style="margin-top:10px">Good afternoon,<br/>Sarah</h2>
+              <p>Villa Verano · 01-36</p>
+            </div>
+            <div class="icon-row">
+              <div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2"><path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="badge">3</span></div>
+              <div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2"><path d="M4 4h16v16H4z"/><polyline points="4,4 12,13 20,4"/></svg></div>
+            </div>
+          </div>
+          <div class="hero-tile">
+            <h3>Welcome to the <span class="hl">community!</span></h3>
+            <div class="tier-row">
+              <span class="tier-pill">⭐ Silver Status</span>
+              <span class="tier-pill">💚 Shop Local Credits $0.00</span>
+            </div>
+          </div>
+          <div class="fd-quick-head">Shop &amp; earn Shop Local Credits 💚</div>
+          <div class="fd-quick3">
+            <div class="fd-qtile" data-goto="food">
+              <div class="ic g-food">🍔</div>
+              <div class="nm">Food</div>
+              <div class="sb">5% back</div>
+            </div>
+            <div class="fd-qtile" data-goto="wallet">
+              <div class="ic g-clean">🧽</div>
+              <div class="nm">Cleaning</div>
+              <div class="sb">Book a Pro</div>
+            </div>
+            <div class="fd-qtile" data-goto="gas">
+              <div class="ic g-gas">⛽</div>
+              <div class="nm">Save on Gas</div>
+              <div class="sb">25¢/gal back</div>
+            </div>
+          </div>
+          <div class="balance-card">
+            <div class="label">Balance Due</div>
+            <div class="amount">$2,105<span style="font-size:22px;color:var(--rp-muted)">.00</span></div>
+            <div class="due-sub">Due May 31, 2026 · Pay now to earn Shop Local Credits 💚</div>
+            <div style="margin-top:14px"><button class="btn btn-primary" data-goto="payments">Make a Payment →</button></div>
+          </div>
+          <div class="rp-cash-card">
+            <div class="head">
+              <div class="brand"><span class="heart">💚</span> Shop Local Credits<sup style="font-size:9px;font-weight:600">™</sup></div>
+              <div class="wallet-pill">Wallet <strong>$0.00</strong></div>
+            </div>
+            <p>Earn cash back on rent and spend it on cleaning, laundry, pet care, and other neighborhood goods.</p>
+            <a href="javascript:void(0)" data-goto="wallet">Explore Rewards</a>
+          </div>
+          <div class="quick-grid">
+            <div class="quick-tile"><div class="num">0</div><div class="lab">Service<br/>Requests</div></div>
+            <div class="quick-tile"><div class="num">0</div><div class="lab">Packages<br/>Ready</div></div>
+            <div class="quick-tile"><div class="num">2</div><div class="lab">Amenity<br/>Reservations</div></div>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab active" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M14 20c0-2 2-4 5-4s4 1.5 4 4"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap a highlighted area to continue</div>
+      </div>
+
+      <!-- ─────────── SCREEN 2: PAYMENTS ─────────── -->
+      <div class="screen" data-screen="payments" data-name="Payments" data-step="4">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="home"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Payments</h2>
+          </div>
+          <div class="balance-card">
+            <div class="label">Current Due</div>
+            <div class="amount">$2,105<span style="font-size:22px;color:var(--rp-muted)">.00</span></div>
+            <div class="due-sub">Includes past due, deposits</div>
+            <div class="btn-row">
+              <button class="btn btn-primary" data-goto="make">Make a Payment</button>
+              <button class="btn btn-secondary">Schedule</button>
+            </div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#E3F2E9;display:grid;place-items:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2E8B62" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div>
+            <div style="flex:1"><div style="font-weight:600;font-size:14px">Scheduled Payments</div><div style="font-size:11.5px;color:var(--rp-muted);margin-top:2px">Manage upcoming payments</div></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B9B9B" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#E6F4EC;display:grid;place-items:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2E9C6E" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></div>
+            <div style="flex:1"><div style="font-weight:600;font-size:14px">Account History</div><div style="font-size:11.5px;color:var(--rp-muted);margin-top:2px">See all past payments</div></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B9B9B" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:14px;padding:16px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:#FFF1DE;display:grid;place-items:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F5A24F" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg></div>
+            <div style="flex:1"><div style="font-weight:600;font-size:14px">Saved Payment Accounts</div><div style="font-size:11.5px;color:var(--rp-muted);margin-top:2px">Add and manage methods</div></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9B9B9B" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab active" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap a highlighted area to continue</div>
+      </div>
+
+      <!-- ─────────── SCREEN 3: MAKE A PAYMENT ─────────── -->
+      <div class="screen" data-screen="make" data-name="Make a Payment" data-step="5">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="payments"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Make a Payment</h2>
+          </div>
+          <div class="card" style="background:#E3F2E9;border:1px solid #C9E6D5">
+            <div class="label" style="font-size:11px;font-weight:600;color:var(--rp-muted);text-transform:uppercase;letter-spacing:.6px">Account Snapshot</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:32px;line-height:1.05;letter-spacing:-.5px;margin-top:8px">$2,105.00</div>
+            <div style="font-size:11.5px;color:var(--rp-muted);margin-top:4px">Current due · includes past due, deposits</div>
+          </div>
+          <div class="sec-title">Payment Details</div>
+          <div class="input-field">
+            <span class="lab">Payment Amount</span>
+            <span class="val">$2,105.00 <span style="color:var(--rp-muted);font-size:13px">▾</span></span>
+          </div>
+          <div class="input-field">
+            <span class="lab">Payment Date</span>
+            <span class="val">05/14/26 <span style="color:var(--rp-muted);font-size:13px">▾</span></span>
+          </div>
+          <div style="background:#FFF;border:1px dashed var(--rp-line-strong);border-radius:14px;padding:14px;margin-top:6px;display:flex;gap:10px;align-items:center">
+            <span style="font-size:18px">💚</span>
+            <p style="font-size:11.5px;color:var(--rp-muted);line-height:1.4">Earn Shop Local Credits on this payment when you choose Visa on the next screen.</p>
+          </div>
+          <div style="margin-top:18px"><button class="btn btn-primary" data-goto="method">Continue to Payment Method →</button></div>
+          <div style="margin-top:10px"><button class="btn btn-secondary" style="background:transparent;border:none;color:var(--rp-muted);font-weight:500" data-goto="payments">Cancel</button></div>
+        </div>
+        <div class="reveal-banner">Tap a highlighted area to continue</div>
+      </div>
+
+      <!-- ─────────── SCREEN 4: PAYMENT METHOD ─────────── -->
+      <div class="screen" data-screen="method" data-name="Payment Method ★" data-step="6">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="make"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Payment Method</h2>
+            <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="pm-list">
+            <div class="pm-option selected">
+              <div class="pm-radio"></div>
+              <div class="pm-icon" style="background:#1A1F71"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+              <div class="pm-meta"><div class="name">Saved Payment</div><div class="sub">Visa Credit Card · ending in 1234</div></div>
+            </div>
+            <div class="pm-option" data-goto="ach">
+              <div class="pm-radio"></div>
+              <div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#6B6B6B" stroke-width="1.8"><path d="M3 6L12 1l9 5"/><path d="M5 6v9M9 6v9M15 6v9M19 6v9"/><path d="M2 17h20"/></svg></div>
+              <div class="pm-meta"><div class="name">Bank Account</div><div class="sub">ACH transfer · No fee</div></div>
+            </div>
+            <div class="pm-option">
+              <div class="pm-radio"></div>
+              <div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#6B6B6B" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 8h20"/></svg></div>
+              <div class="pm-meta"><div class="name">Credit Card</div><div class="sub">Add a new card</div></div>
+            </div>
+            <div class="pm-option">
+              <div class="pm-radio"></div>
+              <div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#6B6B6B" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 8h20M6 13h4"/></svg></div>
+              <div class="pm-meta"><div class="name">Debit Card</div><div class="sub">Add a new card</div></div>
+            </div>
+          </div>
+          <div class="offer">
+            <div class="head">
+              <div class="heart-circle"><span>💚</span></div>
+              <div><h4>Earn Shop Local Credits.</h4></div>
+            </div>
+            <p class="sub">Free to enroll. Rewards pile up in your wallet to spend on cleaning, laundry, pet care, and other neighborhood services.</p>
+            <div class="reward-tiles">
+              <div class="reward-tile"><div class="rt-icon" style="background:var(--rp-purple)"><span>💚</span></div><div class="rt-amt">$21.05</div><div class="rt-lab">Shop Local Credits</div></div>
+              
+            </div>
+            <ul>
+              <li>Pay with <strong>Visa</strong> to earn <strong>1.0% Shop Local Credits</strong> back on rent</li>
+              <li>Save <strong>up to 25¢/gal</strong> in Shop Local Credits at the pump with your linked Visa ⛽</li>
+              
+            </ul>
+            <div class="agree-row">
+              <div class="checkbox" id="enroll-check"></div>
+              <div class="agree-text">I agree to share my contact information and account details with Resident Portal to enroll in Shop Local Credits.</div>
+            </div>
+            <button class="btn btn-purple-disabled" id="enroll-btn">Enroll Now</button>
+          </div>
+          <div style="margin-top:6px"><button class="btn btn-primary" data-goto="summary">Next →</button></div>
+        </div>
+        <div class="reveal-banner">Tap Visa or Bank Account to choose</div>
+      </div>
+
+      <!-- ─────────── SCREEN 5: SUMMARY ─────────── -->
+      <div class="screen" data-screen="summary" data-name="Summary" data-step="7">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="method"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Summary</h2>
+            <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="card" style="padding:18px 20px">
+            <div class="summary-line"><span class="label">Amount</span><span>$2,105.00</span></div>
+            <div class="summary-line"><span class="label">Convenience Fee</span><span>$2.99</span></div>
+            <div class="summary-line total"><span class="label">Total</span><span>$2,107.99</span></div>
+          </div>
+          <div class="reward-callout">
+            <div class="ic"><span style="font-size:14px">💚</span></div>
+            <p>This payment earns you <strong>$21.05 in Shop Local Credits</strong>.</p>
+          </div>
+          <div class="meta-block"><div class="lab">Payment Method</div><div class="val">Visa Credit Card · ending in 1234</div></div>
+          <div class="meta-block"><div class="lab">Address</div><div class="val">Sarah Thompson<br/>1234 Main St<br/>Cincinnati, OH 45377</div></div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin:16px 4px 14px">
+            <div style="width:18px;height:18px;border-radius:4px;border:1.5px solid var(--rp-line-strong);background:#FFF;flex-shrink:0;margin-top:1px"></div>
+            <div style="font-size:12px;color:var(--rp-ink-2);line-height:1.4">I agree to the terms <a href="javascript:void(0)" style="color:var(--rp-purple-dark);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--rp-purple-dark);margin-left:4px">View Terms</a></div>
+          </div>
+          <div><button class="btn btn-primary" data-goto="approved">Submit Payment</button></div>
+        </div>
+        <div class="reveal-banner">Tap Submit Payment to continue</div>
+      </div>
+
+      <!-- ─────────── SCREEN 6: APPROVED ─────────── -->
+      <div class="screen" data-screen="approved" data-name="Payment Approved" data-step="8">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar" style="padding-top:14px"><h2 style="text-align:center;flex:1">Payment Approved</h2></div>
+          <div class="approved-hero">
+            <div class="check"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.8"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3>Thank you, Sarah!</h3>
+            <p>Your payment of <strong>$2,107.99</strong> has been approved.</p>
+          </div>
+          <div class="reward-callout" style="margin-top:0">
+            <div class="ic"><span style="font-size:14px">💚</span></div>
+            <p>You earned <strong>$21.05 in Shop Local Credits</strong> by paying with your Visa card. <a href="javascript:void(0)" data-goto="wallet" style="color:var(--rp-purple-dark);font-weight:700;text-decoration:none;border-bottom:1.5px solid var(--rp-purple-dark)">View My Wallet →</a></p>
+          </div>
+          <div class="banner-cta" data-goto="why">
+            <div class="bc-meta">
+              <div class="bc-title">Now earn cash back everywhere you spend</div>
+              <div class="bc-sub">Link a card to earn at Uber, Walmart, CVS, and 3,400+ more brands.</div>
+            </div>
+            <div class="bc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          </div>
+          <div class="meta-block"><div class="lab">Name on Account</div><div class="val">Sarah Thompson</div></div>
+          <div class="meta-block"><div class="lab">Payment Method</div><div class="val">Visa Credit Card · 1234</div></div>
+          <div class="meta-block"><div class="lab">Transaction Number</div><div class="val">00000000000</div></div>
+          <div class="meta-block"><div class="lab">Payment Date</div><div class="val">05/14/26</div></div>
+          <div class="meta-block"><div class="lab">Payment Amount</div><div class="val">$2,107.99</div></div>
+          <div style="margin-top:14px"><button class="btn btn-primary" data-goto="home">Done</button></div>
+          <div class="notif-card">
+            <div class="app-icon"></div>
+            <div style="flex:1">
+              <div class="meta"><span><strong style="color:var(--rp-ink)">Resident Portal</strong> 💚</span><span>now</span></div>
+              <div class="body-txt">💚 Thanks for paying rent on time, Sarah! You earned <strong>$21.05 in Shop Local Credits</strong> — now in your wallet.</div>
+            </div>
+          </div>
+        </div>
+        <div class="reveal-banner">Tap Done to restart</div>
+      </div>
+
+      <!-- ─────────── SCREEN 7: ACH / PLATINUM UPSELL ─────────── -->
+      <div class="screen" data-screen="ach" data-name="ACH → Resident Plus" data-step="9">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="method"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Payment Method</h2>
+            <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+          <div class="pm-list">
+            <div class="pm-option" data-goto="method">
+              <div class="pm-radio"></div>
+              <div class="pm-icon" style="background:#1A1F71"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+              <div class="pm-meta"><div class="name">Saved Payment</div><div class="sub">Visa Credit Card · ending in 1234</div></div>
+            </div>
+            <div class="pm-option selected">
+              <div class="pm-radio"></div>
+              <div class="pm-icon" style="background:#E3F2E9"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#14532D" stroke-width="2"><path d="M3 6L12 1l9 5"/><path d="M5 6v9M9 6v9M15 6v9M19 6v9"/><path d="M2 17h20"/></svg></div>
+              <div class="pm-meta"><div class="name">Bank Account</div><div class="sub">ACH transfer · No fee</div></div>
+            </div>
+            <div class="pm-option">
+              <div class="pm-radio"></div>
+              <div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#6B6B6B" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 8h20"/></svg></div>
+              <div class="pm-meta"><div class="name">Credit Card</div><div class="sub">Add a new card</div></div>
+            </div>
+            <div class="pm-option">
+              <div class="pm-radio"></div>
+              <div class="pm-icon"><svg width="20" height="14" viewBox="0 0 24 18" fill="none" stroke="#6B6B6B" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 8h20M6 13h4"/></svg></div>
+              <div class="pm-meta"><div class="name">Debit Card</div><div class="sub">Add a new card</div></div>
+            </div>
+          </div>
+          <div class="ach-confirm-pill">ACH selected · No cash back earned</div>
+          <div class="platinum-card">
+            <div class="platinum-brand">
+              <span class="pl-logo">Resident Portal</span>
+              <span class="pl-tier">PLUS</span>
+            </div>
+            <h4>Pay by bank? Earn rewards anyway.</h4>
+            <p class="pl-sub">Resident Plus members earn Shop Local Credits on every rent payment — no matter how they pay.</p>
+            <div class="platinum-benefits">
+              <div class="pb-row"><div class="pb-icon">%</div><div class="pb-text"><strong>1% Shop Local Credits back</strong> on every rent payment, including ACH</div></div>
+              <div class="pb-row"><div class="pb-icon">5</div><div class="pb-text">Earn up to <strong>5.0%</strong> at <strong>local dining, home services, online shopping</strong> and more</div></div>
+              <div class="pb-row"><div class="pb-icon">★</div><div class="pb-text"><strong>7-day-a-week concierge</strong> for moving, services &amp; community</div></div>
+            </div>
+            <div class="platinum-price"><span class="pp-amt">$9.99</span><span class="pp-per">/ month · cancel anytime</span></div>
+            <button class="btn-platinum" data-goto="summary">Start Resident Plus →</button>
+          </div>
+          <div style="margin-top:6px"><button class="btn btn-primary" data-goto="summary">Continue with ACH</button></div>
+          <div style="text-align:center;margin-top:10px"><a href="javascript:void(0)" data-goto="method" style="font-size:12px;color:var(--rp-muted);text-decoration:none">Maybe later</a></div>
+        </div>
+        <div class="reveal-banner">Tap Start Resident Plus to subscribe</div>
+      </div>
+
+      <!-- ─────────── SCREEN 8: Resident Portal WALLET / MARKETPLACE ─────────── -->
+      <div class="screen" data-screen="wallet" data-name="Resident Portal Wallet" data-step="10">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="market-top">
+            <div>
+              <span class="rp-logo small">Resident Portal</span>
+              <h2>Hello, Sarah</h2>
+            </div>
+            <div class="icon-row">
+              <div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2"><path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="badge">2</span></div>
+              <div class="icon-btn" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+            </div>
+          </div>
+
+          <div class="wallet-stats">
+            <div class="ws-item">
+              <div class="ws-lab">Your Savings</div>
+              <div class="ws-amt">$889.89</div>
+            </div>
+            <div class="ws-item">
+              <div class="ws-lab">Shop Local Credits</div>
+              <div class="ws-amt purple"><span class="heart">💚</span>$44.00</div>
+            </div>
+          </div>
+
+          <div class="banner-cta" data-goto="why">
+            <div class="bc-meta">
+              <div class="bc-title">Link a card to earn everywhere</div>
+              <div class="bc-sub">Earn up to 5% back at Uber, Walmart, CVS, and 3,400+ more.</div>
+            </div>
+            <div class="bc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          </div>
+
+          <h3 class="market-section">Must Book For You</h3>
+          <div class="must-book-card" data-goto="home">
+            <div class="mbc-content">
+              <div class="mbc-cat">Cleaning Services</div>
+              <div class="mbc-name">Anna C. <span class="mbc-verified">✓</span></div>
+              <div class="mbc-rating"><span class="star">★</span> 5.0 (126+ jobs)</div>
+              <button class="mbc-btn">Book Again — $119+</button>
+            </div>
+            <div class="mbc-photo">
+              <img src="anna-c.jpg" alt="Anna C., Amenify cleaning pro" />
+              <span class="photo-tag">PRO</span>
+            </div>
+          </div>
+
+          <h3 class="market-section">Popular Services</h3>
+          <div class="services-grid">
+            <div class="service-tile" data-goto="home">
+              <div class="st-icon-wrap"><span class="st-icon">🧽</span></div>
+              <div class="st-name">Cleaning</div>
+              <div class="st-meta">Top Pros<br/>hired for you</div>
+            </div>
+            <div class="service-tile s-pink" data-goto="home">
+              <div class="st-icon-wrap"><span class="st-icon">🛒</span></div>
+              <div class="st-name">Food / Grocery</div>
+              <div class="st-meta">Delivery &amp; Pickup</div>
+            </div>
+            <div class="service-tile s-orange" data-goto="home">
+              <div class="st-icon-wrap"><span class="st-icon">🛍️</span></div>
+              <div class="st-name">Online Shopping</div>
+              <div class="st-meta">Shop top home<br/>products</div>
+            </div>
+            <div class="service-tile s-blue" data-goto="home">
+              <div class="st-icon-wrap"><span class="st-icon">🔧</span></div>
+              <div class="st-name">Handyman</div>
+              <div class="st-meta">Top Pros<br/>hired for you</div>
+            </div>
+            <div class="service-tile s-pink" data-goto="home">
+              <div class="st-icon-wrap"><span class="st-icon">🧺</span></div>
+              <div class="st-name">Chores</div>
+              <div class="st-meta">Top Pros<br/>hired for you</div>
+            </div>
+            <div class="service-tile s-orange" data-goto="home">
+              <div class="st-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2E8B62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18"/><rect x="3" y="6" width="18" height="14" rx="2.5"/><path d="M8 3v4M16 3v4"/><circle cx="9" cy="14" r="1.2" fill="#F5A24F" stroke="none"/><circle cx="13" cy="14" r="1.2" fill="#F5A24F" stroke="none"/><circle cx="17" cy="14" r="1.2" fill="#F5A24F" stroke="none"/><circle cx="9" cy="17.5" r="1.2" fill="#F5A24F" stroke="none"/></svg></div>
+              <div class="st-name">Local Events</div>
+              <div class="st-meta">Community<br/>happenings</div>
+            </div>
+            <div class="service-tile" data-goto="home">
+              <div class="st-icon-wrap"><span class="st-icon">📦</span></div>
+              <div class="st-name">Moving Services</div>
+              <div class="st-meta">Top Pros<br/>hired for you</div>
+            </div>
+            <div class="service-tile s-pink" data-goto="home">
+              <div class="st-icon-wrap"><span class="st-icon">🛡️</span></div>
+              <div class="st-name">Protection Plan</div>
+              <div class="st-meta">A must have<br/>for you</div>
+            </div>
+            <div class="service-tile s-orange" data-goto="home">
+              <div class="st-icon-wrap"><span class="st-icon">🍽️</span></div>
+              <div class="st-name">Local Dining</div>
+              <div class="st-meta">Earn cash<br/>back here</div>
+            </div>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap "Link a card" to continue</div>
+      </div>
+
+      <!-- ─────────── SCREEN 9: WHY LINK CARD ─────────── -->
+      <div class="screen" data-screen="why" data-name="Why Link a Card" data-step="11">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="wallet"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2 style="font-size:22px">Earn Everywhere</h2>
+            <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+
+          <div class="why-headline">Earn <span class="hl">Shop Local Credits</span> everywhere you spend.</div>
+          <p class="why-sub">Use your linked Visa card at thousands of brands — plus <strong>up to 25¢/gal back at the pump</strong> — and we'll auto-credit your wallet. <strong>Exclusive Visa partnership</strong>.</p>
+
+          <div class="gas-link-feat" data-goto="gas">
+            <div class="glf-icon">⛽</div>
+            <div class="glf-text">
+              <div class="glf-title">Save on Gas with your linked Visa</div>
+              <div class="glf-sub">Up to <strong>25¢/gal back</strong> in Shop Local Credits at stations near you</div>
+            </div>
+            <div class="glf-arrow"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+          </div>
+
+          <div class="why-card-hero">
+            <div class="rp-visa-card">
+              <div class="top-row">
+                <span class="pill">Resident Portal</span>
+                <span class="heart">💚</span>
+              </div>
+              <div class="chip"></div>
+              <div class="num">•••• •••• •••• 1234</div>
+              <div class="footer-row">
+                <span class="name">Sarah Thompson</span>
+                <svg class="visa-svg lg" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg>
+              </div>
+            </div>
+            <div class="back-badge">
+              <div class="bb-up">UP TO</div>
+              <div class="bb-pct">5%</div>
+              <div class="bb-lab">CASH BACK</div>
+            </div>
+          </div>
+
+          <div class="place-section">Popular places near Villa Verano</div>
+          <div class="place-list">
+            <div class="place-row">
+              <div class="brand-chip">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="20" cy="20" r="20" fill="#000"/>
+                  <path d="M 17 14 L 27 14 Q 28.5 14 28.5 15.5 L 28.5 24.5 Q 28.5 26 27 26 L 17 26 Q 15.5 26 15.5 24.5 L 15.5 22.5 L 7 22.5 L 7 17.5 L 15.5 17.5 L 15.5 15.5 Q 15.5 14 17 14 Z" fill="#FFF"/>
+                </svg>
+              </div>
+              <div class="pr-meta"><div class="pr-name">Uber</div><div class="pr-sub">Rides &amp; Eats</div></div>
+              <span class="pr-pct">2% back</span>
+            </div>
+            <div class="place-row">
+              <div class="brand-chip">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="20" cy="20" r="20" fill="#0071CE"/>
+                  <g transform="translate(20 20)" stroke="#FFC220" stroke-width="3.4" stroke-linecap="round">
+                    <line x1="0" y1="-4" x2="0" y2="-11"/>
+                    <line x1="0" y1="4" x2="0" y2="11"/>
+                    <line x1="-3.5" y1="-2" x2="-9.5" y2="-5.5"/>
+                    <line x1="3.5" y1="-2" x2="9.5" y2="-5.5"/>
+                    <line x1="-3.5" y1="2" x2="-9.5" y2="5.5"/>
+                    <line x1="3.5" y1="2" x2="9.5" y2="5.5"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="pr-meta"><div class="pr-name">Walmart</div><div class="pr-sub">Groceries &amp; everyday</div></div>
+              <span class="pr-pct">2% back</span>
+            </div>
+            <div class="place-row">
+              <div class="brand-chip white-bg">
+                <svg viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
+                  <text x="20" y="20" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="900" font-size="20" fill="#CC0000" letter-spacing="-1">cvs</text>
+                </svg>
+              </div>
+              <div class="pr-meta"><div class="pr-name">CVS Pharmacy</div><div class="pr-sub">Health &amp; everyday</div></div>
+              <span class="pr-pct">2% back</span>
+            </div>
+            <div class="place-row">
+              <div class="brand-chip white-bg">
+                <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 20 8 L 9 16 L 9 30 Q 9 31 10 31 L 30 31 Q 31 31 31 30 L 31 16 Z" fill="#F37032"/>
+                  <g fill="#FFFFFF">
+                    <rect x="13.5" y="17" width="0.9" height="4.5" rx="0.4"/>
+                    <rect x="15" y="17" width="0.9" height="4.5" rx="0.4"/>
+                    <rect x="16.5" y="17" width="0.9" height="4.5" rx="0.4"/>
+                    <rect x="13" y="20.5" width="4.7" height="1.5" rx="0.3"/>
+                    <rect x="14.6" y="22" width="1.5" height="6" rx="0.3"/>
+                    <path d="M 22 17 Q 22 15 23.5 15 Q 25 15 25 17 L 25 22 L 24.5 22 L 24.5 28 Q 24.5 28.5 24 28.5 L 23 28.5 Q 22.5 28.5 22.5 28 L 22.5 22 L 22 22 Z" fill="#FFFFFF"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="pr-meta"><div class="pr-name">Grubhub</div><div class="pr-sub">Food delivery</div></div>
+              <span class="pr-pct high">5% back</span>
+            </div>
+          </div>
+
+          <div class="why-stats">
+            <div class="why-stat"><div class="ws-lab">Avg resident earns</div><div class="ws-val">$42<span style="font-size:14px;opacity:0.6">/mo</span></div></div>
+            <div class="why-stat"><div class="ws-lab">Brands available</div><div class="ws-val">3,400+</div></div>
+          </div>
+
+          <div style="margin-top:14px"><button class="btn btn-primary" data-goto="link">Link a card to start earning →</button></div>
+          <div style="text-align:center;margin-top:10px"><a href="javascript:void(0)" data-goto="wallet" style="font-size:12px;color:var(--rp-muted);text-decoration:none">Maybe later</a></div>
+        </div>
+        <div class="reveal-banner">Tap "Link a card" to continue</div>
+      </div>
+
+      <!-- ─────────── SCREEN 10: LINK YOUR CARD ─────────── -->
+      <div class="screen" data-screen="link" data-name="Link your card" data-step="12">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="why"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2 style="font-size:22px">Link your card</h2>
+            <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+
+          <div class="link-hero">Choose a card to link</div>
+          <p class="link-sub">We use bank-grade encryption. We never see your full card number or charge your card.</p>
+
+          <div class="rp-visa-card">
+            <div class="top-row">
+              <span class="pill">Resident Portal</span>
+              <span class="heart">💚</span>
+            </div>
+            <div class="chip"></div>
+            <div class="num">•••• •••• •••• 1234</div>
+            <div class="footer-row">
+              <span class="name">Sarah Thompson</span>
+              <svg class="visa-svg lg" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg>
+            </div>
+          </div>
+
+          <div class="link-option-list">
+            <div class="link-option selected">
+              <div class="lo-radio"></div>
+              <div class="lo-icon"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+              <div class="lo-meta"><div class="lo-name">Use your saved card</div><div class="lo-sub">Visa Credit Card · ending in 1234</div></div>
+            </div>
+            <div class="link-option add">
+              <div class="lo-radio"></div>
+              <div class="lo-icon"></div>
+              <div class="lo-meta"><div class="lo-name">Add a new Visa card</div><div class="lo-sub">Visa-exclusive rewards partner</div></div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px"><button class="btn btn-primary" data-goto="set">Link Card</button></div>
+          <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--rp-muted)">By linking your card you agree to the <a href="javascript:void(0)" style="color:var(--rp-purple-dark);font-weight:600;text-decoration:none;border-bottom:1px solid var(--rp-purple-dark)">Shop Local Credits Terms</a>.</div>
+        </div>
+        <div class="reveal-banner">Tap "Link Card" to confirm</div>
+      </div>
+
+      <!-- ─────────── SCREEN 11: YOU'RE ALL SET ─────────── -->
+      <div class="screen" data-screen="set" data-name="You're all set" data-step="13">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar" style="padding-top:14px">
+            <div class="back" data-goto="link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2 style="text-align:center;flex:1;font-size:20px">Link your card</h2>
+            <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+          </div>
+
+          <div class="allset-card-wrap">
+            <div class="rp-visa-card" style="margin-bottom:0">
+              <div class="top-row">
+                <span class="pill">Resident Portal</span>
+                <span class="heart">💚</span>
+              </div>
+              <div class="chip"></div>
+              <div class="num">•••• •••• •••• 1234</div>
+              <div class="footer-row">
+                <span class="name">Sarah Thompson</span>
+                <svg class="visa-svg lg" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg>
+              </div>
+            </div>
+            <div class="check-overlay">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <div class="allset-headline">You're all set!</div>
+          <p class="allset-sub">We'll automatically earn <strong>Shop Local Credits</strong> when you shop with your linked cards.</p>
+
+          <div class="benefit-list">
+            <div class="benefit-row">
+              <div class="br-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              </div>
+              <div class="br-meta"><div class="br-title">Secure &amp; private</div><div class="br-body">Your data is encrypted and never sold. We never store your full card number.</div></div>
+            </div>
+            <div class="benefit-row">
+              <div class="br-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+              </div>
+              <div class="br-meta"><div class="br-title">Works everywhere</div><div class="br-body">In-store, online, in-app, anywhere you tap or swipe your linked cards.</div></div>
+            </div>
+            <div class="benefit-row">
+              <div class="br-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+              </div>
+              <div class="br-meta"><div class="br-title">No extra steps</div><div class="br-body">Just keep using your cards like normal. Shop Local Credits lands in your wallet automatically.</div></div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px"><button class="btn btn-purple" data-goto="maddie">Done</button></div>
+        </div>
+        <div class="reveal-banner">Tap "Done" to meet Maddie</div>
+      </div>
+
+      <!-- ─────────── SCREEN 12: ORDER WITH MADDIE ─────────── -->
+      <div class="screen" data-screen="maddie" data-name="Order with Maddie" data-step="14">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="maddie-header">
+            <div class="maddie-avatar"></div>
+            <div class="maddie-meta">
+              <div class="name">Maddie <span class="ai-tag">AI</span></div>
+              <div class="status">Here to help, anytime.</div>
+            </div>
+            <div class="maddie-actions">
+              <span class="ma-pill">5%</span>
+              <div class="ma-dots"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1A1A1A"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="chat-body">
+            <div class="chat-msg out">
+              <div class="chat-bubble">Please order a pepperoni pizza from Domino's and a diet coke.</div>
+              <span class="chat-time">9:41 AM</span>
+            </div>
+            <div class="chat-msg in">
+              <div class="chat-bubble">Got it! I'll place your order now.</div>
+              <span class="chat-time">9:41 AM</span>
+            </div>
+            <div class="chat-card-order">
+              <div class="order-logo">D</div>
+              <div class="order-meta">
+                <div class="order-name">Domino's Pizza</div>
+                <div class="order-items">1 Large Pepperoni Pizza<br/>1 Diet Coke</div>
+              </div>
+              <div class="order-price">$24.18</div>
+            </div>
+            <div class="chat-msg in">
+              <div class="chat-bubble">Your order is confirmed and on the way! 🎉</div>
+              <span class="chat-time">9:42 AM</span>
+            </div>
+            <div class="chat-earn">
+              <span class="ce-heart">💚</span>
+              <div class="ce-text">You earned <strong>$1.21 in Shop Local Credits</strong> (5% back) — now in your wallet.</div>
+            </div>
+          </div>
+
+          <div class="chat-input-bar">
+            <input type="text" placeholder="Message Maddie..." disabled />
+            <button class="send-btn" data-goto="wallet">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap → to head back to your wallet</div>
+      </div>
+
+      <!-- ─────────── SCREEN 15: FOOD & GROCERY (BROWSE) ─────────── -->
+      <div class="screen" data-screen="food" data-name="Food & Grocery" data-step="15">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="home"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><div class="eyebrow">Resident Portal · Powered by Amenify</div><h2>Food &amp; Grocery</h2></div>
+          </div>
+          <div class="fd-addr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            3155 Broderick St · Villa Verano
+          </div>
+
+          <div class="fd-promo">
+            <div class="fd-promo-eyebrow"><span class="heart">💚</span> Shop Local Credits</div>
+            <h3>Earn 5% back on<br/>every order.</h3>
+            <p>Order from local spots and we'll drop Shop Local Credits into your Resident Portal wallet — spend it on anything.</p>
+            <div class="fd-promo-chips"><span>Free resident delivery</span><span>Wallet works everywhere</span></div>
+          </div>
+
+          <div class="fd-toggle">
+            <div class="fd-seg active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="15" height="11" rx="2"/><path d="M16 9h4l3 3v5h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg> Delivery</div>
+            <div class="fd-seg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 0l3-3m-3 3L9 5"/><path d="M5 11h14l-1.5 9h-11z"/></svg> Pickup</div>
+            <div class="fd-seg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg> List</div>
+            <div class="fd-seg active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg> Map</div>
+          </div>
+
+          <div class="offer-map">
+            <span class="om-green" style="top:-20%;left:-12%;width:130px;height:150px"></span>
+            <span class="om-green" style="bottom:-18%;right:-10%;width:120px;height:120px"></span>
+            <span class="om-road om-r1"></span><span class="om-road om-r2"></span><span class="om-road om-r3"></span>
+            <div class="om-pin best" style="top:40%;left:32%" data-goto="menu"><div class="om-chip">🍔 Balboa Cafe</div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:24%;left:64%"><div class="om-chip">🍜</div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:60%;left:58%"><div class="om-chip">🍕</div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:54%;left:18%"><div class="om-chip">🥗</div><div class="om-dot"></div></div>
+            <div class="om-pop" data-goto="menu">
+              <div class="op-thumb food">🍔</div>
+              <div><div class="op-name">Balboa Cafe</div><div class="op-sub">American (new) · ★ 4.8 · 0.4 mi · Free delivery</div></div>
+              <div class="op-go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="fd-chips">
+            <div class="fd-chip active">All</div>
+            <div class="fd-chip">American</div>
+            <div class="fd-chip">Italian</div>
+            <div class="fd-chip">Japanese</div>
+            <div class="fd-chip">Pizza</div>
+            <div class="fd-chip">Grocery</div>
+          </div>
+
+          <div class="fd-section-title">Popular near you</div>
+
+          <div class="fd-rest-card" data-goto="menu">
+            <div class="fd-rest-img g1">🍔
+              <span class="fd-feat">💚 SHOP LOCAL</span>
+              <div class="fd-heart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E8B62" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z"/></svg></div>
+            </div>
+            <div class="fd-rest-body">
+              <div class="fd-rest-row">
+                <div class="fd-rest-name">Balboa Cafe</div>
+                <div class="fd-rest-rating"><span class="star">★</span> 4.8 <span class="ct">(1,240)</span></div>
+              </div>
+              <div class="fd-rest-sub">American (new) · 0.4 mi · 25–40 min</div>
+              <div class="fd-tags"><span>Free delivery</span><span>5% Shop Local Credits</span></div>
+            </div>
+          </div>
+
+          <div class="fd-rest-card" data-goto="menu">
+            <div class="fd-rest-img g2">🍜
+              <div class="fd-heart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E8B62" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z"/></svg></div>
+            </div>
+            <div class="fd-rest-body">
+              <div class="fd-rest-row">
+                <div class="fd-rest-name">Nopa Noodle House</div>
+                <div class="fd-rest-rating"><span class="star">★</span> 4.7 <span class="ct">(860)</span></div>
+              </div>
+              <div class="fd-rest-sub">Japanese · 0.6 mi · 30–45 min</div>
+              <div class="fd-tags"><span>Free delivery</span><span>5% Shop Local Credits</span></div>
+            </div>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>Order</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap a restaurant to view the menu</div>
+      </div>
+
+      <!-- ─────────── SCREEN 16: RESTAURANT MENU ─────────── -->
+      <div class="screen has-cta-dock" data-screen="menu" data-name="Balboa Cafe Menu" data-step="16">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="food"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2>Balboa Cafe</h2></div>
+          </div>
+          <div class="fd-menu-hero">🍔<span class="fd-feat">💚 SHOP LOCAL</span></div>
+          <div class="fd-rest-head">
+            <div class="fd-rest-meta"><span class="star">★ 4.8</span><span class="dot">·</span><span>American (new)</span><span class="dot">·</span><span>Free delivery</span><span class="dot">·</span><span>25–40 min</span></div>
+            <div class="fd-localbadge"><span>💚</span> Earn 5% Shop Local Credits on this order</div>
+          </div>
+
+          <div class="fd-chips">
+            <div class="fd-chip active">Lunch — Entrees</div>
+            <div class="fd-chip">Soups &amp; Salads</div>
+            <div class="fd-chip">To Share</div>
+            <div class="fd-chip">Sides</div>
+          </div>
+
+          <div class="fd-menu-cat">Lunch — Entrees</div>
+
+          <div class="fd-item" data-goto="item">
+            <div class="fd-item-thumb">🍔</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Balboa Burger on a Baguette</div>
+              <div class="fd-item-desc">Butter lettuce, housemade pickles and onions, shoestring fries</div>
+              <div class="fd-item-price">$16.50</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item" data-goto="item">
+            <div class="fd-item-thumb">🍝</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Daily Pasta</div>
+              <div class="fd-item-desc">Daily seasonal pasta selection</div>
+              <div class="fd-item-price">$23.50</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item" data-goto="item">
+            <div class="fd-item-thumb">🐟</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Pan Seared Salmon</div>
+              <div class="fd-item-desc">Coconut rice, fennel and orange salad, red pepper coulis</div>
+              <div class="fd-item-price">$19.50</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item" data-goto="item">
+            <div class="fd-item-thumb">🍗</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Roasted Chicken Breast</div>
+              <div class="fd-item-desc">Soft polenta, confit tomatoes, stewed peppers and onions</div>
+              <div class="fd-item-price">$22.50</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn btn-primary" data-goto="item">View item →</button>
+        </div>
+        <div class="reveal-banner">Tap an item to customize it</div>
+      </div>
+
+      <!-- ─────────── SCREEN 17: ITEM DETAIL ─────────── -->
+      <div class="screen has-cta-dock" data-screen="item" data-name="Balboa Burger" data-step="17">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-x" data-goto="menu"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+            <div class="fd-title"></div>
+          </div>
+          <div class="fd-item-hero">🍔</div>
+          <div class="fd-item-title">Balboa Burger on a Baguette</div>
+          <div class="fd-item-fulldesc">Butter lettuce, housemade pickles and onions, shoestring fries.</div>
+          <div class="fd-item-base">$16.50 base price</div>
+
+          <div class="fd-field-lab">Special instructions</div>
+          <textarea class="fd-textarea" rows="3" placeholder="e.g. no onions, extra crispy…" disabled></textarea>
+
+          <div class="fd-qty-row">
+            <div class="fd-qty">
+              <button type="button">−</button>
+              <span class="fd-qnum">1</span>
+              <button type="button">+</button>
+            </div>
+            <div style="font-size:11.5px;color:var(--rp-muted)">💚 Earns 5% Shop Local Credits</div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn btn-purple" data-goto="cart">Add to cart · $16.50</button>
+        </div>
+        <div class="reveal-banner">Tap “Add to cart” to continue</div>
+      </div>
+
+      <!-- ─────────── SCREEN 18: CART ─────────── -->
+      <div class="screen has-cta-dock" data-screen="cart" data-name="Your Cart" data-step="18">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2>Your cart</h2></div>
+          </div>
+          <div class="fd-cart-from">From <strong>Balboa Cafe</strong> · Delivery</div>
+
+          <div class="fd-cart-line">
+            <div class="fd-cl-thumb">🍔</div>
+            <div class="fd-cl-info">
+              <div class="fd-cl-name">Balboa Burger on a Baguette</div>
+              <div class="fd-cl-each">Qty 1 · $16.50 each</div>
+            </div>
+            <div class="fd-cl-price">$16.50</div>
+          </div>
+
+          <div class="fd-slc-card">
+            <div class="fd-slc-top">
+              <div class="fd-slc-lab">
+                <span class="heart">💚</span>
+                <div><div class="t">Apply Shop Local Credits</div><div class="s">$50.00 in your Resident Portal wallet</div></div>
+              </div>
+              <div class="fd-switch" id="cart-slc-switch"></div>
+            </div>
+            <div class="fd-slc-applied">−$10.00 applied to this order · $40.00 remaining</div>
+          </div>
+
+          <div class="fd-summary">
+            <div class="fd-row"><span>Subtotal</span><span>$16.50</span></div>
+            <div class="fd-row"><span>Delivery</span><span class="free">Free</span></div>
+            <div class="fd-row"><span>Service fee</span><span>$0.83</span></div>
+            <div class="fd-row"><span>Estimated tax</span><span>$1.44</span></div>
+            <div class="fd-row fd-credit"><span class="lab"><span class="heart">💚</span> Shop Local Credits credit</span><span>−$10.00</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row fd-total"><span>Total</span><span>$8.77</span></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn btn-primary" data-goto="checkout">Go to checkout · $8.77</button>
+        </div>
+        <div class="reveal-banner">Shop Local Credits already knocked $10 off — tap to check out</div>
+      </div>
+
+      <!-- ─────────── SCREEN 19: CHECKOUT ─────────── -->
+      <div class="screen has-cta-dock" data-screen="checkout" data-name="Checkout ★" data-step="19">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="cart"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2>Checkout</h2></div>
+          </div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#2E8B62" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg> Deliver to</div>
+            <div class="fd-input-grid">
+              <div class="fd-input full"><div class="fd-in-lab">Street address</div><div class="fd-in-val">3155 Broderick Street</div></div>
+              <div class="fd-input"><div class="fd-in-lab">Apt / Suite</div><div class="fd-in-val">01-36</div></div>
+              <div class="fd-input"><div class="fd-in-lab">City</div><div class="fd-in-val">San Francisco</div></div>
+            </div>
+          </div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#2E8B62" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Delivery time</div>
+            <div class="fd-time">
+              <div class="fd-radio"></div>
+              <div><div class="fd-t-name">ASAP</div><div class="fd-t-sub">Sent to courier on order · 25–40 min</div></div>
+            </div>
+          </div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#2E8B62" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> Courier tip</div>
+            <div class="fd-tips" id="fd-tips">
+              <div class="fd-tip active" data-tip="1.65">10% · $1.65</div>
+              <div class="fd-tip" data-tip="2.48">15% · $2.48</div>
+              <div class="fd-tip" data-tip="2.97">18% · $2.97</div>
+              <div class="fd-tip" data-tip="0">No tip</div>
+            </div>
+          </div>
+
+          <div class="fd-slc-card">
+            <div class="fd-slc-top">
+              <div class="fd-slc-lab">
+                <span class="heart">💚</span>
+                <div><div class="t">Shop Local Credits</div><div class="s">$50.00 available in Resident Portal wallet</div></div>
+              </div>
+              <div class="fd-switch" id="checkout-slc-switch"></div>
+            </div>
+            <div class="fd-slc-applied" id="checkout-slc-applied">−$10.00 applied · saves you $10 on this order</div>
+          </div>
+
+          <div class="fd-summary">
+            <div class="fd-row"><span>Subtotal</span><span>$16.50</span></div>
+            <div class="fd-row"><span>Delivery</span><span class="free">Free</span></div>
+            <div class="fd-row"><span>Service fee</span><span>$0.83</span></div>
+            <div class="fd-row"><span>Estimated tax</span><span>$1.44</span></div>
+            <div class="fd-row"><span>Courier tip</span><span id="fd-tip-line">$1.65</span></div>
+            <div class="fd-row fd-credit" id="fd-credit-row"><span class="lab"><span class="heart">💚</span> Shop Local Credits credit</span><span id="fd-credit-amt">−$10.00</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row fd-total"><span>Total</span><span id="fd-total-line">$10.42</span></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn btn-purple" data-goto="track"><span id="fd-place-line">Place order · $10.42</span></button>
+        </div>
+        <div class="reveal-banner">$10 Shop Local Credits is applied — tap to place the order</div>
+      </div>
+
+      <!-- ─────────── SCREEN 20: ORDER TRACKING ─────────── -->
+      <div class="screen" data-screen="track" data-name="Order Confirmed" data-step="20">
+        <div class="status-bar">
+          <span>9:42</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-track-head">
+            <div class="fd-ord-id">Order ORD_LFT8QJWIL · Balboa Cafe</div>
+            <h2>Order confirmed</h2>
+            <span class="fd-eta-pill">⏱ 40 min remaining · 25–40 min ETA</span>
+          </div>
+
+          <div class="fd-map">
+            <span class="road r1"></span><span class="road r2"></span><span class="road r3"></span>
+            <span class="dash"></span>
+            <span class="pin courier">🛵</span>
+            <span class="pin home">🏠</span>
+          </div>
+
+          <div class="fd-courier">
+            <div class="fd-c-avatar">P</div>
+            <div>
+              <div class="fd-c-name">Priya M.</div>
+              <div class="fd-c-sub">Your courier · ★ 4.9</div>
+            </div>
+          </div>
+
+          <div class="fd-progress">
+            <div class="fd-prog-title">Progress</div>
+            <div class="fd-step done"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg></div><div class="fd-step-lab">Order confirmed</div></div>
+            <div class="fd-step active"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4M5 11v8h14v-8"/></svg></div><div class="fd-step-lab">Kitchen is cooking</div></div>
+            <div class="fd-step"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12l-1 7H7z"/><path d="M5 9h14v11H5z"/></svg></div><div class="fd-step-lab">Ready for pickup</div></div>
+            <div class="fd-step"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M6 18h8l3-7h4"/></svg></div><div class="fd-step-lab">Courier on the way</div></div>
+            <div class="fd-step"><div class="fd-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></div><div class="fd-step-lab">Delivered</div></div>
+          </div>
+
+          <div class="fd-summary" style="margin-bottom:12px">
+            <div class="fd-row"><span>1 × Balboa Burger on a Baguette</span><span>$16.50</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row"><span>Subtotal</span><span>$16.50</span></div>
+            <div class="fd-row"><span>Delivery</span><span class="free">Free</span></div>
+            <div class="fd-row"><span>Service</span><span>$0.83</span></div>
+            <div class="fd-row"><span>Tax</span><span>$1.44</span></div>
+            <div class="fd-row"><span>Tip</span><span>$1.65</span></div>
+            <div class="fd-row fd-credit"><span class="lab"><span class="heart">💚</span> Shop Local Credits credit</span><span>−$10.00</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row fd-total"><span>Total</span><span>$10.42</span></div>
+          </div>
+
+          <div class="fd-earn-banner">
+            <span class="heart">💚</span>
+            <div class="fd-earn-text">You earned <strong>$0.83 in Shop Local Credits</strong> (5% back) — now in your Resident Portal wallet.</div>
+          </div>
+
+          <div class="btn-row" style="margin-top:14px">
+            <button class="btn btn-secondary" data-goto="menu">Reorder</button>
+            <button class="btn btn-primary" data-goto="home">Done</button>
+          </div>
+        </div>
+        <div class="reveal-banner">Tap → to return Home</div>
+      </div>
+
+      <!-- ─────────── SCREEN 21: SAVE ON GAS ─────────── -->
+      <div class="screen" data-screen="gas" data-name="Save on Gas" data-step="21">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="home"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><div class="eyebrow">Resident Portal · Powered by Amenify</div><h2>Save on Gas</h2></div>
+          </div>
+          <div class="fd-addr">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Offers near 94123
+          </div>
+
+          <div class="offer-map">
+            <span class="om-green" style="top:-22%;left:-14%;width:140px;height:160px"></span>
+            <span class="om-green" style="bottom:-20%;right:-12%;width:130px;height:130px"></span>
+            <span class="om-road om-r1"></span><span class="om-road om-r2"></span><span class="om-road om-r3"></span>
+            <div class="om-pin best" style="top:38%;left:30%" data-goto="gasoffer"><div class="om-chip">$6.05 <span class="cb">25¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:23%;left:62%"><div class="om-chip">$6.01 <span class="cb">25¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:63%;left:55%"><div class="om-chip">$5.76 <span class="cb">24¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:57%;left:19%"><div class="om-chip">$6.10 <span class="cb">20¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pin" style="top:29%;left:80%"><div class="om-chip">$5.74 <span class="cb">6¢</span></div><div class="om-dot"></div></div>
+            <div class="om-pop" data-goto="gasoffer">
+              <div class="op-thumb gas">⛽</div>
+              <div><div class="op-name">Chevron · Best value</div><div class="op-sub">2070 Redwood Hwy · 1.2 mi · 💚 25¢/gal back</div></div>
+              <div class="op-go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-list-title">Offers near you</div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Chevron</div>
+              <div class="gr-addr">2070 Redwood Hwy · 1.2 mi</div>
+              <div class="gr-back">💚 25¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$6.05</div>
+              <div class="gr-was">$6.30</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Gas station</div>
+              <div class="gr-addr">921 Del Presidio Blvd · 2.1 mi</div>
+              <div class="gr-back">💚 25¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$6.01</div>
+              <div class="gr-was">$6.26</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Chevron</div>
+              <div class="gr-addr">901 W Cutting Blvd · 2.6 mi</div>
+              <div class="gr-back">💚 24¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$5.76</div>
+              <div class="gr-was">$6.00</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Chevron</div>
+              <div class="gr-addr">301 Sir Francis Drake Blvd · 3.0 mi</div>
+              <div class="gr-back">💚 20¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$6.10</div>
+              <div class="gr-was">$6.30</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-row" data-goto="gasoffer">
+            <div class="gr-logo">⛽</div>
+            <div class="gr-info">
+              <div class="gr-name">Chevron</div>
+              <div class="gr-addr">340 Miller Ave · 3.4 mi</div>
+              <div class="gr-back">💚 6¢/gal back · linked Visa</div>
+            </div>
+            <div class="gr-right">
+              <div class="gr-now">$5.74</div>
+              <div class="gr-was">$5.80</div>
+              <div class="gr-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="gas-foot">Pump prices update in real time. Pay with your linked Visa and cash back lands in your Resident Portal wallet as Shop Local Credits 💚.</div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>Order</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap a pin or offer to see the Visa cash-back deal</div>
+      </div>
+
+      <!-- ─────────── SCREEN 22: GAS OFFER DETAIL ─────────── -->
+      <div class="screen has-cta-dock" data-screen="gasoffer" data-name="Gas Offer ★" data-step="22">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="gas"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><div class="eyebrow">Shop Local Credits offer 💚</div><h2>Gas offer</h2></div>
+          </div>
+
+          <div class="go-hero">
+            <div class="gh-top">
+              <div>
+                <div class="gh-name">Chevron</div>
+                <div class="gh-addr">2070 Redwood Hwy · 1.2 mi · Open now</div>
+              </div>
+              <div class="gh-price">
+                <div class="now">$6.05</div>
+                <div><span class="was">$6.30</span> <span class="unit">/gal</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="go-back-big">
+            <div class="gb-amt">25¢</div>
+            <div>
+              <div class="gb-lab">/gal back in Shop Local Credits</div>
+              <div class="gb-sub">Automatically credited to your Resident Portal wallet when you pay with your <strong>linked Visa</strong>.</div>
+            </div>
+          </div>
+
+          <div class="go-visa-row">
+            <div class="gv-chip"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+            <div>
+              <div class="gv-name">Visa · ending in 1234</div>
+              <div class="gv-sub">Sarah Thompson</div>
+            </div>
+            <span class="gv-tag">✓ Linked</span>
+          </div>
+
+          <div class="go-steps">
+            <div class="gs-title">How you get 25¢/gal back</div>
+            <div class="go-step"><div class="gs-num">1</div><div class="gs-text">Tap <strong>Open in Google Maps</strong> and drive to the Chevron on Redwood Hwy.</div></div>
+            <div class="go-step"><div class="gs-num">2</div><div class="gs-text">Fill up and pay with your <strong>linked Visa ending 1234</strong> — no coupon to scan.</div></div>
+            <div class="go-step"><div class="gs-num">3</div><div class="gs-text"><strong>25¢/gal</strong> posts to your wallet as Shop Local Credits within 24 hours.</div></div>
+          </div>
+
+          <div class="go-link-note">Want to use a different card? <a href="javascript:void(0)" data-goto="why">Manage linked Visa →</a></div>
+        </div>
+        <div class="cta-dock">
+          <a class="gas-maps-btn" href="https://www.google.com/maps/dir/?api=1&destination=Chevron%2C+2070+Redwood+Hwy%2C+San+Rafael%2C+CA" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Open in Google Maps · get 25¢/gal back
+          </a>
+        </div>
+        <div class="reveal-banner">Tap "Open in Google Maps" to navigate &amp; earn</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="thumbs-wrap">
+    <div class="thumbs">
+      <div class="thumb is-active" data-goto="survey"><span class="tnum">1</span>Survey</div>
+      <div class="thumb" data-goto="reward"><span class="tnum">2</span>Credit Added</div>
+      <div class="thumb" data-goto="home"><span class="tnum">3</span>Home</div>
+      <div class="thumb" data-goto="payments"><span class="tnum">4</span>Payments</div>
+      <div class="thumb" data-goto="make"><span class="tnum">5</span>Make</div>
+      <div class="thumb" data-goto="method"><span class="tnum">6</span>Method ★</div>
+      <div class="thumb" data-goto="summary"><span class="tnum">7</span>Summary</div>
+      <div class="thumb" data-goto="approved"><span class="tnum">8</span>Approved</div>
+      <div class="thumb alt" data-goto="ach"><span class="tnum">9</span>ACH alt</div>
+      <div class="thumb" data-goto="wallet"><span class="tnum">10</span>Resident Portal Wallet</div>
+      <div class="thumb" data-goto="why"><span class="tnum">11</span>Why Link</div>
+      <div class="thumb" data-goto="link"><span class="tnum">12</span>Link Card</div>
+      <div class="thumb" data-goto="set"><span class="tnum">13</span>All Set</div>
+      <div class="thumb" data-goto="maddie"><span class="tnum">14</span>Maddie</div>
+      <div class="thumb" data-goto="food"><span class="tnum">15</span>Food</div>
+      <div class="thumb" data-goto="menu"><span class="tnum">16</span>Menu</div>
+      <div class="thumb" data-goto="item"><span class="tnum">17</span>Item</div>
+      <div class="thumb" data-goto="cart"><span class="tnum">18</span>Cart</div>
+      <div class="thumb" data-goto="checkout"><span class="tnum">19</span>Checkout ★</div>
+      <div class="thumb" data-goto="track"><span class="tnum">20</span>Tracking</div>
+      <div class="thumb" data-goto="gas"><span class="tnum">21</span>Gas Map</div>
+      <div class="thumb" data-goto="gasoffer"><span class="tnum">22</span>Gas Offer ★</div>
+    </div>
+  </div>
+
+  <p class="footer-hint">Tap a button on the phone to advance — or tap anywhere on the screen to <strong>highlight clickable areas</strong>. Use <kbd>←</kbd> / <kbd>→</kbd> arrow keys to navigate.</p>
+
+</div>
+
+<script>
+(function(){
+  const screens = Array.from(document.querySelectorAll('.screen'));
+  const thumbs = Array.from(document.querySelectorAll('.thumb'));
+  const order = ['survey','reward','home','payments','make','method','summary','approved','ach','wallet','why','link','set','maddie','food','menu','item','cart','checkout','track','gas','gasoffer'];
+  const curNumEl = document.getElementById('cur-num');
+  const curNameEl = document.getElementById('cur-name');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const restartBtn = document.getElementById('restart');
+
+  function getActive() {
+    return document.querySelector('.screen.is-active');
+  }
+
+  function go(name) {
+    const target = document.querySelector('.screen[data-screen="'+name+'"]');
+    if (!target) return;
+    screens.forEach(s => {
+      s.classList.remove('is-active');
+      s.classList.remove('reveal-hotspots');
+      s.querySelector('.body').scrollTop = 0;
+    });
+    target.classList.add('is-active');
+    const step = target.dataset.step;
+    const label = target.dataset.name;
+    curNumEl.textContent = step;
+    curNameEl.textContent = label;
+    thumbs.forEach(t => {
+      const isActive = t.dataset.goto === name;
+      t.classList.toggle('is-active', isActive);
+      if (isActive && t.scrollIntoView) {
+        t.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+      }
+    });
+    updateNav(name);
+  }
+
+  function updateNav(name) {
+    const idx = order.indexOf(name);
+    prevBtn.disabled = idx <= 0;
+    nextBtn.disabled = idx >= order.length - 1;
+  }
+
+  function revealHotspots() {
+    const active = getActive();
+    if (!active) return;
+    active.classList.remove('reveal-hotspots');
+    // restart animation
+    void active.offsetWidth;
+    active.classList.add('reveal-hotspots');
+    clearTimeout(window.__revealTimer);
+    window.__revealTimer = setTimeout(() => {
+      active.classList.remove('reveal-hotspots');
+    }, 2800);
+  }
+
+  // Tap handler for screens
+  document.querySelectorAll('.phone .screen').forEach(screen => {
+    screen.addEventListener('click', function(e){
+      const hot = e.target.closest('[data-goto]');
+      if (hot) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Special: if it's the enroll checkbox, just toggle
+        if (hot.id === 'enroll-check') return;
+        const dest = hot.dataset.goto;
+        if (dest) go(dest);
+      } else {
+        revealHotspots();
+      }
+    });
+  });
+
+  // Enroll checkbox + button interaction
+  const enrollCheck = document.getElementById('enroll-check');
+  const enrollBtn = document.getElementById('enroll-btn');
+  if (enrollCheck && enrollBtn) {
+    enrollCheck.addEventListener('click', function(e){
+      e.stopPropagation();
+      enrollCheck.classList.toggle('checked');
+      if (enrollCheck.classList.contains('checked')) {
+        enrollBtn.classList.remove('btn-purple-disabled');
+        enrollBtn.classList.add('btn-purple');
+      } else {
+        enrollBtn.classList.add('btn-purple-disabled');
+        enrollBtn.classList.remove('btn-purple');
+      }
+    });
+  }
+
+  // Thumbnail nav
+  thumbs.forEach(t => {
+    t.addEventListener('click', e => {
+      e.stopPropagation();
+      go(t.dataset.goto);
+    });
+  });
+
+  // Prev / Next / Restart
+  prevBtn.addEventListener('click', () => {
+    const cur = getActive().dataset.screen;
+    const idx = order.indexOf(cur);
+    if (idx > 0) go(order[idx-1]);
+  });
+  nextBtn.addEventListener('click', () => {
+    const cur = getActive().dataset.screen;
+    const idx = order.indexOf(cur);
+    if (idx < order.length - 1) go(order[idx+1]);
+  });
+  restartBtn.addEventListener('click', () => go('survey'));
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') nextBtn.click();
+    else if (e.key === 'ArrowLeft') prevBtn.click();
+    else if (e.key === 'r' || e.key === 'R') restartBtn.click();
+  });
+
+  // ── Survey tile selection + submit → reward ──
+  const surveyTiles = document.querySelectorAll('[data-survey-tile]');
+  const surveyCount = document.getElementById('survey-count');
+  const surveySubmit = document.getElementById('survey-submit');
+  const rewardChips = document.getElementById('reward-chips');
+
+  function refreshSurveyCount() {
+    const n = document.querySelectorAll('[data-survey-tile].selected').length;
+    if (n === 0) {
+      surveyCount.innerHTML = 'Pick at least one to claim your <strong>$50 credit</strong>';
+      surveySubmit.disabled = true;
+    } else {
+      surveyCount.innerHTML = '<strong>' + n + '</strong> selected · ready to claim your <strong>$50 credit</strong>';
+      surveySubmit.disabled = false;
+    }
+  }
+
+  surveyTiles.forEach(tile => {
+    tile.addEventListener('click', e => {
+      // Don't trigger screen-level [data-goto] navigation
+      e.stopPropagation();
+      tile.classList.toggle('selected');
+      refreshSurveyCount();
+    });
+  });
+
+  // When the user taps "Claim my $50 credit", copy selections to chips on reward screen
+  if (surveySubmit) {
+    surveySubmit.addEventListener('click', e => {
+      if (surveySubmit.disabled) { e.preventDefault(); e.stopPropagation(); return; }
+      const sel = Array.from(document.querySelectorAll('[data-survey-tile].selected'));
+      if (sel.length > 0 && rewardChips) {
+        rewardChips.innerHTML = sel.map(t => {
+          const ico = (t.querySelector('.st-icon') || {}).textContent || '';
+          const name = (t.querySelector('.st-name') || {}).textContent || '';
+          return '<span class="pchip"><span class="ico">' + ico + '</span>' + name + '</span>';
+        }).join('');
+      }
+      // The data-goto="reward" on the button itself triggers the screen change.
+    });
+  }
+
+  // ── Food delivery: tip + Shop Local Credits credit recompute (checkout) ──
+  (function(){
+    const checkout = document.querySelector('.screen[data-screen="checkout"]');
+    if (!checkout) return;
+    const BASE = 18.77; // subtotal 16.50 + service 0.83 + tax 1.44
+    const tipEls = Array.from(checkout.querySelectorAll('.fd-tip'));
+    const tipLine = document.getElementById('fd-tip-line');
+    const totalLine = document.getElementById('fd-total-line');
+    const placeLine = document.getElementById('fd-place-line');
+    const creditAmt = document.getElementById('fd-credit-amt');
+    const creditRow = document.getElementById('fd-credit-row');
+    const slcSwitch = document.getElementById('checkout-slc-switch');
+    const slcApplied = document.getElementById('checkout-slc-applied');
+    let tip = 1.65, creditOn = true;
+    const fmt = n => '$' + n.toFixed(2);
+    function render(){
+      const credit = creditOn ? 10 : 0;
+      const total = BASE + tip - credit;
+      tipLine.textContent = fmt(tip);
+      creditAmt.textContent = '−$10.00';
+      creditRow.style.display = creditOn ? '' : 'none';
+      totalLine.textContent = fmt(total);
+      placeLine.textContent = 'Place order · ' + fmt(total);
+      slcSwitch.classList.toggle('off', !creditOn);
+      slcApplied.textContent = creditOn
+        ? '−$10.00 applied · saves you $10 on this order'
+        : 'Tap to apply $10 Shop Local Credits from your wallet';
+    }
+    tipEls.forEach(el => el.addEventListener('click', e => {
+      e.stopPropagation();
+      tipEls.forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      tip = parseFloat(el.dataset.tip) || 0;
+      render();
+    }));
+    if (slcSwitch) slcSwitch.addEventListener('click', e => { e.stopPropagation(); creditOn = !creditOn; render(); });
+    render();
+  })();
+
+  // ── Food delivery: cart Shop Local Credits toggle ──
+  (function(){
+    const sw = document.getElementById('cart-slc-switch');
+    if (sw) sw.addEventListener('click', e => e.stopPropagation()); // applied by default, non-destructive
+  })();
+
+  updateNav('survey');
+})();
+</script>
+</body>
+</html>
