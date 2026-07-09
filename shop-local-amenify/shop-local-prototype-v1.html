@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shop Local by Amenify — Clickable Prototype v1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root {
+    /* ── amenify.ai brand palette ── */
+    --ink: #0F172A;          /* midnight */
+    --ink-2: #1E293B;
+    --muted: #64748B;        /* slate-500 */
+    --faint: #94A3B8;        /* slate-400 */
+    --brand: #2563EB;        /* amenify blue */
+    --brand-dark: #1D4ED8;
+    --brand-deep: #1E3A8A;
+    --brand-light: #60A5FA;
+    --brand-soft: #EFF6FF;
+    --brand-soft-2: #DBEAFE;
+    --green: #22C55E;        /* action green */
+    --green-deep: #16A34A;
+    --green-soft: #F0FDF4;
+    --green-soft-2: #DCFCE7;
+    --purple: #7C3AED;       /* accent purple */
+    --purple-soft: #F5F3FF;
+    --amber: #F59E0B;
+    --amber-soft: #FFF7ED;
+    --amber-soft-2: #FFEDD5;
+    --pink-soft: #FDF2F8;
+    --cream: #F8FAFC;
+    --line: #E7ECF2;
+    --line-strong: #CBD5E1;
+    --card: #FFFFFF;
+    --danger: #EF4444;
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+    --shadow-md: 0 4px 12px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.07);
+    --shadow-lg: 0 12px 40px rgba(15,23,42,0.14);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #E9EDF3; color: var(--ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; }
+
+  /* ─────────── Stage / page chrome ─────────── */
+  .stage { min-height: 100vh; display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 18px; padding: 28px 24px 32px; max-width: 1100px; margin: 0 auto; }
+  .stage-head { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  .stage-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; line-height: 1.25; letter-spacing: -0.5px; font-weight: 800; margin-bottom: 10px; }
+  .stage-title .hl { color: var(--brand); }
+  .stage-meta { font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .stage-meta .dot { color: var(--line-strong); font-weight: 700; }
+
+  .controls { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .ctrl-btn { background: #FFF; color: var(--ink); border: 1px solid var(--line-strong); padding: 9px 14px; border-radius: 999px; font-family: 'Inter'; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .ctrl-btn:hover { border-color: var(--brand); color: var(--brand-dark); }
+  .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .ctrl-btn.primary { background: var(--brand); color: #FFF; border-color: var(--brand); }
+  .ctrl-btn.primary:hover { background: var(--brand-dark); border-color: var(--brand-dark); color: #FFF; }
+  .step-indicator { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700; color: var(--ink); padding: 0 12px; min-width: 260px; text-align: center; }
+  .step-indicator .num { color: var(--brand); }
+
+  /* ─────────── Phone stage ─────────── */
+  .phone-stage { display: grid; place-items: center; padding: 12px 0; }
+  .phone { width: 380px; height: 800px; background: #0A0F1C; border-radius: 48px; padding: 11px; box-shadow: var(--shadow-lg); position: relative; }
+  .phone::before { content: ''; position: absolute; left: 50%; top: 22px; transform: translateX(-50%); width: 110px; height: 32px; background: #0A0F1C; border-radius: 20px; z-index: 5; }
+  .screen { width: 100%; height: 100%; background: #FFFFFF; border-radius: 38px; overflow: hidden; position: relative; display: none; flex-direction: column; }
+  .screen.is-active { display: flex; }
+  .screen.tint-blue { background: linear-gradient(180deg, #EFF6FF 0%, #F7FAFF 42%, #FFFFFF 100%); }
+  .screen.tint-green { background: linear-gradient(180deg, #F0FDF4 0%, #F7FDF9 42%, #FFFFFF 100%); }
+
+  .status-bar { height: 48px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 4px; font-size: 14px; font-weight: 600; color: var(--ink); flex-shrink: 0; position: relative; z-index: 6; }
+  .status-bar .signal { display: flex; gap: 4px; align-items: center; }
+  .body { flex: 1; overflow-y: auto; padding: 4px 18px 100px; -webkit-overflow-scrolling: touch; }
+  .body::-webkit-scrollbar { width: 0; }
+  .body.no-tab { padding-bottom: 24px; }
+
+  /* ─────────── Brand marks ─────────── */
+  .wordmark { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.6px; color: var(--ink); display: inline-flex; align-items: flex-start; line-height: 1; }
+  .wordmark .plus { color: var(--green); font-size: 13px; margin-left: 1px; margin-top: -1px; }
+  .wordmark.small { font-size: 16px; }
+  .wordmark.on-dark { color: #FFF; }
+  .ap-mark { width: 42px; height: 42px; border-radius: 13px; background: linear-gradient(150deg, #3B82F6 0%, #2563EB 55%, #1D4ED8 100%); display: inline-flex; align-items: center; justify-content: center; color: #FFF; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 0.3px; box-shadow: 0 6px 16px rgba(37,99,235,0.34); flex-shrink: 0; }
+  .ap-mark .plus { font-size: 11px; margin-top: -6px; margin-left: 1px; color: #A7F3D0; }
+  .ap-mark.sm { width: 30px; height: 30px; border-radius: 9px; font-size: 12px; }
+  .ap-mark.lg { width: 60px; height: 60px; border-radius: 18px; font-size: 23px; }
+
+  /* ─────────── Buttons ─────────── */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 15px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 15px; border: none; cursor: pointer; width: 100%; transition: transform .1s ease; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--brand); color: #FFF; box-shadow: 0 8px 20px rgba(37,99,235,0.28); }
+  .btn-green { background: var(--green); color: #FFF; box-shadow: 0 8px 20px rgba(34,197,94,0.28); }
+  .btn-dark { background: var(--ink); color: #FFF; }
+  .btn-secondary { background: #FFF; color: var(--ink); border: 1px solid var(--line-strong); box-shadow: none; }
+  .link-txt { display: block; text-align: center; margin-top: 14px; font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 600; cursor: pointer; }
+  .link-txt b { color: var(--brand-dark); }
+
+  /* ─────────── Top bars ─────────── */
+  .app-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 4px 16px; }
+  .app-top .brand-left { display: flex; flex-direction: column; gap: 3px; }
+  .app-top .partner { font-size: 9.5px; font-weight: 700; letter-spacing: 0.4px; color: var(--muted); text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
+  .app-top .partner .visa { font-family: 'Plus Jakarta Sans'; font-style: italic; font-weight: 800; color: #1A1F71; letter-spacing: 0; }
+  .icon-btn { width: 38px; height: 38px; border-radius: 50%; background: #FFF; border: 1px solid var(--line); display: grid; place-items: center; position: relative; cursor: pointer; }
+  .icon-btn .badge { position: absolute; top: -2px; right: -2px; background: var(--danger); color: #FFF; font-size: 9px; font-weight: 700; width: 15px; height: 15px; border-radius: 50%; display: grid; place-items: center; border: 2px solid #FFF; }
+
+  .topbar { display: flex; align-items: center; gap: 12px; padding: 8px 4px 16px; }
+  .topbar .back { width: 38px; height: 38px; border-radius: 50%; background: #FFF; border: 1px solid var(--line); display: grid; place-items: center; cursor: pointer; flex-shrink: 0; }
+  .topbar h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.4px; flex: 1; }
+  .topbar .x { width: 38px; height: 38px; border-radius: 50%; background: transparent; display: grid; place-items: center; color: var(--muted); cursor: pointer; }
+
+  /* ─────────── Home: address header ─────────── */
+  .home-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 4px 14px; }
+  .addr { cursor: pointer; }
+  .addr .addr-l { font-size: 9.5px; font-weight: 700; letter-spacing: 0.6px; color: var(--muted); text-transform: uppercase; }
+  .addr .addr-v { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 16px; letter-spacing: -0.3px; display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+  .addr .addr-v .pin { color: var(--brand); }
+  .addr .addr-v .chev { color: var(--faint); font-size: 12px; }
+  .head-icons { display: flex; align-items: center; gap: 9px; }
+  .avatar-btn { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(150deg,#3B82F6,#1D4ED8); display: grid; place-items: center; color: #FFF; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; cursor: pointer; }
+
+  .search-bar { display: flex; align-items: center; gap: 10px; background: #FFF; border: 1px solid var(--line); border-radius: 14px; padding: 13px 15px; margin-bottom: 14px; box-shadow: var(--shadow-sm); cursor: pointer; }
+  .search-bar .s-txt { flex: 1; font-size: 13.5px; color: var(--faint); font-weight: 500; }
+
+  /* Credits strip */
+  .credits-strip { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border-radius: 16px; padding: 14px 16px; margin-bottom: 18px; color: #FFF; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 10px 26px rgba(15,23,42,0.22); }
+  .credits-strip::after { content: ''; position: absolute; right: -30px; top: -40px; width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, rgba(37,99,235,0.55) 0%, transparent 70%); }
+  .credits-strip .cs-txt { flex: 1; position: relative; z-index: 2; }
+  .credits-strip .cs-amt { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
+  .credits-strip .cs-amt .lab { font-size: 11px; font-weight: 600; color: #CBD5E1; margin-left: 6px; letter-spacing: 0; }
+  .credits-strip .cs-sub { font-size: 11.5px; color: #A7F3D0; margin-top: 3px; font-weight: 600; }
+  .credits-strip .cs-chev { position: relative; z-index: 2; color: #FFF; opacity: 0.8; }
+
+  .sec-head { display: flex; align-items: center; justify-content: space-between; margin: 6px 2px 12px; }
+  .sec-head h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; }
+  .sec-head a { font-size: 12px; font-weight: 700; color: var(--brand-dark); text-decoration: none; cursor: pointer; }
+
+  /* Featured service tiles (Food + Grocery) */
+  .svc-feat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-bottom: 11px; }
+  .svc-feat { border-radius: 18px; padding: 15px; min-height: 132px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; cursor: pointer; border: 1px solid var(--line); transition: transform 0.12s ease, box-shadow 0.12s ease; }
+  .svc-feat:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .svc-feat.food { background: linear-gradient(160deg, #FFF7ED 0%, #FFEDD5 100%); border-color: #FCE3C2; }
+  .svc-feat.grocery { background: linear-gradient(160deg, #F0FDF4 0%, #DCFCE7 100%); border-color: #C6F0D3; }
+  .svc-feat .sf-emoji { font-size: 34px; line-height: 1; }
+  .svc-feat .sf-name { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 15.5px; letter-spacing: -0.3px; margin-top: 8px; }
+  .svc-feat .sf-sub { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+  .svc-feat .sf-pill { position: absolute; top: 13px; right: 13px; background: var(--green); color: #FFF; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 999px; letter-spacing: 0.2px; }
+
+  /* Wide service tile (Online shopping) */
+  .svc-wide { display: flex; align-items: center; gap: 14px; border-radius: 18px; padding: 15px 16px; margin-bottom: 11px; background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border: 1px solid #C7DCFB; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.12s ease, box-shadow 0.12s ease; }
+  .svc-wide:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .svc-wide .sw-emoji { width: 52px; height: 52px; border-radius: 15px; background: #FFF; display: grid; place-items: center; font-size: 26px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+  .svc-wide .sw-txt { flex: 1; }
+  .svc-wide .sw-name { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 15.5px; letter-spacing: -0.3px; }
+  .svc-wide .sw-sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .svc-wide .sw-chev { color: var(--brand); flex-shrink: 0; }
+
+  /* Small services grid */
+  .svc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .svc-tile { background: #FFF; border: 1px solid var(--line); border-radius: 16px; padding: 14px 8px 11px; text-align: center; box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.12s ease; }
+  .svc-tile:hover { border-color: var(--brand); transform: translateY(-2px); }
+  .svc-tile .st-ic { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 20px; margin: 0 auto 8px; }
+  .svc-tile .st-ic.clean { background: var(--brand-soft); }
+  .svc-tile .st-ic.handy { background: var(--amber-soft); }
+  .svc-tile .st-ic.goods { background: var(--green-soft); }
+  .svc-tile .st-ic.events { background: var(--purple-soft); }
+  .svc-tile .st-ic.cvs { background: #CC0000; }
+  .svc-tile .st-ic.cvs .cvs-logo { color: #FFF; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; font-style: italic; letter-spacing: -0.5px; }
+  .svc-tile .st-ic.more { background: #F1F5F9; }
+  .svc-tile .st-name { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 11.5px; line-height: 1.2; }
+
+  /* Maddie promo card */
+  .maddie-card { display: flex; align-items: center; gap: 13px; background: linear-gradient(135deg, var(--brand-soft) 0%, #F3F8FF 100%); border: 1px solid var(--brand-soft-2); border-radius: 18px; padding: 14px 16px; margin-bottom: 18px; cursor: pointer; }
+  .maddie-card img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid #FFF; box-shadow: var(--shadow-sm); }
+  .maddie-card .mc-txt { flex: 1; }
+  .maddie-card .mc-txt .t { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+  .maddie-card .mc-txt .s { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .maddie-card .mc-go { width: 32px; height: 32px; border-radius: 50%; background: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+  .ai-tag { background: var(--brand); color:#fff; font-size:8px; font-weight:800; padding:2px 6px; border-radius:999px; letter-spacing:0.3px; }
+
+  /* Popular near you */
+  .pop { display: flex; align-items: center; gap: 12px; padding: 11px 4px; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .pop:last-child { border-bottom: none; }
+  .pop .pop-emoji { width: 52px; height: 52px; border-radius: 14px; background: var(--cream); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+  .pop .pop-meta { flex: 1; }
+  .pop .pop-meta .n { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+  .pop .pop-meta .d { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .pop .pop-meta .d .star { color: var(--amber); }
+  .pop .pop-back { font-size: 10.5px; color: var(--green-deep); font-weight: 800; background: var(--green-soft); padding: 3px 8px; border-radius: 999px; flex-shrink: 0; }
+
+  .card { background: #FFF; border-radius: 18px; padding: 18px; margin-bottom: 14px; border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+
+  /* ─────────── Ways to use / categories ─────────── */
+  .use-intro { margin: 4px 2px 16px; }
+  .use-intro h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
+  .use-intro p { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+  .cat-list { display: flex; flex-direction: column; gap: 10px; }
+  .cat { display: flex; align-items: center; gap: 14px; background: #FFF; border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow-sm); cursor: pointer; transition: all 0.15s; }
+  .cat:hover { border-color: var(--brand); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .cat .cat-ic { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 22px; flex-shrink: 0; }
+  .cat .cat-ic.food { background: var(--amber-soft); }
+  .cat .cat-ic.grocery { background: var(--green-soft); }
+  .cat .cat-ic.home { background: var(--brand-soft); }
+  .cat .cat-ic.ecom { background: var(--pink-soft); }
+  .cat .cat-ic.events { background: var(--purple-soft); }
+  .cat .cat-txt { flex: 1; }
+  .cat .cat-txt .n { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 15px; }
+  .cat .cat-txt .d { font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+  .cat .cat-chev { color: var(--faint); flex-shrink: 0; }
+
+  .ask-bar { display: flex; align-items: center; gap: 10px; background: #FFF; border: 1.5px solid var(--brand-soft-2); border-radius: 16px; padding: 13px 16px; margin-top: 16px; box-shadow: var(--shadow-sm); cursor: pointer; }
+  .ask-bar img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+  .ask-bar .ab-txt { flex: 1; font-size: 13px; color: var(--muted); font-weight: 500; }
+  .ask-bar .ab-mic { color: var(--brand); }
+
+  /* ─────────── Restaurant / order ─────────── */
+  .rest-hero { border-radius: 18px; height: 120px; background: linear-gradient(135deg, #FDBA74 0%, #F59E0B 55%, #D97706 100%); margin-bottom: 14px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 14px; }
+  .rest-hero .rh-emoji { position: absolute; right: 12px; top: 8px; font-size: 54px; opacity: 0.92; }
+  .rest-hero .rh-badge { background: rgba(15,23,42,0.6); color: #FFF; font-size: 10px; font-weight: 700; letter-spacing: 0.4px; padding: 4px 9px; border-radius: 999px; backdrop-filter: blur(4px); }
+  .rest-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+  .rest-head h2 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 20px; letter-spacing: -0.4px; display: flex; align-items: center; gap: 6px; }
+  .verified { background: var(--brand); color: #FFF; width: 17px; height: 17px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10px; font-weight: 800; }
+  .rest-meta { font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
+  .rest-meta .star { color: var(--amber); }
+  .earn-banner { display: flex; align-items: center; gap: 10px; background: var(--green-soft); border: 1px solid var(--green-soft-2); border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; }
+  .earn-banner .eb-ic { width: 30px; height: 30px; border-radius: 9px; background: var(--green); display: grid; place-items: center; flex-shrink: 0; color: #fff; font-weight: 800; }
+  .earn-banner p { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+  .earn-banner p b { color: var(--green-deep); }
+
+  .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item .mi-txt { flex: 1; }
+  .menu-item .mi-txt .n { font-weight: 700; font-size: 14px; font-family: 'Plus Jakarta Sans'; }
+  .menu-item .mi-txt .d { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+  .menu-item .mi-txt .pr { font-size: 13px; font-weight: 700; margin-top: 5px; color: var(--ink); }
+  .menu-item .mi-emoji { width: 56px; height: 56px; border-radius: 13px; background: var(--cream); display: grid; place-items: center; font-size: 26px; flex-shrink: 0; }
+  .add-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--brand); color: #FFF; border: none; display: grid; place-items: center; font-size: 18px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+  /* ─────────── Summary / checkout ─────────── */
+  .summary-line { display: flex; justify-content: space-between; padding: 11px 0; font-size: 13px; border-bottom: 1px solid var(--line); }
+  .summary-line:last-child { border-bottom: none; }
+  .summary-line.total { font-weight: 800; font-size: 16px; border-top: 2px solid var(--ink); margin-top: 4px; border-bottom: none; font-family: 'Plus Jakarta Sans'; }
+  .summary-line .label { color: var(--muted); }
+  .summary-line.credit .amt { color: var(--green-deep); font-weight: 700; }
+
+  .slc-toggle { display: flex; align-items: center; gap: 12px; background: var(--green-soft); border: 1px solid var(--green-soft-2); border-radius: 16px; padding: 14px 16px; margin: 16px 0; cursor: pointer; }
+  .slc-toggle .st-ic { width: 34px; height: 34px; border-radius: 10px; background: var(--green); display: grid; place-items: center; flex-shrink: 0; }
+  .slc-toggle .st-txt { flex: 1; }
+  .slc-toggle .st-txt .t { font-weight: 700; font-size: 13px; font-family: 'Plus Jakarta Sans'; }
+  .slc-toggle .st-txt .s { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .switch { width: 46px; height: 27px; border-radius: 999px; background: var(--green); position: relative; flex-shrink: 0; transition: background 0.2s; }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 22px; width: 21px; height: 21px; border-radius: 50%; background: #FFF; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .switch.off { background: #CBD5E1; }
+  .switch.off::after { left: 3px; }
+
+  .pay-method { display: flex; align-items: center; gap: 12px; background: #FFF; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+  .pay-method .pm-card { width: 42px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%); display: grid; place-items: center; flex-shrink: 0; }
+  .pay-method .pm-meta { flex: 1; }
+  .pay-method .pm-meta .n { font-weight: 700; font-size: 13.5px; font-family: 'Plus Jakarta Sans'; }
+  .pay-method .pm-meta .s { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .pay-method .pm-chg { font-size: 12px; font-weight: 700; color: var(--brand-dark); }
+  .deliver-to { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); background: var(--brand-soft); border-radius: 12px; padding: 10px 12px; margin-bottom: 14px; }
+  .deliver-to b { color: var(--ink); font-weight: 700; }
+
+  /* ─────────── Confirm ─────────── */
+  .confirm-hero { background: linear-gradient(160deg, #3B82F6 0%, #2563EB 50%, #1D4ED8 100%); border-radius: 24px; padding: 34px 22px 28px; margin: 8px 0 18px; color: #FFF; text-align: center; position: relative; overflow: hidden; }
+  .confirm-hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 70% 10%, rgba(255,255,255,0.22) 0%, transparent 55%); }
+  .confirm-hero .check { width: 76px; height: 76px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 16px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,0.45); position: relative; z-index: 2; }
+  .confirm-hero h3 { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 24px; letter-spacing: -0.4px; margin-bottom: 6px; position: relative; z-index: 2; }
+  .confirm-hero p { font-size: 13.5px; opacity: 0.94; line-height: 1.45; position: relative; z-index: 2; }
+  .earned-pill { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--green-soft); border: 1px solid var(--green-soft-2); border-radius: 14px; padding: 14px; margin-bottom: 16px; font-size: 13.5px; font-weight: 700; color: var(--green-deep); font-family: 'Plus Jakarta Sans'; }
+  .track-list { background: #FFF; border: 1px solid var(--line); border-radius: 16px; padding: 6px 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+  .track-step { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+  .track-step .ts-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--brand); flex-shrink: 0; box-shadow: 0 0 0 4px var(--brand-soft); }
+  .track-step.pending .ts-dot { background: #CBD5E1; box-shadow: none; }
+  .track-step .ts-txt { font-size: 13px; font-weight: 600; }
+  .track-step.pending .ts-txt { color: var(--faint); font-weight: 500; }
+
+  /* ─────────── Link card ─────────── */
+  .card-visual { width: 100%; aspect-ratio: 1.586; border-radius: 20px; background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 52%, #172554 100%); padding: 22px; color: #FFF; position: relative; overflow: hidden; box-shadow: 0 16px 40px rgba(30,58,138,0.34); margin: 8px 0 20px; }
+  .card-visual::after { content: ''; position: absolute; right: -50px; bottom: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(96,165,250,0.5) 0%, transparent 68%); }
+  .card-visual .cv-top { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2; }
+  .card-visual .cv-chip { width: 40px; height: 30px; border-radius: 7px; background: linear-gradient(135deg, #E4D9A8 0%, #C9B978 100%); }
+  .card-visual .cv-num { font-family: 'Plus Jakarta Sans'; font-weight: 600; font-size: 17px; letter-spacing: 2px; margin-top: 30px; position: relative; z-index: 2; }
+  .card-visual .cv-bottom { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 18px; position: relative; z-index: 2; }
+  .card-visual .cv-name { font-size: 12px; letter-spacing: 0.5px; }
+  .card-visual .cv-visa { font-family: 'Plus Jakarta Sans'; font-style: italic; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
+
+  .benefit { display: flex; align-items: flex-start; gap: 13px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .benefit:last-child { border-bottom: none; }
+  .benefit .b-ic { width: 34px; height: 34px; border-radius: 10px; background: var(--brand-soft); display: grid; place-items: center; flex-shrink: 0; }
+  .benefit .b-txt .t { font-weight: 700; font-size: 13.5px; font-family: 'Plus Jakarta Sans'; }
+  .benefit .b-txt .s { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+  /* ─────────── Welcome ─────────── */
+  .welcome-wrap { display: flex; flex-direction: column; height: 100%; padding: 8px 6px 20px; text-align: center; }
+  .welcome-top { padding: 20px 0 8px; }
+  .welcome-hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .welcome-hero .wh-mark { margin-bottom: 26px; }
+  .welcome-hero h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.12; letter-spacing: -0.8px; margin-bottom: 12px; }
+  .welcome-hero h1 .hl { color: var(--green-deep); }
+  .welcome-hero p { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 280px; }
+  .welcome-credits { background: linear-gradient(145deg, #1E293B 0%, #0F172A 100%); border-radius: 20px; padding: 20px 22px; margin: 30px auto 0; width: 100%; color: #FFF; display: flex; align-items: center; gap: 14px; box-shadow: 0 14px 32px rgba(15,23,42,0.28); position: relative; overflow: hidden; }
+  .welcome-credits::after { content:''; position:absolute; right:-30px; top:-40px; width:130px; height:130px; border-radius:50%; background: radial-gradient(circle, rgba(37,99,235,0.55) 0%, transparent 70%); }
+  .welcome-credits .wc-txt { text-align: left; flex: 1; position: relative; z-index: 2; }
+  .welcome-credits .wc-txt .l { font-size: 11px; color: #CBD5E1; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .welcome-credits .wc-txt .a { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 26px; letter-spacing: -1px; margin-top: 3px; }
+
+  /* ─────────── Maddie chat ─────────── */
+  .chat-head { display: flex; align-items: center; gap: 12px; padding: 6px 4px 14px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .chat-head img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #FFF; box-shadow: var(--shadow-sm); }
+  .chat-head .ch-meta { flex: 1; }
+  .chat-head .ch-meta .n { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 6px; }
+  .chat-head .ch-meta .n .ai { background: var(--brand); color: #FFF; font-size: 8.5px; font-weight: 800; padding: 2px 6px; border-radius: 999px; letter-spacing: 0.4px; }
+  .chat-head .ch-meta .s { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .bubble { max-width: 78%; padding: 12px 15px; border-radius: 18px; font-size: 13.5px; line-height: 1.45; margin-bottom: 10px; }
+  .bubble.them { background: var(--cream); color: var(--ink-2); border-bottom-left-radius: 5px; }
+  .bubble.me { background: var(--brand); color: #FFF; border-bottom-right-radius: 5px; margin-left: auto; }
+  .bubble .time { font-size: 9.5px; opacity: 0.6; margin-top: 5px; display: block; }
+  .order-bubble { background: #FFF; border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 10px; max-width: 82%; box-shadow: var(--shadow-sm); }
+  .order-bubble .ob-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .order-bubble .ob-logo { width: 36px; height: 36px; border-radius: 10px; background: #006491; display: grid; place-items: center; color: #FFF; font-weight: 800; font-size: 13px; font-family: 'Plus Jakarta Sans'; flex-shrink: 0; }
+  .order-bubble .ob-name { font-weight: 700; font-size: 13.5px; font-family: 'Plus Jakarta Sans'; }
+  .order-bubble .ob-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .order-bubble .ob-line { display: flex; justify-content: space-between; font-size: 12.5px; padding: 4px 0; color: var(--ink-2); }
+  .order-bubble .ob-total { display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 800; padding-top: 8px; margin-top: 4px; border-top: 1px solid var(--line); font-family: 'Plus Jakarta Sans'; }
+  .earned-chip { display: inline-flex; align-items: center; gap: 7px; background: var(--green); color: #FFF; padding: 10px 14px; border-radius: 14px; font-size: 12.5px; font-weight: 700; margin-bottom: 10px; font-family: 'Plus Jakarta Sans'; }
+  .chat-input { position: absolute; left: 0; right: 0; bottom: 0; background: #FFF; border-top: 1px solid var(--line); padding: 12px 16px 16px; display: flex; align-items: center; gap: 10px; z-index: 4; }
+  .chat-input .ci-field { flex: 1; background: var(--cream); border-radius: 999px; padding: 12px 16px; font-size: 13px; color: var(--faint); }
+  .chat-input .ci-send { width: 40px; height: 40px; border-radius: 50%; background: var(--brand); display: grid; place-items: center; flex-shrink: 0; }
+
+  /* ─────────── Wallet ─────────── */
+  .wallet-hero { background: linear-gradient(145deg, #1E293B 0%, #0F172A 100%); border-radius: 22px; padding: 22px; color: #FFF; margin-bottom: 16px; position: relative; overflow: hidden; box-shadow: 0 14px 32px rgba(15,23,42,0.28); }
+  .wallet-hero::after { content: ''; position: absolute; right: -40px; top: -50px; width: 170px; height: 170px; border-radius: 50%; background: radial-gradient(circle, rgba(37,99,235,0.55) 0%, transparent 70%); }
+  .wallet-hero .wh-l { font-size: 11px; color: #CBD5E1; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; position: relative; z-index: 2; display: flex; align-items: center; gap: 6px; }
+  .wallet-hero .wh-a { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 42px; line-height: 1; letter-spacing: -1.5px; margin-top: 12px; position: relative; z-index: 2; }
+  .wallet-hero .wh-stats { display: flex; gap: 24px; margin-top: 18px; position: relative; z-index: 2; }
+  .wallet-hero .wh-stat .l { font-size: 10.5px; color: #CBD5E1; text-transform: uppercase; letter-spacing: 0.4px; }
+  .wallet-hero .wh-stat .v { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 17px; margin-top: 3px; }
+  .wallet-hero .wh-stat .v.green { color: #4ADE80; }
+  .activity { display: flex; align-items: center; gap: 12px; padding: 13px 4px; border-bottom: 1px solid var(--line); }
+  .activity:last-child { border-bottom: none; }
+  .activity .ac-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+  .activity .ac-ic.earn { background: var(--green-soft); }
+  .activity .ac-ic.redeem { background: var(--amber-soft); }
+  .activity .ac-meta { flex: 1; }
+  .activity .ac-meta .n { font-weight: 700; font-size: 13.5px; font-family: 'Plus Jakarta Sans'; }
+  .activity .ac-meta .d { font-size: 11px; color: var(--faint); margin-top: 2px; }
+  .activity .ac-amt { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 14.5px; }
+  .activity .ac-amt.plus { color: var(--green-deep); }
+  .activity .ac-amt.minus { color: var(--ink-2); }
+
+  /* ─────────── CVS partner ─────────── */
+  .cvs-hello { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:22px; letter-spacing:-0.5px; margin-top:5px; }
+  .cvs-bal { background:#FFF; border:1px solid var(--line); border-radius:18px; padding:16px 18px; margin-bottom:14px; box-shadow:var(--shadow-sm); display:flex; align-items:center; justify-content:space-between; }
+  .cvs-bal .cb-a { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:26px; letter-spacing:-0.8px; }
+  .cvs-bal .cb-l { font-size:12px; color:var(--ink-2); font-weight:700; margin-top:2px; }
+  .cvs-bal .cb-s { font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .cvs-bal .cb-btn { background:var(--brand-soft); color:var(--brand-dark); font-weight:700; font-size:12px; padding:8px 12px; border-radius:999px; white-space:nowrap; cursor:pointer; }
+
+  .cvs-hero { background: linear-gradient(135deg,#E11B1B 0%, #CC0000 55%, #9B0000 100%); border-radius:18px; padding:16px; margin-bottom:14px; color:#FFF; display:flex; gap:12px; position:relative; overflow:hidden; box-shadow:0 12px 28px rgba(204,0,0,0.28); cursor:pointer; }
+  .cvs-hero .ch-left { flex:1; display:flex; flex-direction:column; }
+  .cvs-hero .ch-brand { display:flex; align-items:center; gap:7px; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:22px; letter-spacing:-0.5px; }
+  .cvs-hero .ch-brand .heart { font-size:18px; }
+  .cvs-hero .ch-back { font-size:12.5px; line-height:1.4; margin-top:9px; font-weight:600; opacity:0.97; }
+  .cvs-hero .ch-back b { font-weight:800; }
+  .cvs-hero .ch-visa { font-family:'Plus Jakarta Sans'; font-style:italic; font-weight:800; font-size:18px; margin-top:auto; padding-top:14px; }
+  .cvs-hero .ch-linked { background:#FFF; border-radius:12px; padding:12px; width:118px; flex-shrink:0; display:flex; flex-direction:column; justify-content:center; }
+  .cvs-hero .ch-linked .cl-check { color:var(--green-deep); font-weight:800; font-size:12px; display:flex; align-items:center; gap:4px; }
+  .cvs-hero .ch-linked .cl-sub { color:var(--muted); font-size:10.5px; margin-top:5px; line-height:1.3; }
+
+  .cvs-list-row { display:flex; align-items:center; gap:13px; background:#FFF; border:1px solid var(--line); border-radius:16px; padding:13px 15px; margin-bottom:11px; box-shadow:var(--shadow-sm); cursor:pointer; }
+  .cvs-list-row .clr-ic { width:44px; height:44px; border-radius:13px; display:grid; place-items:center; flex-shrink:0; font-family:'Plus Jakarta Sans'; font-weight:800; }
+  .cvs-list-row .clr-ic.cvs { background:#CC0000; color:#FFF; font-style:italic; font-size:14px; }
+  .cvs-list-row .clr-ic.rx { background:var(--amber-soft); color:#B45309; font-size:15px; }
+  .cvs-list-row .clr-ic.maddie { padding:0; }
+  .cvs-list-row .clr-ic.maddie img { width:44px; height:44px; border-radius:50%; object-fit:cover; }
+  .cvs-list-row .clr-txt { flex:1; }
+  .cvs-list-row .clr-txt .t { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; }
+  .cvs-list-row .clr-txt .s { font-size:11.5px; color:var(--muted); margin-top:2px; line-height:1.35; }
+  .cvs-list-row .clr-btn { background:var(--brand-soft); color:var(--brand-dark); font-weight:700; font-size:12px; padding:8px 12px; border-radius:999px; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; }
+  .cvs-list-row .clr-chev { color:var(--faint); }
+
+  .btn-navy { background: var(--ink); color:#FFF; }
+  .btn-navy .heart { color:#FF6B6B; }
+
+  .cvs-search-top { display:flex; align-items:center; gap:10px; padding:6px 2px 14px; }
+  .cvs-search-top .cst-search { flex:1; display:flex; align-items:center; gap:8px; background:#FFF; border:1px solid var(--line); border-radius:999px; padding:11px 15px; font-size:13px; color:var(--faint); box-shadow:var(--shadow-sm); }
+  .cvs-search-top .cst-pill { background:var(--brand-soft); color:var(--brand-dark); font-weight:800; font-size:13px; padding:10px 14px; border-radius:999px; font-family:'Plus Jakarta Sans'; }
+  .cvs-search-top .cst-av { width:38px; height:38px; border-radius:50%; background:linear-gradient(150deg,#3B82F6,#1D4ED8); color:#FFF; display:grid; place-items:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:13px; flex-shrink:0; }
+
+  .cvs-map { position:relative; border-radius:18px; overflow:hidden; height:300px; box-shadow:var(--shadow-sm); border:1px solid var(--line); }
+  .cvs-map svg { width:100%; height:100%; display:block; }
+  .cvs-map .map-chip { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:#FFF; border-radius:999px; padding:8px 14px; font-size:12px; font-weight:700; font-family:'Plus Jakarta Sans'; box-shadow:var(--shadow-md); white-space:nowrap; }
+  .map-pin { position:absolute; transform:translate(-50%,-50%); }
+  .map-pin .pin-2 { background:#CC0000; color:#FFF; font-weight:800; font-size:12px; padding:5px 9px; border-radius:999px; box-shadow:0 6px 14px rgba(204,0,0,0.45); font-family:'Plus Jakarta Sans'; display:inline-flex; align-items:center; gap:3px; }
+  .map-pin .pin-dot { width:20px; height:20px; border-radius:50%; background:var(--brand); border:3px solid #FFF; box-shadow:0 4px 10px rgba(37,99,235,0.5); }
+  .map-pin .pin-dot.grey { background:#94A3B8; }
+  .map-pin .pin-dot.red { background:#CC0000; box-shadow:0 4px 10px rgba(204,0,0,0.5); }
+
+  .cvs-store-card { background:#FFF; border-radius:20px; margin:-32px 4px 0; position:relative; z-index:3; box-shadow:var(--shadow-lg); overflow:hidden; border:1px solid var(--line); }
+  .cvs-store-card .csc-banner { background: linear-gradient(135deg,#E11B1B 0%, #CC0000 55%, #9B0000 100%); height:118px; display:grid; place-items:center; color:#FFF; }
+  .cvs-store-card .csc-banner .b-brand { display:flex; align-items:center; gap:9px; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:30px; letter-spacing:-0.6px; }
+  .cvs-store-card .csc-body { padding:16px 18px 18px; }
+  .cvs-store-card .csc-name { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:18px; display:flex; align-items:center; gap:9px; }
+  .cvs-store-card .csc-name .sq { width:14px; height:14px; border-radius:4px; background:#CC0000; }
+  .cvs-store-card .csc-addr { font-size:12.5px; color:var(--muted); margin-top:6px; }
+  .cvs-store-card .csc-addr .open { color:var(--green-deep); font-weight:700; }
+  .cvs-store-card .csc-cash { color:var(--green-deep); font-weight:800; font-size:13.5px; margin-top:9px; font-family:'Plus Jakarta Sans'; }
+  .cvs-store-card .csc-btns { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px; }
+  .cvs-store-card .csc-btns .btn { padding:13px; }
+
+  /* ─────────── Earn note ─────────── */
+  .earn-note { display:flex; align-items:center; gap:11px; background:var(--green-soft); border:1px solid var(--green-soft-2); border-radius:14px; padding:12px 14px; margin-bottom:18px; cursor:pointer; }
+  .earn-note .en-ic { width:32px; height:32px; border-radius:9px; background:var(--green); display:grid; place-items:center; flex-shrink:0; }
+  .earn-note .en-txt { flex:1; font-size:11.5px; color:var(--ink-2); line-height:1.42; }
+  .earn-note .en-txt b { color:var(--green-deep); font-weight:800; }
+  .earn-note .en-chev { color:var(--green-deep); font-weight:700; }
+  .svc-tile .st-ic.gas { background:#E6EEF9; }
+
+  /* ─────────── Home v2 (map strip + credit tiles) ─────────── */
+  .map-strip { position:relative; height:150px; margin:-4px -18px 0; overflow:hidden; background:#E7ECE6; }
+  .map-strip.lmap { border-radius:0; border:none; height:150px; }
+  .map-strip::after { content:''; position:absolute; inset:0; z-index:500; pointer-events:none; background:linear-gradient(180deg, rgba(255,255,255,0.46) 0%, rgba(255,255,255,0.18) 34%, rgba(255,255,255,0.55) 78%, rgba(255,255,255,0.92) 100%); }
+  .map-strip .ms-map { width:100%; height:100%; display:block; }
+  .map-strip .ms-addr { position:absolute; top:14px; left:14px; z-index:600; background:#FFF; border-radius:999px; padding:8px 13px; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:12.5px; box-shadow:var(--shadow-md); display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .map-strip .ms-addr .pin { color:var(--brand); }
+  .map-strip .ms-addr .chev { color:var(--faint); font-size:11px; }
+  .map-strip .ms-wallet { position:absolute; top:14px; right:14px; z-index:600; background:#FFF; border-radius:999px; padding:6px 13px 6px 6px; box-shadow:var(--shadow-md); display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .map-strip .ms-wallet .msw-amt { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14px; }
+  .map-strip .ms-pin { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:50%; background:var(--brand); border:3px solid #FFF; box-shadow:0 0 0 6px rgba(37,99,235,0.22); }
+  .home-sheet { background:#FFF; border-radius:22px 22px 0 0; margin:-22px -18px 0; padding:20px 18px 0; position:relative; z-index:2; }
+  .welcome-row { display:flex; align-items:center; gap:13px; padding:2px 2px 14px; }
+  .welcome-row .wr-av { width:46px; height:46px; border-radius:50%; background:#EEF2F7; border:1px solid var(--line); display:grid; place-items:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; color:var(--ink-2); flex-shrink:0; }
+  .welcome-row .wr-name { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:20px; letter-spacing:-0.4px; }
+  .welcome-row .wr-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+  .home-h2 { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:19px; letter-spacing:-0.4px; margin:8px 2px 12px; }
+  .hscroll { display:flex; gap:10px; overflow-x:auto; padding:2px 2px 6px; scrollbar-width:none; }
+  .hscroll::-webkit-scrollbar { display:none; }
+  .credit-tile { flex-shrink:0; width:86px; min-height:86px; background:#F4F6F9; border:1px solid var(--line); border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:8px 4px; cursor:pointer; transition:all 0.12s; }
+  .credit-tile:hover { border-color:var(--brand); transform:translateY(-2px); }
+  .credit-tile .ct-ic { font-size:24px; line-height:1; }
+  .credit-tile .ct-lab { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:11px; color:var(--ink-2); text-align:center; line-height:1.2; }
+  .earn-card { flex-shrink:0; width:252px; background:#FFF; border:1px solid var(--line); border-radius:16px; padding:14px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow-sm); cursor:pointer; }
+  .earn-card .ec-logo { width:48px; height:48px; border-radius:12px; background:#FFF; border:1px solid var(--line); display:grid; place-items:center; flex-shrink:0; overflow:hidden; }
+  .earn-card .ec-logo img { width:44px; height:44px; object-fit:contain; }
+  .earn-card .ec-txt { flex:1; }
+  .earn-card .ec-t { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; line-height:1.25; }
+  .earn-card .ec-s { font-size:11px; color:var(--green-deep); font-weight:700; margin-top:4px; }
+  .earn-card .ec-chev { color:var(--faint); flex-shrink:0; }
+  .ap-mark.sl { letter-spacing:0; font-size:12px; }
+  .credit-tile .ct-ic.logo { width:auto; height:auto; background:transparent; border:none; border-radius:0; }
+  .credit-tile .ct-ic.logo img { width:52px; height:52px; object-fit:contain; display:block; }
+  .credit-tile.has-logo { padding-top:6px; background:#FFF; }
+  .earn-2col { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+  .earn-box { position:relative; border-radius:20px; padding:18px 14px 16px; box-shadow:var(--shadow-md); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:12px; border:1.5px solid transparent; overflow:hidden; transition:transform .13s ease, box-shadow .13s ease; }
+  .earn-box.chevron { background:linear-gradient(160deg,#EAF2FE 0%,#D3E4FD 100%); border-color:#BFD8FB; }
+  .earn-box.walmart { background:linear-gradient(160deg,#FFF7E0 0%,#FCE9B6 100%); border-color:#F6DA95; }
+  .earn-box:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); }
+  .earn-box .eb-logo { width:84px; height:84px; border-radius:20px; background:#FFF; display:grid; place-items:center; overflow:hidden; box-shadow:0 4px 12px rgba(15,23,42,.1); padding:8px; }
+  .earn-box .eb-logo img { width:100%; height:100%; object-fit:contain; }
+  .earn-box .eb-title { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px; letter-spacing:-0.3px; }
+  .earn-box .eb-pill { background:var(--green); color:#FFF; font-weight:800; font-size:11.5px; padding:6px 13px; border-radius:999px; box-shadow:0 5px 12px rgba(34,197,94,.32); }
+
+  /* ── Home hub (combined greeting + earn + nudge) ── */
+  .home-hub { background:#FFF; border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow-sm); padding:16px; margin-bottom:20px; cursor:pointer; }
+  .home-hub .hub-top { display:flex; align-items:center; gap:12px; }
+  .home-hub .wr-av { width:44px; height:44px; border-radius:50%; background:#EEF2F7; border:1px solid var(--line); display:grid; place-items:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; color:var(--ink-2); flex-shrink:0; }
+  .home-hub .hub-txt { flex:1; }
+  .home-hub .hub-name { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:19px; letter-spacing:-0.4px; }
+  .home-hub .hub-chip { display:inline-block; background:var(--green-soft); color:var(--green-deep); font-weight:800; font-size:10.5px; padding:5px 10px; border-radius:999px; white-space:nowrap; margin-top:6px; }
+  .home-hub .hub-nudge { display:flex; align-items:center; gap:10px; margin-top:13px; padding-top:13px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-2); line-height:1.4; }
+  .home-hub .hub-nudge img { width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0; border:2px solid #fff; box-shadow:var(--shadow-sm); }
+  .home-hub .hub-nudge b { color:var(--brand-dark); font-weight:800; }
+  .home-hub .hub-nudge .chev { color:var(--faint); font-weight:700; margin-left:auto; padding-left:6px; }
+
+  /* ─────────── Leaflet maps ─────────── */
+  .lmap, .leaflet-container { background-color:#E7ECE6; background-image: repeating-linear-gradient(0deg, rgba(150,168,158,0.22) 0 1px, transparent 1px 40px), repeating-linear-gradient(90deg, rgba(150,168,158,0.22) 0 1px, transparent 1px 40px); }
+  .lmap { height:300px; border-radius:18px; overflow:hidden; box-shadow:var(--shadow-sm); border:1px solid var(--line); position:relative; z-index:0; }
+  .lmap.tall { height:340px; }
+  .leaflet-container { font-family:'Inter',sans-serif; }
+  .pin-ico { display:grid; place-items:center; border-radius:50%; border:2.5px solid #FFF; box-shadow:0 3px 8px rgba(15,23,42,0.3); font-size:12px; font-weight:800; color:#FFF; font-family:'Plus Jakarta Sans'; }
+  .pin-food { background:#F97316; }
+  .pin-cvs { background:#CC0000; }
+  .pin-walmart { background:#0071CE; }
+  .pin-chevron { background:#0054A4; }
+  .pin-you { background:#2563EB; border:3px solid #FFF; box-shadow:0 0 0 6px rgba(37,99,235,0.22); }
+  .map-float-chip { position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:500; background:#FFF; border-radius:999px; padding:7px 13px; font-size:12px; font-weight:700; font-family:'Plus Jakarta Sans'; box-shadow:var(--shadow-md); white-space:nowrap; pointer-events:none; }
+
+  /* ─────────── Browse (food/grocery) ─────────── */
+  .browse-top { display:flex; align-items:center; gap:10px; padding:6px 2px 12px; }
+  .browse-top .bt-search { flex:1; display:flex; align-items:center; gap:8px; background:#FFF; border:1px solid var(--line); border-radius:999px; padding:11px 14px; font-size:13px; color:var(--faint); box-shadow:var(--shadow-sm); }
+  .chip-row { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 12px; scrollbar-width:none; }
+  .chip-row::-webkit-scrollbar { display:none; }
+  .chip { display:inline-flex; align-items:center; gap:7px; background:#FFF; border:1px solid var(--line-strong); border-radius:999px; padding:7px 13px 7px 7px; font-size:12.5px; font-weight:600; color:var(--ink-2); white-space:nowrap; cursor:pointer; flex-shrink:0; }
+  .chip .chip-emoji { width:24px; height:24px; border-radius:50%; background:var(--cream); display:grid; place-items:center; font-size:13px; }
+  .chip.active { background:linear-gradient(135deg,#F97316,#EA580C); border-color:transparent; color:#FFF; padding-left:13px; }
+  .chip.active .chip-emoji { display:none; }
+  .filter-row { display:flex; gap:8px; flex-wrap:wrap; padding:0 2px 14px; }
+  .fchip { display:inline-flex; align-items:center; gap:5px; background:#FFF; border:1px solid var(--line-strong); border-radius:999px; padding:7px 12px; font-size:12px; font-weight:600; color:var(--muted); cursor:pointer; }
+  .fchip.on { border-color:var(--brand); color:var(--brand-dark); background:var(--brand-soft); }
+
+  /* ─────────── Walmart / Chevron partner ─────────── */
+  .partner-hero { border-radius:18px; padding:18px; margin-bottom:14px; color:#FFF; position:relative; overflow:hidden; }
+  .partner-hero.walmart { background:linear-gradient(135deg,#0071CE 0%,#004F91 100%); box-shadow:0 12px 28px rgba(0,113,206,0.28); }
+  .partner-hero.chevron { background:linear-gradient(135deg,#0A66C2 0%,#0054A4 55%,#003B75 100%); box-shadow:0 12px 28px rgba(0,84,164,0.28); }
+  .partner-hero .ph-brand { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:24px; letter-spacing:-0.5px; display:flex; align-items:center; gap:8px; }
+  .partner-hero .ph-brand .wm-star { color:#FFC220; font-size:20px; }
+  .partner-hero .ph-brand .cv-tri { color:#E31837; }
+  .partner-hero .ph-sub { font-size:12.5px; margin-top:8px; opacity:0.96; line-height:1.4; }
+  .partner-hero .ph-badges { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .partner-hero .ph-badge { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:10px; padding:8px 11px; font-size:11px; font-weight:600; }
+  .partner-hero .ph-badge b { font-size:14px; font-family:'Plus Jakarta Sans'; font-weight:800; display:block; }
+  .note-band { display:flex; align-items:flex-start; gap:9px; border-radius:12px; padding:11px 13px; font-size:12px; margin-bottom:14px; line-height:1.4; }
+  .note-band.warn { background:#FFF7ED; border:1px solid #FCE3C2; color:#9A5B12; }
+  .note-band.good { background:var(--green-soft); border:1px solid var(--green-soft-2); color:var(--green-deep); font-weight:600; }
+  .seg { display:flex; background:#EEF2F7; border-radius:12px; padding:4px; margin-bottom:14px; }
+  .seg .seg-opt { flex:1; text-align:center; padding:9px; border-radius:9px; font-size:13px; font-weight:700; font-family:'Plus Jakarta Sans'; color:var(--muted); cursor:pointer; }
+  .seg .seg-opt.active { background:#FFF; color:var(--ink); box-shadow:var(--shadow-sm); }
+
+  /* ─────────── Spend tutorial ─────────── */
+  .spend-hero { background:linear-gradient(150deg,#1E293B 0%,#0F172A 100%); border-radius:22px; padding:24px 20px; color:#FFF; margin-bottom:18px; position:relative; overflow:hidden; text-align:center; box-shadow:0 14px 32px rgba(15,23,42,0.28); }
+  .spend-hero::after { content:''; position:absolute; right:-40px; top:-50px; width:170px; height:170px; border-radius:50%; background:radial-gradient(circle,rgba(34,197,94,0.5) 0%,transparent 70%); }
+  .spend-hero .sh-eq { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:29px; letter-spacing:-1px; position:relative; z-index:2; }
+  .spend-hero .sh-eq .g { color:#4ADE80; }
+  .spend-hero .sh-sub { font-size:13px; color:#CBD5E1; margin-top:8px; line-height:1.5; position:relative; z-index:2; }
+  .spend-step { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--line); }
+  .spend-step:last-child { border-bottom:none; }
+  .spend-step .ss-n { width:36px; height:36px; border-radius:11px; display:grid; place-items:center; font-size:18px; flex-shrink:0; }
+  .spend-step .ss-n.b1 { background:var(--brand-soft); }
+  .spend-step .ss-n.b2 { background:var(--green-soft); }
+  .spend-step .ss-n.b3 { background:var(--purple-soft); }
+  .spend-step .ss-n.b4 { background:var(--amber-soft); }
+  .spend-step .ss-txt .t { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14.5px; }
+  .spend-step .ss-txt .s { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.45; }
+  .value-row { display:flex; gap:10px; margin:16px 0; }
+  .value-tile { flex:1; background:var(--green-soft); border:1px solid var(--green-soft-2); border-radius:14px; padding:14px 10px; text-align:center; }
+  .value-tile .vt-a { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:19px; color:var(--green-deep); }
+  .value-tile .vt-l { font-size:10.5px; color:var(--ink-2); margin-top:4px; line-height:1.3; }
+  .cap-card { background:#FFF; border:1px solid var(--line); border-radius:16px; padding:4px 16px; margin:4px 0 12px; box-shadow:var(--shadow-sm); }
+  .cap-row { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+  .cap-row:last-child { border-bottom:none; }
+  .cap-row .cr-ic { width:36px; height:36px; border-radius:11px; display:grid; place-items:center; font-size:17px; flex-shrink:0; }
+  .cap-row .cr-txt { flex:1; }
+  .cap-row .cr-txt .t { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13.5px; }
+  .cap-row .cr-txt .s { font-size:11px; color:var(--muted); margin-top:2px; }
+  .cap-row .cr-amt { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14px; color:var(--green-deep); white-space:nowrap; }
+  .cap-note { display:flex; align-items:center; justify-content:center; gap:7px; background:var(--amber-soft); border:1px solid var(--amber-soft-2); border-radius:12px; padding:10px 12px; margin:-4px 0 14px; font-size:11.5px; font-weight:600; color:#9A5B12; }
+  .disclosure { font-size:10.5px; color:var(--faint); line-height:1.5; margin:12px 2px 4px; }
+
+  /* ─────────── Motion & states ─────────── */
+  .screen.is-active .body, .screen.is-active .welcome-wrap { animation: screenIn .34s cubic-bezier(.22,.61,.36,1); }
+  @keyframes screenIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  .credit-tile, .earn-box, .cat, .svc-tile, .pop, .btn, .cvs-list-row, .maddie-card, .earn-note, .nudge, .add-btn { transition: transform .12s ease, box-shadow .12s ease; }
+  .btn:active, .credit-tile:active, .earn-box:active, .cat:active, .pop:active, .cvs-list-row:active, .maddie-card:active, .nudge:active, .add-btn:active { transform: scale(.972); }
+  .lmap.loading::after, .map-strip.loading::after { content:''; position:absolute; inset:0; z-index:1; background:linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,.5) 50%, rgba(255,255,255,0) 80%); background-size:200% 100%; animation:shimmer 1.3s infinite; pointer-events:none; }
+  @keyframes shimmer { to { background-position:-200% 0; } }
+
+  /* ─────────── Savings hero (wallet) ─────────── */
+  .savings-hero { background:linear-gradient(150deg,#16A34A 0%,#15803D 100%); border-radius:22px; padding:20px; color:#FFF; margin-bottom:14px; position:relative; overflow:hidden; box-shadow:0 14px 30px rgba(21,128,61,.28); }
+  .savings-hero::after { content:''; position:absolute; right:-40px; top:-50px; width:170px; height:170px; border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,.22) 0,transparent 70%); }
+  .savings-hero .sv-l { font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:#D1FAE5; font-weight:700; position:relative; z-index:2; display:flex; align-items:center; gap:6px; }
+  .savings-hero .sv-a { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:34px; letter-spacing:-1px; margin-top:6px; position:relative; z-index:2; }
+  .savings-hero .sv-s { font-size:12px; color:#D1FAE5; margin-top:4px; position:relative; z-index:2; }
+
+  /* ─────────── Progress to reward ─────────── */
+  .reward-progress { background:#FFF; border:1px solid var(--line); border-radius:16px; padding:15px 16px; margin-bottom:16px; box-shadow:var(--shadow-sm); cursor:pointer; }
+  .reward-progress .rp-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .reward-progress .rp-t { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13.5px; display:flex; align-items:center; gap:7px; }
+  .reward-progress .rp-goal { font-size:11.5px; color:var(--muted); font-weight:600; }
+  .reward-progress .rp-bar { height:10px; border-radius:999px; background:#EEF2F7; overflow:hidden; }
+  .reward-progress .rp-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,#22C55E,#16A34A); width:12%; transition:width 1.1s cubic-bezier(.22,.61,.36,1); }
+  .reward-progress .rp-sub { font-size:11.5px; color:var(--muted); margin-top:9px; }
+  .reward-progress .rp-sub b { color:var(--green-deep); font-weight:800; }
+
+  /* ─────────── Proactive Maddie nudge ─────────── */
+  .nudge { display:flex; align-items:center; gap:12px; background:linear-gradient(135deg,#EFF6FF,#F5F3FF); border:1px solid var(--brand-soft-2); border-radius:16px; padding:13px 15px; margin-bottom:16px; cursor:pointer; }
+  .nudge img { width:42px; height:42px; border-radius:50%; object-fit:cover; flex-shrink:0; border:2px solid #fff; box-shadow:var(--shadow-sm); }
+  .nudge .nu-txt { flex:1; font-size:12.5px; color:var(--ink-2); line-height:1.42; }
+  .nudge .nu-txt b { color:var(--brand-dark); font-weight:800; }
+  .nudge .nu-chev { color:var(--faint); }
+
+  /* ─────────── Imagery ─────────── */
+  .food-hero-img { width:100%; height:150px; border-radius:18px; object-fit:cover; margin-bottom:14px; display:block; }
+  .pop .pop-photo { width:56px; height:56px; border-radius:14px; object-fit:cover; flex-shrink:0; }
+  .pop-emoji.grad-a { background:linear-gradient(135deg,#FDBA74,#F97316) !important; }
+  .pop-emoji.grad-b { background:linear-gradient(135deg,#86EFAC,#22C55E) !important; }
+  .pop-emoji.grad-c { background:linear-gradient(135deg,#93C5FD,#3B82F6) !important; }
+  .pop-emoji.grad-d { background:linear-gradient(135deg,#FCA5A5,#EF4444) !important; }
+  .mi-emoji.grad-a { background:linear-gradient(135deg,#FDBA74,#F97316) !important; }
+  .mi-emoji.grad-b { background:linear-gradient(135deg,#C4B5FD,#8B5CF6) !important; }
+  .mi-emoji.grad-c { background:linear-gradient(135deg,#86EFAC,#22C55E) !important; }
+  .logo-chip { width:44px; height:44px; border-radius:12px; background:#fff; border:1px solid var(--line); display:grid; place-items:center; flex-shrink:0; overflow:hidden; }
+  .logo-chip img { width:36px; height:36px; object-fit:contain; }
+
+  /* ─────────── Map legend + pin popups ─────────── */
+  .map-legend { display:flex; gap:14px; flex-wrap:wrap; padding:12px 2px 2px; }
+  .map-legend .lg-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); font-weight:600; }
+  .map-legend .lg-dot { width:12px; height:12px; border-radius:50%; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+  .leaflet-popup-content-wrapper { border-radius:12px; }
+  .leaflet-popup-content { margin:10px 12px; font-family:'Inter',sans-serif; }
+  .pin-pop-t { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:12.5px; }
+  .pin-pop-s { font-size:11px; color:var(--green-deep); font-weight:700; margin-top:2px; }
+
+  /* ─────────── Confetti ─────────── */
+  .confetti { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:60; }
+  .confetti i { position:absolute; top:-14px; width:8px; height:13px; border-radius:2px; opacity:.95; animation:fall linear forwards; }
+  @keyframes fall { to { transform:translateY(760px) rotate(760deg); opacity:0; } }
+  .earned-pop { animation:earnedPop .5s cubic-bezier(.22,1.3,.5,1) both; }
+  @keyframes earnedPop { 0% { transform:scale(.6); opacity:0; } 60% { transform:scale(1.06); } 100% { transform:scale(1); opacity:1; } }
+
+  /* ─────────── Lock screen push notifications ─────────── */
+  .screen.lockscreen { background: linear-gradient(165deg,#0B1220 0%,#233250 44%,#3B2E63 100%); }
+  .screen.is-active .lock-body { animation: screenIn .34s cubic-bezier(.22,.61,.36,1); }
+  .lock-body { position:relative; height:100%; color:#fff; }
+  .lock-date { text-align:center; font-size:15px; font-weight:600; color:rgba(255,255,255,.92); margin-top:18px; letter-spacing:.2px; }
+  .lock-time { text-align:center; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:78px; line-height:.95; letter-spacing:-2.5px; margin-top:2px; text-shadow:0 2px 24px rgba(0,0,0,.28); }
+  .lock-notifs { position:absolute; left:12px; right:12px; bottom:118px; display:flex; flex-direction:column; }
+  .lock-stack { height:16px; margin:0 12px -8px; border-radius:16px 16px 0 0; background:rgba(255,255,255,.42); }
+  .lock-stack.two { margin:0 22px -8px; height:14px; background:rgba(255,255,255,.28); }
+  .lnotif { background:rgba(255,255,255,.9); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); border-radius:19px; padding:13px 14px; color:var(--ink); box-shadow:0 10px 34px rgba(0,0,0,.28); cursor:pointer; position:relative; z-index:2; }
+  .lnotif .ln-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .lnotif .ln-ic { width:24px; height:24px; border-radius:6px; overflow:hidden; background:#fff; flex-shrink:0; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+  .lnotif .ln-ic img { height:24px; width:auto; display:block; }
+  .lnotif .ln-app { font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; flex:1; }
+  .lnotif .ln-time { font-size:11px; color:var(--faint); }
+  .lnotif .ln-title { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14.5px; line-height:1.25; margin-bottom:3px; letter-spacing:-0.2px; }
+  .lnotif .ln-body { font-size:12.5px; color:var(--ink-2); line-height:1.4; }
+  .lnotif .ln-cta { margin-top:9px; font-size:11.5px; font-weight:800; color:var(--brand-dark); }
+  .lock-bottom { position:absolute; left:0; right:0; bottom:54px; display:flex; align-items:center; justify-content:space-between; padding:0 36px; }
+  .lock-btn { width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,.16); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); display:grid; place-items:center; font-size:19px; }
+  .lock-handle { position:absolute; left:50%; bottom:11px; transform:translateX(-50%); width:126px; height:5px; border-radius:3px; background:rgba(255,255,255,.65); }
+
+  /* ─────────── Tab bar ─────────── */
+  .tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 82px; background: rgba(255,255,255,0.96); backdrop-filter: blur(12px); border-top: 1px solid var(--line); display: flex; align-items: flex-start; justify-content: space-around; padding-top: 10px; z-index: 4; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--faint); font-size: 10px; font-weight: 600; padding: 4px 8px; cursor: pointer; }
+  .tab svg { width: 22px; height: 22px; }
+  .tab.active { color: var(--brand); }
+  .tab.pay { margin-top: -14px; }
+  .tab.pay .pay-btn { width: 52px; height: 52px; border-radius: 17px; background: linear-gradient(150deg, #3B82F6 0%, #2563EB 60%, #1D4ED8 100%); display: grid; place-items: center; box-shadow: 0 8px 18px rgba(37,99,235,0.4); }
+  .tab.pay .pay-lab { color: var(--brand); font-size: 10px; font-weight: 700; margin-top: 3px; }
+
+  /* ─────────── Hotspot reveal ─────────── */
+  [data-goto] { position: relative; cursor: pointer; }
+  .screen.reveal-hotspots [data-goto] { animation: hotspot-flash 1.4s ease-out 2; z-index: 50; }
+  @keyframes hotspot-flash {
+    0%, 100% { outline: 0 solid rgba(37,99,235,0); outline-offset: 0; }
+    40% { outline: 4px solid rgba(37,99,235,0.85); outline-offset: 4px; }
+    70% { outline: 4px solid rgba(37,99,235,0.5); outline-offset: 4px; }
+  }
+  .reveal-banner { position: absolute; top: 56px; left: 50%; transform: translate(-50%, -6px); background: var(--brand-dark); color: #FFF; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; box-shadow: 0 10px 28px rgba(29,78,216,0.4); opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease; z-index: 100; pointer-events: none; white-space: nowrap; }
+  .screen.reveal-hotspots .reveal-banner { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ─────────── Thumbnails ─────────── */
+  .thumbs { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 6px 12px; }
+  .thumb { display: inline-flex; align-items: center; gap: 6px; background: #FFF; border: 1px solid var(--line-strong); border-radius: 999px; padding: 6px 11px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .thumb:hover { border-color: var(--brand); color: var(--brand-dark); }
+  .thumb .tnum { background: #EEF2F7; color: var(--ink); font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; }
+  .thumb.is-active { background: var(--brand); border-color: var(--brand); color: #FFF; }
+  .thumb.is-active .tnum { background: rgba(255,255,255,0.25); color: #FFF; }
+
+  .footer-hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div class="stage-head">
+    <div>
+      <div class="stage-title">Shop Local <span class="hl">by Amenify</span> — clickable prototype</div>
+      <div class="stage-meta">
+        <span>Earn &amp; use Shop Local Credits</span><span class="dot">•</span>
+        <span>Tap highlighted areas to navigate</span><span class="dot">•</span>
+        <span>Wireframe v1</span>
+      </div>
+    </div>
+    <div class="wordmark">amenify<span class="plus">+</span></div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="prev">← Prev</button>
+    <div class="step-indicator"><span class="num" id="cur-num">1</span> · <span id="cur-name">Welcome</span></div>
+    <button class="ctrl-btn" id="next">Next →</button>
+    <button class="ctrl-btn primary" id="restart">↻ Restart</button>
+  </div>
+
+  <div class="phone-stage">
+    <div class="phone">
+
+      <!-- ══════════ 1 · WELCOME ══════════ -->
+      <div class="screen tint-blue is-active" data-screen="welcome" data-step="1" data-name="Welcome">
+        <div class="reveal-banner">Tap “Get started” to continue ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="welcome-wrap">
+          <div class="welcome-top"><div class="wordmark">amenify<span class="plus">+</span></div></div>
+          <div class="welcome-hero">
+            <div class="wh-mark"><div class="ap-mark lg">SL</div></div>
+            <h1>Earn up to <span class="hl">5% back</span><br>on everyday spending</h1>
+            <p><b>1.0% back on rent</b> and up to <b>5.0% back</b> on local spending, in Shop Local Credits — just link your Visa®.</p>
+            <div class="welcome-credits">
+              <div class="ap-mark">SL</div>
+              <div class="wc-txt">
+                <div class="l">Shop Local Credits</div>
+                <div class="a countup" data-to="87.43" data-prefix="$">$87.43</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 0 4px;">
+            <button class="btn btn-primary" data-goto="link">Get started</button>
+            <a class="link-txt" data-goto="home">Already a member? <b>Log in</b></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ 2 · LINK CARD ══════════ -->
+      <div class="screen" data-screen="link" data-step="2" data-name="Link your card">
+        <div class="reveal-banner">Tap “Link my Visa” ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="welcome">‹</div>
+            <h2>Link your card</h2>
+            <div class="x" data-goto="home">✕</div>
+          </div>
+          <div style="text-align:center; margin: 0 4px 6px;">
+            <h1 style="font-family:'Plus Jakarta Sans'; font-weight:800; font-size:24px; letter-spacing:-0.5px; line-height:1.15;">Link your card.<br><span style="color:var(--brand)">That’s it.</span></h1>
+            <p style="font-size:13px; color:var(--muted); margin-top:8px; line-height:1.5;">No new card. No change in how you pay. Keep using your Visa like normal.</p>
+          </div>
+          <div class="card-visual">
+            <div class="cv-top"><div class="cv-chip"></div><div class="wordmark small on-dark">amenify<span class="plus" style="color:#A7F3D0">+</span></div></div>
+            <div class="cv-num">•••• •••• •••• 4242</div>
+            <div class="cv-bottom"><div class="cv-name">SARAH THOMPSON</div><div class="cv-visa">VISA</div></div>
+          </div>
+          <div class="card">
+            <div class="benefit">
+              <div class="b-ic">🔒</div>
+              <div class="b-txt"><div class="t">Secure &amp; private</div><div class="s">Your data is encrypted and never sold.</div></div>
+            </div>
+            <div class="benefit">
+              <div class="b-ic">🌐</div>
+              <div class="b-txt"><div class="t">Works everywhere</div><div class="s">In-store, online, everywhere you spend.</div></div>
+            </div>
+            <div class="benefit">
+              <div class="b-ic">⚡</div>
+              <div class="b-txt"><div class="t">No extra steps</div><div class="s">Just keep using your card like normal.</div></div>
+            </div>
+          </div>
+          <button class="btn btn-primary" data-goto="set">Link my Visa</button>
+        </div>
+      </div>
+
+      <!-- ══════════ 3 · ALL SET ══════════ -->
+      <div class="screen tint-blue" data-screen="set" data-step="3" data-name="You’re all set">
+        <div class="reveal-banner">Tap “Start exploring” ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="welcome-wrap">
+          <div class="welcome-hero">
+            <div class="confirm-hero" style="width:100%; margin-top:0;">
+              <div class="check">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h3>You’re all set!</h3>
+              <p>We’ll automatically earn Shop Local Credits when you shop with your linked Visa.</p>
+            </div>
+            <div class="card" style="width:100%; text-align:left;">
+              <div class="benefit" style="border:none; padding:8px 0;">
+                <div class="b-ic">💳</div>
+                <div class="b-txt"><div class="t">Visa •••• 4242 linked</div><div class="s">Earning up to 5% back automatically.</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 0 4px;">
+            <button class="btn btn-primary" data-goto="home">Start exploring</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ 4 · HOME (delivery marketplace) ══════════ -->
+      <div class="screen" data-screen="home" data-step="4" data-name="Home">
+        <div class="reveal-banner">Tap a service, search, or Maddie ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body">
+          <div class="map-strip lmap" id="map-home">
+            <div class="ms-addr" data-goto="use"><span class="pin">📍</span> 800 Pennsylvania <span class="chev">▾</span></div>
+            <div class="ms-wallet" data-goto="wallet"><div class="ap-mark sm sl">SL</div><span class="msw-amt countup" data-to="87.43" data-prefix="$">$87.43</span></div>
+          </div>
+
+          <div class="home-sheet">
+            <div class="home-hub" data-goto="wallet">
+              <div class="hub-top">
+                <div class="wr-av">S</div>
+                <div class="hub-txt">
+                  <div class="hub-name">Welcome, Sarah</div>
+                  <div class="hub-chip">1% rent · up to 5% local</div>
+                </div>
+              </div>
+              <div class="hub-nudge">
+                <img src="maddie.jpg" alt="Maddie">
+                <div>You earned <b>$1.21</b> today — you’re only <b>$13</b> from a free dinner 🍽️</div>
+                <span class="chev">›</span>
+              </div>
+            </div>
+
+            <h2 class="home-h2">Earn near you</h2>
+            <div class="earn-2col">
+              <div class="earn-box chevron" data-goto="chevron">
+                <div class="eb-logo"><img src="chevron.svg" alt="Chevron"></div>
+                <div class="eb-title">Gas</div>
+                <div class="eb-pill">Earn 2% back</div>
+              </div>
+              <div class="earn-box walmart" data-goto="walmart">
+                <div class="eb-logo"><img src="walmart.svg" alt="Walmart"></div>
+                <div class="eb-title">Groceries</div>
+                <div class="eb-pill">Earn 5% back</div>
+              </div>
+            </div>
+
+            <h2 class="home-h2" style="margin-top:22px;">Use your Shop Local Credits</h2>
+            <div class="hscroll">
+              <div class="credit-tile" data-goto="food"><div class="ct-ic">🍽️</div><div class="ct-lab">Food &amp; Grocery</div></div>
+              <div class="credit-tile has-logo" data-goto="walmart"><div class="ct-ic logo"><img src="walmart.svg" alt="Walmart"></div><div class="ct-lab">Grocery</div></div>
+              <div class="credit-tile has-logo" data-goto="cvs"><div class="ct-ic logo"><img src="cvs.svg" alt="CVS"></div><div class="ct-lab">Pharmacy</div></div>
+              <div class="credit-tile" data-goto="maddie"><div class="ct-ic">🛍️</div><div class="ct-lab">Home Goods</div></div>
+              <div class="credit-tile" data-goto="maddie"><div class="ct-ic">🧹</div><div class="ct-lab">Home Services</div></div>
+              <div class="credit-tile" data-goto="use"><div class="ct-ic">🎟️</div><div class="ct-lab">Experiences</div></div>
+              <div class="credit-tile" data-goto="maddie"><div class="ct-ic">🚗</div><div class="ct-lab">Rideshare</div></div>
+              <div class="credit-tile" data-goto="maddie"><div class="ct-ic">🛋️</div><div class="ct-lab">Furniture</div></div>
+            </div>
+
+            <div class="maddie-card" data-goto="maddie" style="margin-top:20px;">
+              <img src="maddie.jpg" alt="Maddie">
+              <div class="mc-txt"><div class="t">Ask Maddie <span class="ai-tag">AI</span></div><div class="s">Your AI concierge · 24/7 human support</div></div>
+              <div class="mc-go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#FFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab active">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5V20h14V9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Home
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h13a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16.5" cy="13" r="1.3" fill="currentColor"/></svg>
+            Activity
+          </div>
+          <div class="tab pay" data-goto="maddie">
+            <div class="pay-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16A1.5 1.5 0 0121.5 7v7A1.5 1.5 0 0120 15.5H9l-4 3.2V15.5H4A1.5 1.5 0 012.5 14V7A1.5 1.5 0 014 5.5z" stroke="#FFF" stroke-width="1.7" stroke-linejoin="round"/><circle cx="8.5" cy="10.8" r="1.05" fill="#FFF"/><circle cx="12" cy="10.8" r="1.05" fill="#FFF"/><circle cx="15.5" cy="10.8" r="1.05" fill="#FFF"/></svg>
+            </div>
+            <div class="pay-lab">Concierge</div>
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M16 12.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Wallet
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ 5 · WAYS TO USE ══════════ -->
+      <div class="screen" data-screen="use" data-step="5" data-name="Ways to use">
+        <div class="reveal-banner">Tap a category, or ask Maddie ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body">
+          <div class="app-top">
+            <div class="brand-left"><div class="wordmark">amenify<span class="plus">+</span></div></div>
+            <div class="icon-btn" data-goto="home">✕</div>
+          </div>
+          <div class="use-intro">
+            <h2>Ways to use</h2>
+            <p>Spend your Shop Local Credits anywhere you go — from local favorites to online and everything in between.</p>
+          </div>
+          <div class="cat-list">
+            <div class="cat" data-goto="order">
+              <div class="cat-ic food">🍽️</div>
+              <div class="cat-txt"><div class="n">Restaurants &amp; Food Delivery</div><div class="d">Dine in, takeout, or delivery</div></div>
+              <div class="cat-chev">›</div>
+            </div>
+            <div class="cat" data-goto="order">
+              <div class="cat-ic grocery">🛒</div>
+              <div class="cat-txt"><div class="n">Grocery Delivery</div><div class="d">Stock up and save on everyday essentials</div></div>
+              <div class="cat-chev">›</div>
+            </div>
+            <div class="cat" data-goto="order">
+              <div class="cat-ic ecom">🛍️</div>
+              <div class="cat-txt"><div class="n">Online Shopping</div><div class="d">Shop thousands of stores online</div></div>
+              <div class="cat-chev">›</div>
+            </div>
+            <div class="cat" data-goto="order">
+              <div class="cat-ic home">🧹</div>
+              <div class="cat-txt"><div class="n">Home Services</div><div class="d">Cleaning, repairs, handy pros &amp; more</div></div>
+              <div class="cat-chev">›</div>
+            </div>
+            <div class="cat" data-goto="order">
+              <div class="cat-ic events">🎟️</div>
+              <div class="cat-txt"><div class="n">Local Events</div><div class="d">Tickets, experiences &amp; more</div></div>
+              <div class="cat-chev">›</div>
+            </div>
+          </div>
+          <div class="ask-bar" data-goto="maddie">
+            <img src="maddie.jpg" alt="Maddie">
+            <div class="ab-txt">Ask your AI Concierge, Maddie…</div>
+            <div class="ab-mic">🎙️</div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab" data-goto="home">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5V20h14V9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Home
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h13a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16.5" cy="13" r="1.3" fill="currentColor"/></svg>
+            Activity
+          </div>
+          <div class="tab pay" data-goto="maddie">
+            <div class="pay-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16A1.5 1.5 0 0121.5 7v7A1.5 1.5 0 0120 15.5H9l-4 3.2V15.5H4A1.5 1.5 0 012.5 14V7A1.5 1.5 0 014 5.5z" stroke="#FFF" stroke-width="1.7" stroke-linejoin="round"/><circle cx="8.5" cy="10.8" r="1.05" fill="#FFF"/><circle cx="12" cy="10.8" r="1.05" fill="#FFF"/><circle cx="15.5" cy="10.8" r="1.05" fill="#FFF"/></svg>
+            </div>
+            <div class="pay-lab">Concierge</div>
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M16 12.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Wallet
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ 6 · RESTAURANT / ORDER ══════════ -->
+      <div class="screen" data-screen="order" data-step="6" data-name="Order">
+        <div class="reveal-banner">Tap “Add to order” ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="home">‹</div>
+            <h2>Food Delivery</h2>
+            <div class="x" data-goto="home">✕</div>
+          </div>
+          <img class="food-hero-img" src="burger.jpg" alt="The Corner Burger">
+          <div class="rest-head">
+            <h2>The Corner Burger <span class="verified">✓</span></h2>
+          </div>
+          <div class="rest-meta"><span class="star">★</span> 4.9 (512) · American · 0.4 mi · 20–30 min</div>
+          <div class="earn-banner">
+            <div class="eb-ic">SL</div>
+            <p>Earn <b>5% back</b> in Shop Local Credits on this order.</p>
+          </div>
+          <div class="sec-head"><h3>Popular</h3></div>
+          <div class="menu-item">
+            <img class="mi-emoji" src="burger.jpg" alt="" style="object-fit:cover;">
+            <div class="mi-txt"><div class="n">Smash Burger Combo</div><div class="d">Double smash patty, cheddar, house sauce, fries</div><div class="pr">$16.50</div></div>
+            <button class="add-btn" data-goto="checkout">+</button>
+          </div>
+          <div class="menu-item">
+            <div class="mi-emoji grad-a">🍔</div>
+            <div class="mi-txt"><div class="n">Classic Cheeseburger</div><div class="d">Single patty, American cheese, pickles</div><div class="pr">$12.00</div></div>
+            <button class="add-btn" data-goto="checkout">+</button>
+          </div>
+          <div class="menu-item">
+            <div class="mi-emoji grad-c">🥤</div>
+            <div class="mi-txt"><div class="n">Loaded Fries &amp; Shake</div><div class="d">Crispy fries, melted cheese, vanilla shake</div><div class="pr">$9.00</div></div>
+            <button class="add-btn" data-goto="checkout">+</button>
+          </div>
+          <div style="margin-top:18px;">
+            <button class="btn btn-primary" data-goto="checkout">Add to order · $16.50</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ 7 · CHECKOUT ══════════ -->
+      <div class="screen" data-screen="checkout" data-step="7" data-name="Checkout">
+        <div class="reveal-banner">Toggle credits or tap “Place order” ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="order">‹</div>
+            <h2>Checkout</h2>
+            <div class="x" data-goto="home">✕</div>
+          </div>
+          <div class="deliver-to">📍 Deliver to <b>800 Pennsylvania, Denver</b></div>
+          <div class="card" style="padding:14px 16px;">
+            <div class="menu-item" style="border:none; padding:2px 0;">
+              <img class="mi-emoji" src="burger.jpg" alt="" style="object-fit:cover;">
+              <div class="mi-txt"><div class="n">Smash Burger Combo</div><div class="d">The Corner Burger · Qty 1</div></div>
+              <div style="font-weight:800; font-family:'Plus Jakarta Sans';">$16.50</div>
+            </div>
+          </div>
+
+          <div class="slc-toggle" id="slc-toggle">
+            <div class="st-ic"><div style="color:#fff;font-weight:800;font-size:13px;font-family:'Plus Jakarta Sans';">SL</div></div>
+            <div class="st-txt"><div class="t">Apply Shop Local Credits</div><div class="s" id="slc-applied">−$10.00 applied · saves you $10 on this order</div></div>
+            <div class="switch" id="slc-switch"></div>
+          </div>
+
+          <div class="card" style="padding:8px 16px;">
+            <div class="summary-line"><span class="label">Subtotal</span><span>$16.50</span></div>
+            <div class="summary-line"><span class="label">Service &amp; delivery</span><span>$3.49</span></div>
+            <div class="summary-line"><span class="label">Tax</span><span>$1.44</span></div>
+            <div class="summary-line credit" id="credit-row"><span class="label">Shop Local Credits</span><span class="amt" id="credit-amt">−$10.00</span></div>
+            <div class="summary-line total"><span class="label">Total</span><span id="total-line">$11.43</span></div>
+          </div>
+
+          <div class="sec-head" style="margin-top:14px;"><h3>Pay with</h3></div>
+          <div class="pay-method">
+            <div class="pm-card"><div style="color:#fff;font-family:'Plus Jakarta Sans';font-weight:800;font-size:8px;">SL</div></div>
+            <div class="pm-meta"><div class="n">amenify+ Visa</div><div class="s">•••• 4242 · earns 5% back</div></div>
+            <div class="pm-chg">Change</div>
+          </div>
+
+          <button class="btn btn-primary" id="place-btn" data-goto="confirm">Place order · $11.43</button>
+        </div>
+      </div>
+
+      <!-- ══════════ 8 · CONFIRM ══════════ -->
+      <div class="screen tint-blue" data-screen="confirm" data-step="8" data-name="Order confirmed">
+        <div class="reveal-banner">Tap “Done” to return home ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body no-tab">
+          <div class="confirm-hero">
+            <div class="check">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Order confirmed!</h3>
+            <p>Your order is confirmed and on its way to 800 Pennsylvania. Arriving in 25–35 min.</p>
+          </div>
+          <div class="earned-pill">
+            <div style="font-weight:800;font-family:'Plus Jakarta Sans';color:var(--green-deep);">SL</div>
+            You earned $0.82 (5% back) in Shop Local Credits
+          </div>
+          <div class="track-list">
+            <div class="track-step"><div class="ts-dot"></div><div class="ts-txt">Order confirmed</div></div>
+            <div class="track-step pending"><div class="ts-dot"></div><div class="ts-txt">Preparing your food</div></div>
+            <div class="track-step pending"><div class="ts-dot"></div><div class="ts-txt">Out for delivery</div></div>
+            <div class="track-step pending"><div class="ts-dot"></div><div class="ts-txt">Delivered</div></div>
+          </div>
+          <button class="btn btn-primary" data-goto="home">Done</button>
+          <a class="link-txt" data-goto="wallet">View my <b>Shop Local Credits</b></a>
+        </div>
+      </div>
+
+      <!-- ══════════ 9 · MADDIE CONCIERGE ══════════ -->
+      <div class="screen" data-screen="maddie" data-step="9" data-name="Maddie concierge">
+        <div class="reveal-banner">Tap ✕ or the tab bar to continue ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body" style="padding-bottom:150px;">
+          <div class="chat-head">
+            <img src="maddie.jpg" alt="Maddie">
+            <div class="ch-meta"><div class="n">Maddie <span class="ai">AI</span></div><div class="s">Here to help, anytime · 24/7 human support</div></div>
+            <div class="x" data-goto="use" style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--muted);">✕</div>
+          </div>
+          <div class="bubble me">Please order a pepperoni pizza from Domino’s and a diet coke.<span class="time">9:41 AM</span></div>
+          <div class="bubble them">Got it! I’ll place that order now. 🍕<span class="time">9:41 AM</span></div>
+          <div class="order-bubble">
+            <div class="ob-head">
+              <div class="ob-logo">D</div>
+              <div><div class="ob-name">Domino’s Pizza</div><div class="ob-sub">Delivery to 800 Pennsylvania · 20–30 min</div></div>
+            </div>
+            <div class="ob-line"><span>1 Large Pepperoni Pizza</span><span>$18.99</span></div>
+            <div class="ob-line"><span>1 Diet Coke</span><span>$2.49</span></div>
+            <div class="ob-line"><span>Service &amp; tax</span><span>$2.70</span></div>
+            <div class="ob-total"><span>Total</span><span>$24.18</span></div>
+          </div>
+          <div class="bubble them">Your order is confirmed and on the way! 🎉<span class="time">9:42 AM</span></div>
+          <div class="earned-chip"><div style="font-weight:800;font-family:'Plus Jakarta Sans';">SL</div> You earned $1.21 (5% back) in Shop Local Credits</div>
+        </div>
+        <div class="chat-input">
+          <div class="ci-field">Message Maddie…</div>
+          <div class="ci-send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#FFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+
+      <!-- ══════════ 10 · WALLET ══════════ -->
+      <div class="screen" data-screen="wallet" data-step="10" data-name="Wallet">
+        <div class="reveal-banner">Tap the tab bar to keep exploring ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="home">‹</div>
+            <h2>Wallet</h2>
+            <div class="x" data-goto="home">✕</div>
+          </div>
+          <div class="savings-hero">
+            <div class="sv-l">💚 Saved with Shop Local Credits · this year</div>
+            <div class="sv-a countup" data-to="312.40" data-prefix="$">$312.40</div>
+            <div class="sv-s">That’s about 21 lunches earned back — nice work, Sarah.</div>
+          </div>
+          <div class="wallet-hero">
+            <div class="wh-l"><div class="ap-mark" style="width:22px;height:22px;border-radius:7px;font-size:9px;box-shadow:none;">SL</div> Shop Local Credits balance</div>
+            <div class="wh-a countup" data-to="87.43" data-prefix="$">$87.43</div>
+            <div class="wh-stats">
+              <div class="wh-stat"><div class="l">Earned this month</div><div class="v green">+$34.18</div></div>
+              <div class="wh-stat"><div class="l">Redeemed</div><div class="v">$52.00</div></div>
+            </div>
+          </div>
+          <div class="reward-progress" data-goto="spend">
+            <div class="rp-top">
+              <div class="rp-t">🍽️ Free dinner reward</div>
+              <div class="rp-goal">$87 / $100</div>
+            </div>
+            <div class="rp-bar"><div class="rp-fill" data-fill="87"></div></div>
+            <div class="rp-sub">Just <b>$13 more</b> in credits to unlock a free dinner on us.</div>
+          </div>
+          <button class="btn btn-primary" data-goto="spend" style="margin-bottom:8px;">Use my credits</button>
+          <div class="sec-head" style="margin-top:14px;"><h3>Activity</h3><a data-goto="home">Home</a></div>
+          <div class="activity">
+            <div class="ac-ic" style="overflow:hidden;"><img src="burger.jpg" alt="" style="width:40px;height:40px;object-fit:cover;"></div>
+            <div class="ac-meta"><div class="n">The Corner Burger</div><div class="d">Today · Redeemed credits</div></div>
+            <div class="ac-amt minus">−$10.00</div>
+          </div>
+          <div class="activity">
+            <div class="ac-ic" style="background:#fff;border:1px solid var(--line);overflow:hidden;"><img src="uber.svg" alt="" style="width:26px;height:26px;object-fit:contain;"></div>
+            <div class="ac-meta"><div class="n">Uber</div><div class="d">Jul 6 · 2% back</div></div>
+            <div class="ac-amt plus">+$0.25</div>
+          </div>
+          <div class="activity">
+            <div class="ac-ic" style="background:#fff;border:1px solid var(--line);overflow:hidden;"><img src="kroger.svg" alt="" style="width:28px;height:28px;object-fit:contain;"></div>
+            <div class="ac-meta"><div class="n">Kroger</div><div class="d">Jul 5 · 5% back</div></div>
+            <div class="ac-amt plus">+$0.42</div>
+          </div>
+          <div class="activity">
+            <div class="ac-ic" style="background:#fff;border:1px solid var(--line);overflow:hidden;"><img src="cvs.svg" alt="" style="width:30px;height:30px;object-fit:contain;"></div>
+            <div class="ac-meta"><div class="n">CVS Pharmacy</div><div class="d">Jul 4 · 2% back</div></div>
+            <div class="ac-amt plus">+$0.12</div>
+          </div>
+          <div class="activity">
+            <div class="ac-ic earn">🍕</div>
+            <div class="ac-meta"><div class="n">Domino’s · via Maddie</div><div class="d">Jul 2 · 5% back</div></div>
+            <div class="ac-amt plus">+$1.21</div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab" data-goto="home">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5V20h14V9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Home
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h13a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16.5" cy="13" r="1.3" fill="currentColor"/></svg>
+            Activity
+          </div>
+          <div class="tab pay" data-goto="maddie">
+            <div class="pay-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16A1.5 1.5 0 0121.5 7v7A1.5 1.5 0 0120 15.5H9l-4 3.2V15.5H4A1.5 1.5 0 012.5 14V7A1.5 1.5 0 014 5.5z" stroke="#FFF" stroke-width="1.7" stroke-linejoin="round"/><circle cx="8.5" cy="10.8" r="1.05" fill="#FFF"/><circle cx="12" cy="10.8" r="1.05" fill="#FFF"/><circle cx="15.5" cy="10.8" r="1.05" fill="#FFF"/></svg>
+            </div>
+            <div class="pay-lab">Concierge</div>
+          </div>
+          <div class="tab active">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M16 12.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Wallet
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ 11 · CVS HOME (partner) ══════════ -->
+      <div class="screen tint-blue" data-screen="cvs" data-step="11" data-name="CVS · Shop Local">
+        <div class="reveal-banner">Tap a CVS action, or “Spend at CVS” ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body">
+          <div class="home-head">
+            <div>
+              <div class="addr-v" style="font-size:12.5px; color:var(--muted); font-family:'Inter'; font-weight:600; cursor:pointer;" data-goto="home"><span class="pin">📍</span> 800 Pennsylvania, Denver</div>
+              <h2 class="cvs-hello">Hello Sarah,</h2>
+            </div>
+            <div class="head-icons">
+              <div class="wordmark small">amenify<span class="plus">+</span></div>
+              <div class="avatar-btn">S</div>
+            </div>
+          </div>
+
+          <div class="cvs-bal">
+            <div>
+              <div class="cb-a">$87.43</div>
+              <div class="cb-l">Shop Local Credits</div>
+              <div class="cb-s">Available to spend at CVS</div>
+            </div>
+            <div class="cb-btn" data-goto="wallet">View Activity ›</div>
+          </div>
+
+          <div class="cvs-hero" data-goto="cvsstore">
+            <div class="ch-left">
+              <div class="ch-brand"><span class="heart">♥</span> CVS</div>
+              <div class="ch-back"><b>2% back</b> on all spending<br>in Shop Local Credits</div>
+              <div class="ch-visa">VISA</div>
+            </div>
+            <div class="ch-linked">
+              <div class="cl-check">✓ CVS Connected</div>
+              <div class="cl-sub">5678 Linked Card</div>
+            </div>
+          </div>
+
+          <div class="cvs-list-row" data-goto="cvsstore">
+            <div class="clr-ic" style="background:#fff;border:1px solid var(--line);overflow:hidden;"><img src="cvs.svg" alt="CVS" style="width:34px;height:34px;object-fit:contain;"></div>
+            <div class="clr-txt"><div class="t">Closest CVS · 4 min drive</div><div class="s">0.7 mi · 800 Market St</div></div>
+            <div class="clr-btn">Get Directions</div>
+          </div>
+
+          <div class="cvs-list-row" data-goto="maddie">
+            <div class="clr-ic rx">Rx</div>
+            <div class="clr-txt"><div class="t">Refill Your Prescription</div><div class="s">Send a refill request — we’ll handle the rest.</div></div>
+            <div class="clr-chev">›</div>
+          </div>
+
+          <div class="cvs-list-row" data-goto="maddie">
+            <div class="clr-ic maddie"><img src="maddie.jpg" alt="Maddie"></div>
+            <div class="clr-txt"><div class="t">Maddie · Concierge</div><div class="s">Save, earn rewards, simplify life at home.</div></div>
+            <div class="clr-btn">💬 Chat</div>
+          </div>
+
+          <button class="btn btn-navy" data-goto="cvsstore" style="margin-top:4px;">Spend at CVS <span class="heart">♥</span> →</button>
+        </div>
+        <div class="tabbar">
+          <div class="tab" data-goto="home">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5V20h14V9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Home
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h13a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16.5" cy="13" r="1.3" fill="currentColor"/></svg>
+            Activity
+          </div>
+          <div class="tab pay" data-goto="maddie">
+            <div class="pay-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16A1.5 1.5 0 0121.5 7v7A1.5 1.5 0 0120 15.5H9l-4 3.2V15.5H4A1.5 1.5 0 012.5 14V7A1.5 1.5 0 014 5.5z" stroke="#FFF" stroke-width="1.7" stroke-linejoin="round"/><circle cx="8.5" cy="10.8" r="1.05" fill="#FFF"/><circle cx="12" cy="10.8" r="1.05" fill="#FFF"/><circle cx="15.5" cy="10.8" r="1.05" fill="#FFF"/></svg>
+            </div>
+            <div class="pay-lab">Concierge</div>
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M16 12.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Wallet
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ 12 · CVS STORE DETAIL (map + claim) ══════════ -->
+      <div class="screen tint-blue" data-screen="cvsstore" data-step="12" data-name="CVS store">
+        <div class="reveal-banner">Tap “Claim,” “More info,” or Back ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body no-tab">
+          <div class="cvs-search-top">
+            <div class="cst-search" data-goto="use">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#94A3B8" stroke-width="2"/><path d="M20 20l-3.2-3.2" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg>
+              Search
+            </div>
+            <div class="cst-pill" data-goto="wallet">$87.43</div>
+            <div class="cst-av">S</div>
+          </div>
+
+          <div class="lmap" id="map-cvsstore"><div class="map-float-chip">📍 Nearest CVS · 0.7 mi</div></div>
+
+          <div class="cvs-store-card">
+            <div class="csc-banner"><div class="b-brand"><span>♥</span> CVS</div></div>
+            <div class="csc-body">
+              <div class="csc-name"><span class="sq"></span> CVS Pharmacy</div>
+              <div class="csc-addr">800 Market St · <span class="open">Open</span></div>
+              <div class="csc-cash">2% cash back in Shop Local Credits</div>
+              <div class="csc-btns">
+                <button class="btn btn-secondary" data-goto="cvs">More info</button>
+                <button class="btn btn-primary" data-goto="wallet">Claim</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;">
+            <button class="btn btn-navy" data-goto="cvs">‹ Back to CVS</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ FOOD / GROCERY BROWSE ══════════ -->
+      <div class="screen" data-screen="food" data-step="7" data-name="Food · Browse">
+        <div class="reveal-banner">Tap a restaurant to open its menu ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="home">‹</div>
+            <h2>Food / Grocery</h2>
+            <div class="x" data-goto="home">✕</div>
+          </div>
+          <div class="browse-top">
+            <div class="bt-search" data-goto="food">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#94A3B8" stroke-width="2"/><path d="M20 20l-3.2-3.2" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg>
+              Search restaurants, cuisines, dishes…
+            </div>
+          </div>
+          <div class="chip-row">
+            <div class="chip active">All</div>
+            <div class="chip"><span class="chip-emoji">☕</span>Coffee</div>
+            <div class="chip"><span class="chip-emoji">🍔</span>American</div>
+            <div class="chip"><span class="chip-emoji">🍝</span>Italian</div>
+            <div class="chip"><span class="chip-emoji">🍣</span>Japanese</div>
+            <div class="chip"><span class="chip-emoji">🥡</span>Chinese</div>
+            <div class="chip"><span class="chip-emoji">🍜</span>Thai</div>
+            <div class="chip"><span class="chip-emoji">🍕</span>Pizza</div>
+            <div class="chip"><span class="chip-emoji">🌮</span>Mexican</div>
+          </div>
+          <div class="filter-row">
+            <div class="fchip on">🕐 Open now</div>
+            <div class="fchip">★ Top rated</div>
+            <div class="fchip">Under 30 min</div>
+            <div class="fchip">Free delivery</div>
+          </div>
+          <div class="lmap" id="map-food"><div class="map-float-chip">📍 You are here · 800 Pennsylvania</div></div>
+          <div class="map-legend">
+            <span class="lg-item"><span class="lg-dot" style="background:#F97316"></span>Dining</span>
+            <span class="lg-item"><span class="lg-dot" style="background:#0071CE"></span>Grocery</span>
+            <span class="lg-item"><span class="lg-dot" style="background:#CC0000"></span>Pharmacy</span>
+            <span class="lg-item"><span class="lg-dot" style="background:#2563EB"></span>You</span>
+          </div>
+          <div class="sec-head" style="margin-top:14px;"><h3>Popular near you</h3><a data-goto="food">Sort</a></div>
+          <div class="pop" data-goto="order">
+            <img class="pop-photo" src="burger.jpg" alt="">
+            <div class="pop-meta"><div class="n">The Corner Burger <span class="verified">✓</span></div><div class="d"><span class="star">★</span> 4.9 · American · 0.4 mi · 20–30 min</div></div>
+            <div class="pop-back">+5%</div>
+          </div>
+          <div class="pop" data-goto="order">
+            <div class="pop-emoji grad-a">🌮</div>
+            <div class="pop-meta"><div class="n">Cap Hill Tacos</div><div class="d"><span class="star">★</span> 4.9 · Mexican · 0.4 mi · 20–30 min</div></div>
+            <div class="pop-back">+5%</div>
+          </div>
+          <div class="pop" data-goto="order">
+            <div class="pop-emoji grad-b">🍝</div>
+            <div class="pop-meta"><div class="n">Tony’s Trattoria <span class="verified">✓</span></div><div class="d"><span class="star">★</span> 4.8 · Italian · 0.6 mi · 25–35 min</div></div>
+            <div class="pop-back">+5%</div>
+          </div>
+          <div class="pop" data-goto="order">
+            <div class="pop-emoji grad-c">☕</div>
+            <div class="pop-meta"><div class="n">Logan St. Coffee</div><div class="d"><span class="star">★</span> 4.7 · Coffee · 0.3 mi · 15–20 min</div></div>
+            <div class="pop-back">+5%</div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab" data-goto="home">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5V20h14V9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Home
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h13a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16.5" cy="13" r="1.3" fill="currentColor"/></svg>
+            Activity
+          </div>
+          <div class="tab pay" data-goto="maddie">
+            <div class="pay-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16A1.5 1.5 0 0121.5 7v7A1.5 1.5 0 0120 15.5H9l-4 3.2V15.5H4A1.5 1.5 0 012.5 14V7A1.5 1.5 0 014 5.5z" stroke="#FFF" stroke-width="1.7" stroke-linejoin="round"/><circle cx="8.5" cy="10.8" r="1.05" fill="#FFF"/><circle cx="12" cy="10.8" r="1.05" fill="#FFF"/><circle cx="15.5" cy="10.8" r="1.05" fill="#FFF"/></svg>
+            </div>
+            <div class="pay-lab">Concierge</div>
+          </div>
+          <div class="tab" data-goto="wallet">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" stroke="currentColor" stroke-width="1.8"/><path d="M16 12.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Wallet
+          </div>
+          <div class="tab">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Profile
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ WALMART · GROCERY ══════════ -->
+      <div class="screen tint-blue" data-screen="walmart" data-step="11" data-name="Walmart · Grocery">
+        <div class="reveal-banner">Toggle delivery/pickup & credits, then Place order ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="home">‹</div>
+            <h2>Grocery Delivery</h2>
+            <div class="x" data-goto="home">✕</div>
+          </div>
+          <div class="partner-hero walmart">
+            <div class="logo-chip" style="position:absolute;top:16px;right:16px;"><img src="walmart.svg" alt="Walmart"></div>
+            <div class="ph-brand"><span class="wm-star">✷</span> Walmart</div>
+            <div class="ph-sub">Grocery pickup &amp; delivery to 800 Pennsylvania. Apply your Shop Local Credits at checkout.</div>
+            <div class="ph-badges">
+              <div class="ph-badge"><b>5.0% back</b> Shop Local Credits</div>
+              <div class="ph-badge"><b>Credits OK</b> apply to any order</div>
+            </div>
+          </div>
+          <div class="lmap" id="map-walmart"><div class="map-float-chip">📍 3 Walmart stores near you</div></div>
+          <div class="map-legend"><span class="lg-item"><span class="lg-dot" style="background:#0071CE"></span>Walmart · earn &amp; redeem</span><span class="lg-item"><span class="lg-dot" style="background:#2563EB"></span>You</span></div>
+          <div style="height:12px;"></div>
+          <div class="note-band good">✓ Shop Local Credits can be applied to Walmart orders — pickup or delivery.</div>
+          <div class="seg" id="wm-seg">
+            <div class="seg-opt active" data-seg="delivery">🚚 Delivery</div>
+            <div class="seg-opt" data-seg="pickup">🏬 Pickup</div>
+          </div>
+          <div class="slc-toggle" id="wm-toggle">
+            <div class="st-ic"><div style="color:#fff;font-weight:800;font-size:13px;font-family:'Plus Jakarta Sans';">SL</div></div>
+            <div class="st-txt"><div class="t">Apply Shop Local Credits</div><div class="s" id="wm-applied">−$20.00 applied · saves you $20</div></div>
+            <div class="switch" id="wm-switch"></div>
+          </div>
+          <div class="card" style="padding:8px 16px;">
+            <div class="summary-line"><span class="label">Groceries · 12 items</span><span>$64.30</span></div>
+            <div class="summary-line" id="wm-fee-row"><span class="label" id="wm-fee-label">Delivery fee</span><span id="wm-fee">$6.95</span></div>
+            <div class="summary-line credit" id="wm-credit-row"><span class="label">Shop Local Credits</span><span class="amt">−$20.00</span></div>
+            <div class="summary-line total"><span class="label">Total</span><span id="wm-total">$51.25</span></div>
+          </div>
+          <button class="btn btn-primary" id="wm-place" data-goto="confirm">Place order · $51.25</button>
+          <a class="link-txt" data-goto="home">‹ Back to home</a>
+        </div>
+      </div>
+
+      <!-- ══════════ CHEVRON · GAS ══════════ -->
+      <div class="screen tint-blue" data-screen="chevron" data-step="12" data-name="Chevron · Gas">
+        <div class="reveal-banner">Earn-only partner · tap Get Directions ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="home">‹</div>
+            <h2>Gas</h2>
+            <div class="x" data-goto="home">✕</div>
+          </div>
+          <div class="partner-hero chevron">
+            <div class="logo-chip" style="position:absolute;top:16px;right:16px;"><img src="chevron.svg" alt="Chevron"></div>
+            <div class="ph-brand"><span class="cv-tri">▲</span> Chevron</div>
+            <div class="ph-sub">Fuel up near 800 Pennsylvania and earn Shop Local Credits automatically with your linked Visa.</div>
+            <div class="ph-badges">
+              <div class="ph-badge"><b>2.0% back</b> on gas</div>
+              <div class="ph-badge"><b>5.0% back</b> in-store</div>
+            </div>
+          </div>
+          <div class="lmap" id="map-chevron"><div class="map-float-chip">📍 4 Chevron stations near you</div></div>
+          <div class="map-legend"><span class="lg-item"><span class="lg-dot" style="background:#0054A4"></span>Chevron · earn only</span><span class="lg-item"><span class="lg-dot" style="background:#2563EB"></span>You</span></div>
+          <div style="height:12px;"></div>
+          <div class="note-band warn">ⓘ Shop Local Credits can’t be redeemed at Chevron — but you keep earning them on every fill-up and in-store purchase.</div>
+          <div class="cvs-list-row" data-goto="chevron">
+            <div class="clr-ic" style="background:#0054A4;color:#FFF;font-size:16px;">⛽</div>
+            <div class="clr-txt"><div class="t">Closest Chevron · 3 min drive</div><div class="s">0.5 mi · 1200 Lincoln St</div></div>
+            <div class="clr-btn">Get Directions</div>
+          </div>
+          <div class="card" style="padding:8px 16px;">
+            <div class="summary-line"><span class="label">Gas — earn rate</span><span style="color:var(--green-deep);font-weight:700;">2.0% back</span></div>
+            <div class="summary-line"><span class="label">In-store — earn rate</span><span style="color:var(--green-deep);font-weight:700;">5.0% back</span></div>
+            <div class="summary-line"><span class="label">Redeem credits here</span><span style="color:var(--muted);">Not available</span></div>
+          </div>
+          <button class="btn btn-navy" data-goto="chevron">Navigate to Chevron</button>
+          <a class="link-txt" data-goto="home">‹ Back to home</a>
+        </div>
+      </div>
+
+      <!-- ══════════ WAYS TO SPEND (tutorial) ══════════ -->
+      <div class="screen tint-green" data-screen="spend" data-step="5" data-name="Ways to spend">
+        <div class="reveal-banner">Learn the value of your credits ↓</div>
+        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="body no-tab">
+          <div class="topbar">
+            <div class="back" data-goto="home">‹</div>
+            <h2>Your credits</h2>
+            <div class="x" data-goto="home">✕</div>
+          </div>
+          <div class="spend-hero">
+            <div class="sh-eq"><span class="g">$1 credit</span> = $1 off</div>
+            <div class="sh-sub">Real money, not points — worth $1 each toward eligible purchases. Per-order caps and some restrictions apply, and they vary by category (below).</div>
+          </div>
+          <div class="value-row">
+            <div class="value-tile"><div class="vt-a">$87</div><div class="vt-l">Your balance</div></div>
+            <div class="value-tile"><div class="vt-a">≈ 6</div><div class="vt-l">Free lunches</div></div>
+            <div class="value-tile"><div class="vt-a">$0</div><div class="vt-l">Points to track</div></div>
+          </div>
+          <div class="sec-head"><h3>Ways to spend them</h3></div>
+          <div class="spend-step">
+            <div class="ss-n b1">🛒</div>
+            <div class="ss-txt"><div class="t">Apply at checkout</div><div class="s">Use credits on food, grocery &amp; online orders — instant dollar-for-dollar savings, up to each category’s cap.</div></div>
+          </div>
+          <div class="spend-step">
+            <div class="ss-n b2">🍽️</div>
+            <div class="ss-txt"><div class="t">Order via Maddie</div><div class="s">Have your concierge place orders and spend — or bank — your credits for you.</div></div>
+          </div>
+          <div class="spend-step">
+            <div class="ss-n b3">🏪</div>
+            <div class="ss-txt"><div class="t">Redeem at local partners</div><div class="s">Extra value at CVS, Walmart and hundreds of local spots near you.</div></div>
+          </div>
+          <div class="spend-step">
+            <div class="ss-n b4">🔁</div>
+            <div class="ss-txt"><div class="t">Save &amp; stack</div><div class="s">Bigger purchases unlock bigger caps. Bank credits now and redeem more on higher-value orders like home services and home goods.</div></div>
+          </div>
+
+          <div class="sec-head" style="margin-top:6px;"><h3>How much you can redeem</h3></div>
+          <div class="cap-card">
+            <div class="cap-row">
+              <div class="cr-ic" style="background:var(--green-soft);">🛒</div>
+              <div class="cr-txt"><div class="t">Everyday commerce</div><div class="s">Restaurants, grocery &amp; local retail</div></div>
+              <div class="cr-amt">up to $20</div>
+            </div>
+            <div class="cap-row">
+              <div class="cr-ic" style="background:var(--brand-soft);">🧹</div>
+              <div class="cr-txt"><div class="t">Home services</div><div class="s">Cleaning, handyman &amp; repairs</div></div>
+              <div class="cr-amt">up to $50</div>
+            </div>
+            <div class="cap-row">
+              <div class="cr-ic" style="background:var(--purple-soft);">🛍️</div>
+              <div class="cr-txt"><div class="t">Home goods</div><div class="s">Décor, kitchen &amp; larger items</div></div>
+              <div class="cr-amt">$100+</div>
+            </div>
+            <div class="cap-row">
+              <div class="cr-ic" style="background:var(--amber-soft);">🛋️</div>
+              <div class="cr-txt"><div class="t">Furniture for the home</div><div class="s">Sofas, beds &amp; big-ticket pieces</div></div>
+              <div class="cr-amt">up to $200</div>
+            </div>
+          </div>
+          <div class="cap-note">ⓘ Caps are per order and vary by category</div>
+
+          <button class="btn btn-primary" data-goto="use" style="margin-top:4px;">Start spending credits</button>
+          <a class="link-txt" data-goto="wallet">View my <b>wallet</b></a>
+          <div class="disclosure">Shop Local Credits are worth $1 each toward eligible purchases. Per-order redemption caps vary by category, and some items, merchants, and promotions are excluded. Amounts shown are examples — see full program terms for current limits.</div>
+        </div>
+      </div>
+
+      <!-- ══════════ LOCK SCREEN · RENT DROP → CHEVRON ══════════ -->
+      <div class="screen lockscreen" data-screen="lock-rent" data-step="17" data-name="Push · Rent drop">
+        <div class="reveal-banner">Tap the notification to open Shop Local ↓</div>
+        <div class="status-bar" style="color:#fff;"><span></span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="lock-body">
+          <div class="lock-date">Wednesday, July 8</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="chevron">
+              <div class="ln-head"><div class="ln-ic"><img src="shoplocal-logo.svg" alt=""></div><div class="ln-app">Shop Local</div><div class="ln-time">now</div></div>
+              <div class="ln-title">⛽ It’s Gas Week! Earn 50% back this week</div>
+              <div class="ln-body">Fill up at any Chevron and earn a boosted 3% back — that’s 50% more Shop Local Credits on gas, all week long.</div>
+              <div class="ln-cta">View gas offer ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+      <!-- ══════════ LOCK SCREEN · WALMART TIME-LIMITED ══════════ -->
+      <div class="screen lockscreen" data-screen="lock-walmart" data-step="18" data-name="Push · Walmart">
+        <div class="reveal-banner">Tap the notification to open Shop Local ↓</div>
+        <div class="status-bar" style="color:#fff;"><span></span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="lock-body">
+          <div class="lock-date">Wednesday, July 8</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="walmart">
+              <div class="ln-head"><div class="ln-ic"><img src="shoplocal-logo.svg" alt=""></div><div class="ln-app">Shop Local</div><div class="ln-time">2m ago</div></div>
+              <div class="ln-title">⏰ 1 hour only: +$10 at Walmart online</div>
+              <div class="ln-body">Order groceries online in the next hour and get an extra $10 in Shop Local Credits at checkout — pickup or delivery.</div>
+              <div class="ln-cta">Start a Walmart order ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+      <!-- ══════════ LOCK SCREEN · GEOLOCATION NEARBY ══════════ -->
+      <div class="screen lockscreen" data-screen="lock-geo" data-step="19" data-name="Push · Nearby">
+        <div class="reveal-banner">Tap the notification to open Shop Local ↓</div>
+        <div class="status-bar" style="color:#fff;"><span></span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="lock-body">
+          <div class="lock-date">Wednesday, July 8</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="order">
+              <div class="ln-head"><div class="ln-ic"><img src="shoplocal-logo.svg" alt=""></div><div class="ln-app">Shop Local</div><div class="ln-time">now</div></div>
+              <div class="ln-title">📍 You’re near The Corner Burger</div>
+              <div class="ln-body">Order in the next 30 min and earn 5% back in Shop Local Credits — it’s just around the corner.</div>
+              <div class="ln-cta">Order now ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+      <!-- ══════════ LOCK SCREEN · MOVE-IN FURNITURE ══════════ -->
+      <div class="screen lockscreen" data-screen="lock-credits" data-step="20" data-name="Push · Move-in">
+        <div class="reveal-banner">Tap the notification to open Shop Local ↓</div>
+        <div class="status-bar" style="color:#fff;"><span></span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="lock-body">
+          <div class="lock-date">Wednesday, July 8</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="spend">
+              <div class="ln-head"><div class="ln-ic"><img src="shoplocal-logo.svg" alt=""></div><div class="ln-app">Shop Local</div><div class="ln-time">now</div></div>
+              <div class="ln-title">🛋️ Hi Sarah — $100 for furniture before move-in</div>
+              <div class="ln-body">Use your $100 furniture credit for Unit 183 before your move-in date — plus a free 3D design of your new space.</div>
+              <div class="ln-cta">Claim &amp; design my space ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+      <!-- ══════════ LOCK SCREEN · PET REGISTRATION ══════════ -->
+      <div class="screen lockscreen" data-screen="lock-pet" data-step="21" data-name="Push · Pet">
+        <div class="reveal-banner">Tap the notification to open Shop Local ↓</div>
+        <div class="status-bar" style="color:#fff;"><span></span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="lock-body">
+          <div class="lock-date">Wednesday, July 8</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="use">
+              <div class="ln-head"><div class="ln-ic"><img src="shoplocal-logo.svg" alt=""></div><div class="ln-app">Shop Local</div><div class="ln-time">now</div></div>
+              <div class="ln-title">🐾 Barker’s registered — $15 pet food credit</div>
+              <div class="ln-body">Pet registration complete! Enjoy a $15 Shop Local Credit toward organic pet food for Barker.</div>
+              <div class="ln-cta">Shop for Barker ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="thumbs-wrap">
+    <div class="thumbs">
+      <div class="thumb is-active" data-goto="welcome"><span class="tnum">1</span> Welcome</div>
+      <div class="thumb" data-goto="link"><span class="tnum">2</span> Link card</div>
+      <div class="thumb" data-goto="set"><span class="tnum">3</span> All set</div>
+      <div class="thumb" data-goto="home"><span class="tnum">4</span> Home</div>
+      <div class="thumb" data-goto="spend"><span class="tnum">5</span> Ways to spend</div>
+      <div class="thumb" data-goto="use"><span class="tnum">6</span> Ways to use</div>
+      <div class="thumb" data-goto="food"><span class="tnum">7</span> Food browse</div>
+      <div class="thumb" data-goto="order"><span class="tnum">8</span> Restaurant</div>
+      <div class="thumb" data-goto="checkout"><span class="tnum">9</span> Checkout</div>
+      <div class="thumb" data-goto="confirm"><span class="tnum">10</span> Confirmed</div>
+      <div class="thumb" data-goto="walmart"><span class="tnum">11</span> Walmart</div>
+      <div class="thumb" data-goto="chevron"><span class="tnum">12</span> Chevron</div>
+      <div class="thumb" data-goto="cvs"><span class="tnum">13</span> CVS Home</div>
+      <div class="thumb" data-goto="cvsstore"><span class="tnum">14</span> CVS Store</div>
+      <div class="thumb" data-goto="maddie"><span class="tnum">15</span> Maddie</div>
+      <div class="thumb" data-goto="wallet"><span class="tnum">16</span> Wallet</div>
+      <div class="thumb" data-goto="lock-rent"><span class="tnum">17</span> 🔔 Rent drop</div>
+      <div class="thumb" data-goto="lock-walmart"><span class="tnum">18</span> 🔔 Walmart</div>
+      <div class="thumb" data-goto="lock-geo"><span class="tnum">19</span> 🔔 Nearby</div>
+      <div class="thumb" data-goto="lock-credits"><span class="tnum">20</span> 🔔 Move-in</div>
+      <div class="thumb" data-goto="lock-pet"><span class="tnum">21</span> 🔔 Pet</div>
+    </div>
+  </div>
+
+  <div class="footer-hint">Use ← → arrow keys to step through · press <b>R</b> to restart · tap empty space to reveal hotspots</div>
+
+</div>
+
+<script>
+(function(){
+  const screens = Array.from(document.querySelectorAll('.screen'));
+  const thumbs = Array.from(document.querySelectorAll('.thumb'));
+  const order = ['welcome','link','set','home','spend','use','food','order','checkout','confirm','walmart','chevron','cvs','cvsstore','maddie','wallet','lock-rent','lock-walmart','lock-geo','lock-credits','lock-pet'];
+  const curNumEl = document.getElementById('cur-num');
+  const curNameEl = document.getElementById('cur-name');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const restartBtn = document.getElementById('restart');
+
+  function getActive() { return document.querySelector('.screen.is-active'); }
+
+  function go(name) {
+    const target = document.querySelector('.screen[data-screen="'+name+'"]');
+    if (!target) return;
+    screens.forEach(s => {
+      s.classList.remove('is-active');
+      s.classList.remove('reveal-hotspots');
+      const b = s.querySelector('.body'); if (b) b.scrollTop = 0;
+    });
+    target.classList.add('is-active');
+    const idx = order.indexOf(name);
+    curNumEl.textContent = idx >= 0 ? (idx + 1) : (target.dataset.step || '');
+    curNameEl.textContent = target.dataset.name;
+    thumbs.forEach(t => { t.classList.toggle('is-active', t.dataset.goto === name); });
+    ensureMaps(target);
+    runCountups(target);
+    runProgress(target);
+    if (name === 'confirm') celebrate(target);
+    updateNav(name);
+  }
+
+  function updateNav(name) {
+    const idx = order.indexOf(name);
+    prevBtn.disabled = idx <= 0;
+    nextBtn.disabled = idx >= order.length - 1;
+  }
+
+  function revealHotspots() {
+    const active = getActive();
+    if (!active) return;
+    active.classList.remove('reveal-hotspots');
+    void active.offsetWidth;
+    active.classList.add('reveal-hotspots');
+    clearTimeout(window.__revealTimer);
+    window.__revealTimer = setTimeout(() => { active.classList.remove('reveal-hotspots'); }, 2800);
+  }
+
+  document.querySelectorAll('.phone .screen').forEach(screen => {
+    screen.addEventListener('click', function(e){
+      const hot = e.target.closest('[data-goto]');
+      if (hot) {
+        e.preventDefault(); e.stopPropagation();
+        if (hot.id === 'slc-toggle' || hot.id === 'slc-switch') return;
+        const dest = hot.dataset.goto;
+        if (dest) go(dest);
+      } else {
+        revealHotspots();
+      }
+    });
+  });
+
+  thumbs.forEach(t => { t.addEventListener('click', e => { e.stopPropagation(); go(t.dataset.goto); }); });
+
+  prevBtn.addEventListener('click', () => { const cur = getActive().dataset.screen; const idx = order.indexOf(cur); if (idx > 0) go(order[idx-1]); });
+  nextBtn.addEventListener('click', () => { const cur = getActive().dataset.screen; const idx = order.indexOf(cur); if (idx < order.length - 1) go(order[idx+1]); });
+  restartBtn.addEventListener('click', () => go('welcome'));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') nextBtn.click();
+    else if (e.key === 'ArrowLeft') prevBtn.click();
+    else if (e.key === 'r' || e.key === 'R') restartBtn.click();
+  });
+
+  // ── Checkout: Shop Local Credits toggle + total recompute ──
+  (function(){
+    const co = document.querySelector('.screen[data-screen="checkout"]');
+    if (!co) return;
+    const BASE = 21.43; // subtotal 16.50 + service 3.49 + tax 1.44
+    const totalLine = document.getElementById('total-line');
+    const placeBtn = document.getElementById('place-btn');
+    const creditRow = document.getElementById('credit-row');
+    const slcSwitch = document.getElementById('slc-switch');
+    const slcApplied = document.getElementById('slc-applied');
+    const slcToggle = document.getElementById('slc-toggle');
+    let creditOn = true;
+    const fmt = n => '$' + n.toFixed(2);
+    function render(){
+      const credit = creditOn ? 10 : 0;
+      const total = BASE - credit;
+      creditRow.style.display = creditOn ? '' : 'none';
+      totalLine.textContent = fmt(total);
+      placeBtn.textContent = 'Place order · ' + fmt(total);
+      slcSwitch.classList.toggle('off', !creditOn);
+      slcApplied.textContent = creditOn
+        ? '−$10.00 applied · saves you $10 on this order'
+        : 'Tap to apply $10 Shop Local Credits from your wallet';
+    }
+    function toggle(e){ e.stopPropagation(); creditOn = !creditOn; render(); }
+    if (slcToggle) slcToggle.addEventListener('click', toggle);
+    render();
+  })();
+
+  // ── Leaflet maps (lazy init per screen) ──
+  const DENVER = [39.7256, -104.9769]; // ~800 Pennsylvania St, Denver
+  function spread(n, kind, pop){
+    const pts = []; let seed = kind.length * 13 + n * 7;
+    const rnd = () => { seed = (seed*9301+49297) % 233280; return seed/233280; };
+    for (let i=0;i<n;i++){ pts.push({ lat: DENVER[0]+(rnd()-0.5)*0.045, lng: DENVER[1]+(rnd()-0.5)*0.062, kind, pop }); }
+    return pts;
+  }
+  const mapConfigs = {
+    'map-home':     { zoom:14, you:true, pins: [].concat(
+        spread(7,'food','Dining · earn 5% + redeem'),
+        spread(3,'walmart','Grocery · earn 5% + redeem'),
+        spread(2,'cvs','Pharmacy · earn 2% + redeem'),
+        spread(2,'chevron','Gas · earn 2% back')) },
+    'map-food':     { zoom:14, you:true, pins: [].concat(
+        spread(16,'food','Restaurant · 5% back'),
+        spread(3,'walmart','Grocery · 5% back'),
+        spread(2,'cvs','Pharmacy · 2% back')) },
+    'map-walmart':  { zoom:13, you:true, pins: spread(3,'walmart','Walmart · 5% back + redeem') },
+    'map-chevron':  { zoom:13, you:true, pins: spread(4,'chevron','Chevron · 2% gas, 5% in-store') },
+    'map-cvsstore': { zoom:14, you:true, pins: spread(4,'cvs','CVS · 2% back + redeem') }
+  };
+  const builtMaps = {};
+  function makeIcon(kind){
+    const size = kind==='food' ? 22 : 26;
+    return L.divIcon({ className:'', html:'<div class="pin-ico pin-'+kind+'" style="width:'+size+'px;height:'+size+'px;"></div>', iconSize:[size,size], iconAnchor:[size/2,size/2] });
+  }
+  function ensureMaps(target){
+    const el = target.querySelector('.lmap');
+    if (!el || !el.id || !mapConfigs[el.id]) return;
+    if (builtMaps[el.id]) { setTimeout(()=>builtMaps[el.id].invalidateSize(), 60); return; }
+    if (!window.L) return; // Leaflet blocked → CSS street-grid fallback shows
+    const cfg = mapConfigs[el.id];
+    el.classList.add('loading');
+    const map = L.map(el, { scrollWheelZoom:false, zoomControl:(el.id!=='map-home'), attributionControl:false }).setView(DENVER, cfg.zoom);
+    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 });
+    tiles.on('load', () => el.classList.remove('loading'));
+    tiles.addTo(map);
+    cfg.pins.forEach(p => {
+      const m = L.marker([p.lat,p.lng], { icon: makeIcon(p.kind) }).addTo(map);
+      if (p.pop){ const parts=p.pop.split(' · '); m.bindPopup('<div class="pin-pop-t">'+parts[0]+'</div><div class="pin-pop-s">'+(parts[1]||'')+'</div>'); }
+    });
+    if (cfg.you) L.marker(DENVER, { icon: L.divIcon({ className:'', html:'<div class="pin-ico pin-you" style="width:20px;height:20px;"></div>', iconSize:[20,20], iconAnchor:[10,10] }) }).addTo(map).bindPopup('<div class="pin-pop-t">You are here</div><div class="pin-pop-s">800 Pennsylvania</div>');
+    builtMaps[el.id] = map;
+    setTimeout(()=>{ map.invalidateSize(); el.classList.remove('loading'); }, 1300);
+  }
+
+  // ── Balance count-up ──
+  function runCountups(target){
+    target.querySelectorAll('.countup').forEach(el => {
+      if (el.dataset.done) return; el.dataset.done = '1';
+      const to = parseFloat(el.dataset.to || '0'), pre = el.dataset.prefix || '';
+      const dur = 850, t0 = performance.now();
+      el.textContent = pre + '0.00';
+      (function step(t){ const k = Math.min(1,(t-t0)/dur); const e = 1-Math.pow(1-k,3); el.textContent = pre + (to*e).toFixed(2); if (k<1) requestAnimationFrame(step); else el.textContent = pre + to.toFixed(2); })(performance.now());
+    });
+  }
+  // ── Reward progress fill ──
+  function runProgress(target){
+    target.querySelectorAll('.rp-fill').forEach(el => { const f = el.dataset.fill || '0'; el.style.width='12%'; setTimeout(()=>{ el.style.width = f + '%'; }, 140); });
+  }
+  // ── Confetti + earned-pop celebration (confirm) ──
+  function celebrate(target){
+    const pill = target.querySelector('.earned-pill');
+    if (pill){ pill.classList.remove('earned-pop'); void pill.offsetWidth; pill.classList.add('earned-pop'); }
+    if (target.querySelector('.confetti')) return;
+    const c = document.createElement('div'); c.className = 'confetti';
+    const cols = ['#2563EB','#22C55E','#F59E0B','#EF4444','#7C3AED'];
+    for (let i=0;i<40;i++){ const s=document.createElement('i'); s.style.left=(Math.random()*100)+'%'; s.style.background=cols[i%cols.length]; s.style.animationDuration=(1.4+Math.random()*1.2)+'s'; s.style.animationDelay=(Math.random()*0.35)+'s'; c.appendChild(s); }
+    target.appendChild(c);
+    setTimeout(()=>c.remove(), 3400);
+  }
+
+  // ── Walmart order: delivery/pickup + Shop Local Credits ──
+  (function(){
+    const wm = document.querySelector('.screen[data-screen="walmart"]'); if (!wm) return;
+    const GROC = 64.30;
+    const feeLabel = document.getElementById('wm-fee-label');
+    const feeEl = document.getElementById('wm-fee');
+    const creditRow = document.getElementById('wm-credit-row');
+    const totalEl = document.getElementById('wm-total');
+    const placeBtn = document.getElementById('wm-place');
+    const sw = document.getElementById('wm-switch');
+    const toggle = document.getElementById('wm-toggle');
+    const applied = document.getElementById('wm-applied');
+    const seg = document.getElementById('wm-seg');
+    let mode = 'delivery', creditOn = true;
+    const fmt = n => '$'+n.toFixed(2);
+    function render(){
+      const fee = mode==='delivery' ? 6.95 : 0;
+      const total = GROC + fee - (creditOn ? 20 : 0);
+      feeLabel.textContent = mode==='delivery' ? 'Delivery fee' : 'Pickup';
+      feeEl.textContent = mode==='delivery' ? fmt(6.95) : 'Free';
+      creditRow.style.display = creditOn ? '' : 'none';
+      totalEl.textContent = fmt(total);
+      placeBtn.textContent = 'Place order · ' + fmt(total);
+      sw.classList.toggle('off', !creditOn);
+      applied.textContent = creditOn ? '−$20.00 applied · saves you $20' : 'Tap to apply $20 Shop Local Credits';
+    }
+    seg.querySelectorAll('.seg-opt').forEach(opt => opt.addEventListener('click', e => {
+      e.stopPropagation();
+      seg.querySelectorAll('.seg-opt').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active'); mode = opt.dataset.seg; render();
+    }));
+    toggle.addEventListener('click', e => { e.stopPropagation(); creditOn = !creditOn; render(); });
+    render();
+  })();
+
+  updateNav('welcome');
+  (function(){ const first = getActive(); if (first){ ensureMaps(first); runCountups(first); runProgress(first); } })();
+})();
+</script>
+</body>
+</html>
