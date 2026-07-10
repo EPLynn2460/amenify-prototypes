@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Shop Local by Amenify — Clickable Prototype v1</title>
+<title>Shop Local — Clickable Prototype v1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -77,14 +77,19 @@
   .body.no-tab { padding-bottom: 24px; }
 
   /* ─────────── Brand marks ─────────── */
-  .wordmark { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.6px; color: var(--ink); display: inline-flex; align-items: flex-start; line-height: 1; }
-  .wordmark .plus { color: var(--green); font-size: 13px; margin-left: 1px; margin-top: -1px; }
-  .wordmark.small { font-size: 16px; }
-  .wordmark.on-dark { color: #FFF; }
-  .ap-mark { width: 42px; height: 42px; border-radius: 13px; background: linear-gradient(150deg, #3B82F6 0%, #2563EB 55%, #1D4ED8 100%); display: inline-flex; align-items: center; justify-content: center; color: #FFF; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 0.3px; box-shadow: 0 6px 16px rgba(37,99,235,0.34); flex-shrink: 0; }
-  .ap-mark .plus { font-size: 11px; margin-top: -6px; margin-left: 1px; color: #A7F3D0; }
-  .ap-mark.sm { width: 30px; height: 30px; border-radius: 9px; font-size: 12px; }
-  .ap-mark.lg { width: 60px; height: 60px; border-radius: 18px; font-size: 23px; }
+  /* Shop Local brand lockup (sl mark + wordmark) — the app is Shop Local; Amenify removed */
+  .wordmark { display: inline-flex; align-items: center; gap: 7px; font-size: 0; color: var(--ink); line-height: 1; vertical-align: middle; }
+  .wordmark::before { content: ''; width: 23px; height: 23px; border-radius: 6px; background: #fff url('shoplocal-mark.svg') center/cover no-repeat; box-shadow: 0 2px 7px rgba(15,23,42,.16); flex-shrink: 0; }
+  .wordmark::after { content: 'Shop Local'; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 16.5px; letter-spacing: -0.4px; color: currentColor; white-space: nowrap; }
+  .wordmark .plus { display: none; }
+  .wordmark.small::before { width: 19px; height: 19px; border-radius: 5px; }
+  .wordmark.small::after { font-size: 13.5px; }
+  .wordmark.on-dark { color: #fff; }
+  /* Real Shop Local app mark (SVG on a white tile) — replaces the old blue "SL" square everywhere */
+  .ap-mark { width: 42px; height: 42px; border-radius: 13px; background: #fff url('shoplocal-mark.svg') center/cover no-repeat; box-shadow: 0 6px 16px rgba(15,23,42,0.18); border: 1px solid rgba(15,23,42,0.06); flex-shrink: 0; font-size: 0; color: transparent; overflow: hidden; display: inline-flex; }
+  .ap-mark .plus { display: none; }
+  .ap-mark.sm { width: 30px; height: 30px; border-radius: 9px; }
+  .ap-mark.lg { width: 64px; height: 64px; border-radius: 18px; }
 
   /* ─────────── Buttons ─────────── */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 18px; border-radius: 15px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 15px; border: none; cursor: pointer; width: 100%; transition: transform .1s ease; }
@@ -475,7 +480,7 @@
   .home-hub .hub-nudge .chev { color:var(--faint); font-weight:700; margin-left:auto; padding-left:6px; }
 
   /* ─────────── Leaflet maps ─────────── */
-  .lmap, .leaflet-container { background-color:#E7ECE6; background-image: repeating-linear-gradient(0deg, rgba(150,168,158,0.22) 0 1px, transparent 1px 40px), repeating-linear-gradient(90deg, rgba(150,168,158,0.22) 0 1px, transparent 1px 40px); }
+  .lmap, .leaflet-container { background-color:#E7EEF7; background-image: url('map-bg.svg'); background-size: cover; background-position: center; }
   .lmap { height:300px; border-radius:18px; overflow:hidden; box-shadow:var(--shadow-sm); border:1px solid var(--line); position:relative; z-index:0; }
   .lmap.tall { height:340px; }
   .leaflet-container { font-family:'Inter',sans-serif; }
@@ -610,26 +615,36 @@
   @keyframes earnedPop { 0% { transform:scale(.6); opacity:0; } 60% { transform:scale(1.06); } 100% { transform:scale(1); opacity:1; } }
 
   /* ─────────── Lock screen push notifications ─────────── */
-  .screen.lockscreen { background: linear-gradient(165deg,#0B1220 0%,#233250 44%,#3B2E63 100%); }
+  .screen.lockscreen { background:
+      radial-gradient(115% 75% at 22% 10%, rgba(109,120,255,.55) 0%, transparent 55%),
+      radial-gradient(120% 85% at 88% 20%, rgba(236,72,153,.32) 0%, transparent 55%),
+      radial-gradient(150% 100% at 55% 108%, rgba(251,150,90,.42) 0%, transparent 58%),
+      linear-gradient(165deg,#080D20 0%,#141F45 40%,#33245E 74%,#5A2E57 100%); }
+  .screen.lockscreen::before { content:''; position:absolute; inset:0; z-index:0; pointer-events:none; background:
+      radial-gradient(circle at 74% 26%, rgba(255,255,255,.16) 0 2.5px, transparent 4px),
+      radial-gradient(circle at 26% 40%, rgba(255,255,255,.11) 0 2px, transparent 3px),
+      radial-gradient(circle at 58% 15%, rgba(255,255,255,.09) 0 3.5px, transparent 6px),
+      radial-gradient(circle at 41% 62%, rgba(255,255,255,.07) 0 2px, transparent 4px); }
+  .screen.lockscreen::after { content:''; position:absolute; inset:0; z-index:0; pointer-events:none; background:radial-gradient(125% 120% at 50% 38%, transparent 52%, rgba(0,0,0,.42) 100%); }
   .screen.is-active .lock-body { animation: screenIn .34s cubic-bezier(.22,.61,.36,1); }
-  .lock-body { position:relative; height:100%; color:#fff; }
-  .lock-date { text-align:center; font-size:15px; font-weight:600; color:rgba(255,255,255,.92); margin-top:18px; letter-spacing:.2px; }
-  .lock-time { text-align:center; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:78px; line-height:.95; letter-spacing:-2.5px; margin-top:2px; text-shadow:0 2px 24px rgba(0,0,0,.28); }
-  .lock-notifs { position:absolute; left:12px; right:12px; bottom:118px; display:flex; flex-direction:column; }
-  .lock-stack { height:16px; margin:0 12px -8px; border-radius:16px 16px 0 0; background:rgba(255,255,255,.42); }
-  .lock-stack.two { margin:0 22px -8px; height:14px; background:rgba(255,255,255,.28); }
-  .lnotif { background:rgba(255,255,255,.9); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); border-radius:19px; padding:13px 14px; color:var(--ink); box-shadow:0 10px 34px rgba(0,0,0,.28); cursor:pointer; position:relative; z-index:2; }
-  .lnotif .ln-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-  .lnotif .ln-ic { width:24px; height:24px; border-radius:6px; overflow:hidden; background:#fff; flex-shrink:0; box-shadow:0 1px 3px rgba(0,0,0,.15); }
-  .lnotif .ln-ic img { height:24px; width:auto; display:block; }
-  .lnotif .ln-app { font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; flex:1; }
-  .lnotif .ln-time { font-size:11px; color:var(--faint); }
-  .lnotif .ln-title { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14.5px; line-height:1.25; margin-bottom:3px; letter-spacing:-0.2px; }
-  .lnotif .ln-body { font-size:12.5px; color:var(--ink-2); line-height:1.4; }
-  .lnotif .ln-cta { margin-top:9px; font-size:11.5px; font-weight:800; color:var(--brand-dark); }
-  .lock-bottom { position:absolute; left:0; right:0; bottom:54px; display:flex; align-items:center; justify-content:space-between; padding:0 36px; }
-  .lock-btn { width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,.16); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); display:grid; place-items:center; font-size:19px; }
-  .lock-handle { position:absolute; left:50%; bottom:11px; transform:translateX(-50%); width:126px; height:5px; border-radius:3px; background:rgba(255,255,255,.65); }
+  .lock-body { position:relative; z-index:1; height:100%; color:#fff; }
+  .lock-date { text-align:center; font-size:15.5px; font-weight:600; color:rgba(255,255,255,.95); margin-top:20px; letter-spacing:.3px; text-shadow:0 1px 12px rgba(0,0,0,.28); }
+  .lock-time { text-align:center; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:82px; line-height:.94; letter-spacing:-3px; margin-top:0; text-shadow:0 3px 30px rgba(0,0,0,.34); }
+  .lock-notifs { position:absolute; left:11px; right:11px; bottom:120px; display:flex; flex-direction:column; }
+  .lock-stack { height:20px; margin:0 15px -12px; border-radius:22px; background:rgba(240,243,248,.5); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,.25); }
+  .lock-stack.two { margin:0 27px -12px; height:18px; background:rgba(240,243,248,.32); }
+  .lnotif { background:rgba(247,249,252,.64); -webkit-backdrop-filter:blur(22px) saturate(150%); backdrop-filter:blur(22px) saturate(150%); border-radius:23px; padding:14px 15px; color:var(--ink); box-shadow:0 16px 40px rgba(0,0,0,.30); border:1px solid rgba(255,255,255,.42); cursor:pointer; position:relative; z-index:2; }
+  .lnotif .ln-head { display:flex; align-items:center; gap:9px; margin-bottom:7px; }
+  .lnotif .ln-ic { width:30px; height:30px; border-radius:8px; overflow:hidden; background:#fff url('shoplocal-mark.svg') center/cover no-repeat; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,.2); }
+  .lnotif .ln-ic img { display:none; }
+  .lnotif .ln-app { font-size:11px; font-weight:800; color:#334155; text-transform:uppercase; letter-spacing:.6px; flex:1; }
+  .lnotif .ln-time { font-size:11.5px; color:#94A3B8; font-weight:500; }
+  .lnotif .ln-title { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:15px; line-height:1.28; margin-bottom:3px; letter-spacing:-0.2px; color:#0F172A; }
+  .lnotif .ln-body { font-size:12.5px; color:#475569; line-height:1.42; }
+  .lnotif .ln-cta { margin-top:10px; font-size:12px; font-weight:800; color:var(--brand); }
+  .lock-bottom { position:absolute; left:0; right:0; bottom:52px; display:flex; align-items:center; justify-content:space-between; padding:0 34px; z-index:1; }
+  .lock-btn { width:48px; height:48px; border-radius:50%; background:rgba(0,0,0,.28); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); display:grid; place-items:center; font-size:20px; color:#fff; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); }
+  .lock-handle { position:absolute; left:50%; bottom:11px; transform:translateX(-50%); width:130px; height:5px; border-radius:3px; background:rgba(255,255,255,.7); z-index:1; }
 
   /* ─────────── Tab bar ─────────── */
   .tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 82px; background: rgba(255,255,255,0.96); backdrop-filter: blur(12px); border-top: 1px solid var(--line); display: flex; align-items: flex-start; justify-content: space-around; padding-top: 10px; z-index: 4; }
@@ -667,7 +682,7 @@
 
   <div class="stage-head">
     <div>
-      <div class="stage-title">Shop Local <span class="hl">by Amenify</span> — clickable prototype</div>
+      <div class="stage-title">Shop Local <span class="hl">— clickable prototype</span></div>
       <div class="stage-meta">
         <span>Earn &amp; use Shop Local Credits</span><span class="dot">•</span>
         <span>Tap highlighted areas to navigate</span><span class="dot">•</span>
@@ -687,28 +702,161 @@
   <div class="phone-stage">
     <div class="phone">
 
-      <!-- ══════════ 1 · WELCOME ══════════ -->
-      <div class="screen tint-blue is-active" data-screen="welcome" data-step="1" data-name="Welcome">
-        <div class="reveal-banner">Tap “Get started” to continue ↓</div>
-        <div class="status-bar"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
-        <div class="welcome-wrap">
-          <div class="welcome-top"><div class="wordmark">amenify<span class="plus">+</span></div></div>
-          <div class="welcome-hero">
-            <div class="wh-mark"><div class="ap-mark lg">SL</div></div>
-            <h1>Earn up to <span class="hl">5% back</span><br>on everyday spending</h1>
-            <p><b>1.0% back on rent</b> and up to <b>5.0% back</b> on local spending, in Shop Local Credits — just link your Visa®.</p>
-            <div class="welcome-credits">
-              <div class="ap-mark">SL</div>
-              <div class="wc-txt">
-                <div class="l">Shop Local Credits</div>
-                <div class="a countup" data-to="87.43" data-prefix="$">$87.43</div>
+      <!-- v2 styles: intro carousel + hero welcome -->
+      <style>
+      /* ---- Hero welcome ---- */
+      .wv2 { background:#EFE9E0; }
+      .wv2-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top center; z-index:0; }
+      .wv2-status { position:absolute; top:0; left:0; right:0; z-index:6; color:#0F172A; }
+      .wv2-brandfoot { display:flex; justify-content:center; margin-bottom:6px; }
+      .wv2-brandfoot .wordmark { width:104px; height:26px; opacity:.9; }
+      .wv2-foot { position:absolute; left:0; right:0; bottom:0; z-index:6; padding:70px 20px 26px; display:flex; flex-direction:column; align-items:stretch; gap:12px;
+        background:linear-gradient(180deg, rgba(239,233,224,0) 0%, rgba(239,233,224,0.55) 34%, rgba(239,233,224,0.95) 78%, #EFE9E0 100%); }
+      .wv2-foot .btn-primary { width:100%; }
+      .wv2-login { text-align:center; font-size:13px; }
+      /* ---- Intro carousel ---- */
+      .intro { overflow:hidden; }
+      .intro-panel { position:absolute; inset:0; display:flex; flex-direction:column; opacity:0; visibility:hidden; transition:opacity .4s ease; }
+      .intro-panel.on { opacity:1; visibility:visible; }
+      .intro-panel .ip-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+      .ip-scrim { position:absolute; inset:0; z-index:1; }
+      .ip-adv { position:absolute; inset:0; z-index:2; cursor:pointer; }
+      .ip-content { position:relative; z-index:3; margin-top:auto; padding:24px 26px 156px; pointer-events:none; }
+      .ip-eyebrow { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:11.5px; letter-spacing:1.6px; text-transform:uppercase; opacity:.82; margin-bottom:12px; }
+      .ip-title { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:30px; line-height:1.08; letter-spacing:-0.9px; }
+      .ip-sub { font-size:14.5px; line-height:1.5; margin-top:13px; opacity:.94; max-width:296px; }
+      .ip-1 { background:#EFE9E0; color:#0F172A; }
+      .ip-2 { background:linear-gradient(165deg,#1E3A8A 0%,#2563EB 62%,#1D4ED8 115%); color:#fff; }
+      .ip-3 { background:linear-gradient(165deg,#064E2B 0%,#15803D 58%,#22C55E 125%); color:#fff; }
+      .ip-4 { background:linear-gradient(165deg,#0F172A 0%,#1E293B 62%,#334155 125%); color:#fff; }
+      .ip-stars { font-size:24px; letter-spacing:3px; color:#F5B301; }
+      .ip-bignum { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:30px; line-height:1.08; letter-spacing:-0.9px; }
+      .ip-avatars { display:flex; margin-bottom:18px; }
+      .ip-avatars span { width:40px; height:40px; border-radius:50%; margin-left:-10px; border:2.5px solid #EFE9E0; display:grid; place-items:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14px; color:#fff; overflow:hidden; }
+      .ip-avatars span:first-child { margin-left:0; }
+      .ip-avatars img { width:100%; height:100%; object-fit:cover; }
+      .ip-logos { display:flex; flex-wrap:wrap; align-items:center; gap:9px; margin-top:20px; }
+      .ip-logos .ll { width:50px; height:33px; background:#fff; border-radius:9px; display:grid; place-items:center; box-shadow:0 5px 14px rgba(15,23,42,.12); overflow:hidden; padding:6px; }
+      .ip-logos .ll img { max-width:100%; max-height:100%; object-fit:contain; }
+      .ip-statchip { display:inline-flex; align-items:center; gap:8px; background:rgba(15,23,42,.05); border:1px solid rgba(15,23,42,.1); border-radius:999px; padding:9px 15px; font-size:13px; font-weight:700; margin-top:20px; }
+      .ip-art { position:relative; z-index:3; margin:74px 26px 0; pointer-events:none; }
+      .ip-chipstack { display:flex; flex-direction:column; gap:11px; align-items:flex-start; }
+      .ip-cashchip { display:inline-flex; align-items:center; gap:12px; background:#fff; color:#0F172A; border-radius:15px; padding:11px 15px; box-shadow:0 16px 40px rgba(0,0,0,.26); }
+      .ip-cashchip .cc-ic { width:36px; height:36px; border-radius:11px; display:grid; place-items:center; font-size:17px; }
+      .ip-cashchip .cc-l { font-size:11.5px; color:#64748B; font-weight:600; }
+      .ip-cashchip .cc-a { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; color:#15803D; }
+      .ip-cardart { width:236px; border-radius:18px; padding:18px; background:linear-gradient(135deg,#1E293B,#0F172A); color:#fff; box-shadow:0 22px 46px rgba(0,0,0,.42); }
+      .ip-cardart .ca-top { display:flex; justify-content:space-between; align-items:center; }
+      .ip-cardart .ca-mark { width:38px; height:38px; border-radius:11px; background:#fff url('shoplocal-mark.svg') center/cover no-repeat; }
+      .ip-cardart .ca-visa { width:56px; height:22px; background:url('visa.svg') right center/contain no-repeat; filter:brightness(0) invert(1); }
+      .ip-cardart .ca-num { font-family:'Plus Jakarta Sans'; letter-spacing:2px; font-size:15px; margin-top:32px; }
+      .ip-cardart .ca-row { display:flex; justify-content:space-between; font-size:10.5px; opacity:.82; margin-top:8px; text-transform:uppercase; letter-spacing:.5px; }
+      .ip-maddiebubble { display:flex; gap:10px; align-items:flex-end; }
+      .ip-maddiebubble img { width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,.55); }
+      .ip-maddiebubble .mb { background:#fff; color:#0F172A; border-radius:16px 16px 16px 5px; padding:12px 15px; font-size:13.5px; font-weight:600; box-shadow:0 12px 30px rgba(0,0,0,.28); max-width:214px; }
+      .ip-dots { position:absolute; bottom:98px; left:0; right:0; z-index:4; display:flex; justify-content:center; gap:7px; }
+      .ip-dots .d { width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.3; transition:all .25s; }
+      .ip-dots .d.on { opacity:1; width:22px; border-radius:4px; }
+      .ip-cta { position:absolute; bottom:0; left:0; right:0; z-index:5; padding:0 22px 26px; }
+      .ip-cta .btn { width:100%; }
+      .ip-cta .btn.on-dark { background:#fff; color:#0F172A; box-shadow:0 10px 26px rgba(0,0,0,.28); }
+      .ip-skip { position:absolute; top:54px; right:22px; z-index:7; font-size:13px; font-weight:600; opacity:.72; cursor:pointer; background:none; border:none; color:inherit; font-family:'Inter'; }
+      .ip-brand { position:absolute; top:52px; left:0; right:0; z-index:6; display:flex; justify-content:center; }
+      .ip-brand .wordmark { width:96px; height:24px; }
+      </style>
+
+      <!-- ══════════ 1 · INTRO (Why Shop Local) ══════════ -->
+      <style>
+      .intro { background:#fff; }
+      .intro-panel.rv { background:linear-gradient(180deg,#EAF1FF 0%,#F5F9FF 42%,#FFFFFF 100%); color:#0F172A; }
+      .intro-panel.rs { background:#FFFFFF; color:#0F172A; }
+      .rv-wrap, .rs-wrap { position:relative; z-index:3; margin-top:auto; padding:0 24px 148px; pointer-events:none; }
+      .rv-eyebrow, .rs-eyebrow { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:11.5px; letter-spacing:1.6px; text-transform:uppercase; color:var(--brand); margin-bottom:12px; }
+      .rv-stars { color:#F5B301; font-size:19px; letter-spacing:3px; }
+      .rv-huge { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:54px; line-height:1; letter-spacing:-2.4px; color:var(--brand); margin-top:6px; }
+      .rv-huge small { display:block; font-size:19px; color:#0F172A; letter-spacing:-0.4px; margin-top:8px; font-weight:800; }
+      .rv-cards { margin-top:22px; display:flex; flex-direction:column; gap:11px; }
+      .rv-card { background:#fff; border:1px solid #E7EDF5; border-radius:16px; padding:13px 15px; box-shadow:0 12px 28px rgba(15,23,42,.08); display:flex; gap:11px; }
+      .rc-av { width:38px; height:38px; border-radius:50%; flex-shrink:0; overflow:hidden; display:grid; place-items:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:14px; color:#fff; }
+      .rc-av img { width:100%; height:100%; object-fit:cover; }
+      .rc-top { display:flex; align-items:center; gap:7px; }
+      .rc-name { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:13.5px; }
+      .rc-badge { font-size:9.5px; color:#15803D; background:#DCFCE7; border-radius:999px; padding:2px 7px; font-weight:800; text-transform:uppercase; letter-spacing:.4px; }
+      .rc-stars { color:#F5B301; font-size:11px; letter-spacing:1px; margin-left:auto; }
+      .rc-quote { font-size:12.5px; color:#475569; line-height:1.45; margin-top:5px; }
+      .rs-title { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:27px; line-height:1.12; letter-spacing:-0.8px; margin-bottom:18px; }
+      .rs-row { display:flex; gap:14px; align-items:flex-start; padding:15px 0; border-top:1px solid #EEF2F7; }
+      .rs-row:first-of-type { border-top:none; padding-top:2px; }
+      .rs-ic { width:50px; height:50px; border-radius:15px; display:grid; place-items:center; font-size:23px; flex-shrink:0; }
+      .rs-h { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; letter-spacing:-0.3px; }
+      .rs-s { font-size:13px; color:#64748B; line-height:1.45; margin-top:3px; }
+      </style>
+      <div class="screen intro is-active" id="screen-intro" data-screen="intro" data-step="1" data-name="Why Shop Local">
+        <div class="status-bar" style="position:absolute;top:0;left:0;right:0;z-index:6;"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="ip-brand"><span class="wordmark"></span></div>
+
+        <!-- Slide 1 · reviews + real people -->
+        <div class="intro-panel rv on" data-panel="1">
+          <div class="ip-adv" data-introto="2"></div>
+          <button class="ip-skip" data-goto="welcome">Skip</button>
+          <div class="rv-wrap">
+            <div class="rv-eyebrow">Residents love Shop Local</div>
+            <div class="rv-stars">★★★★★</div>
+            <div class="rv-huge">120,000+<small>five-star reviews</small></div>
+            <div class="rv-cards">
+              <div class="rv-card">
+                <div class="rc-av"><img src="maddie.jpg" alt=""></div>
+                <div>
+                  <div class="rc-top"><span class="rc-name">Maddie R.</span><span class="rc-badge">Verified</span><span class="rc-stars">★★★★★</span></div>
+                  <div class="rc-quote">“I've earned back almost $400 this year just paying rent and buying groceries. It's wild.”</div>
+                </div>
+              </div>
+              <div class="rv-card">
+                <div class="rc-av" style="background:#2563EB;">J</div>
+                <div>
+                  <div class="rc-top"><span class="rc-name">James T.</span><span class="rc-badge">Verified</span><span class="rc-stars">★★★★★</span></div>
+                  <div class="rc-quote">“Linked my Visa in 30 seconds and the credits just show up. Feels like free money.”</div>
+                </div>
               </div>
             </div>
           </div>
-          <div style="padding: 0 4px;">
-            <button class="btn btn-primary" data-goto="link">Get started</button>
-            <a class="link-txt" data-goto="home">Already a member? <b>Log in</b></a>
+        </div>
+
+        <!-- Slide 2 · three reasons -->
+        <div class="intro-panel rs" data-panel="2">
+          <div class="ip-adv" data-goto="welcome"></div>
+          <div class="rs-wrap">
+            <div class="rs-eyebrow">Why residents love it</div>
+            <div class="rs-title">Three reasons to<br>link your card</div>
+            <div class="rs-row">
+              <div class="rs-ic" style="background:#DBEAFE;">🏡</div>
+              <div><div class="rs-h">Earn on home + local spending</div><div class="rs-s">1% back on rent and up to 5% back on everyday local spending — as Shop Local Credits.</div></div>
+            </div>
+            <div class="rs-row">
+              <div class="rs-ic" style="background:#DCFCE7;">💳</div>
+              <div><div class="rs-h">Link your Visa in seconds</div><div class="rs-s">No new card, no change to how you pay. Keep using your Visa — the rewards just show up.</div></div>
+            </div>
+            <div class="rs-row">
+              <div class="rs-ic" style="background:#EDE9FE;">✨</div>
+              <div><div class="rs-h">Everyday concierge</div><div class="rs-s">Order food, book home services, and redeem credits on what you already buy — just ask Maddie.</div></div>
+            </div>
           </div>
+        </div>
+
+        <div class="ip-dots">
+          <span class="d on" data-introto="1"></span><span class="d" data-introto="2"></span>
+        </div>
+        <div class="ip-cta"><button class="btn btn-primary" data-goto="welcome">Get started</button></div>
+      </div>
+
+      <!-- ══════════ 2 · WELCOME ══════════ -->
+      <div class="screen wv2" data-screen="welcome" data-step="2" data-name="Welcome">
+        <img class="wv2-photo" src="app-home-hero.png" alt="Earn on rent and everyday life">
+        <div class="status-bar wv2-status"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
+        <div class="wv2-foot">
+          <div class="wv2-brandfoot"><span class="wordmark"></span></div>
+          <button class="btn btn-primary" data-goto="link">Get started</button>
+          <a class="link-txt wv2-login" data-goto="home">Already a member? <b>Log in</b></a>
         </div>
       </div>
 
@@ -1009,7 +1157,7 @@
           <div class="sec-head" style="margin-top:14px;"><h3>Pay with</h3></div>
           <div class="pay-method">
             <div class="pm-card"><div style="color:#fff;font-family:'Plus Jakarta Sans';font-weight:800;font-size:8px;">SL</div></div>
-            <div class="pm-meta"><div class="n">amenify+ Visa</div><div class="s">•••• 4242 · earns 5% back</div></div>
+            <div class="pm-meta"><div class="n">Shop Local · linked Visa</div><div class="s">•••• 4242 · earns 5% back</div></div>
             <div class="pm-chg">Change</div>
           </div>
 
@@ -1630,27 +1778,28 @@
 
   <div class="thumbs-wrap">
     <div class="thumbs">
-      <div class="thumb is-active" data-goto="welcome"><span class="tnum">1</span> Welcome</div>
-      <div class="thumb" data-goto="link"><span class="tnum">2</span> Link card</div>
-      <div class="thumb" data-goto="set"><span class="tnum">3</span> All set</div>
-      <div class="thumb" data-goto="home"><span class="tnum">4</span> Home</div>
-      <div class="thumb" data-goto="spend"><span class="tnum">5</span> Ways to spend</div>
-      <div class="thumb" data-goto="use"><span class="tnum">6</span> Ways to use</div>
-      <div class="thumb" data-goto="food"><span class="tnum">7</span> Food browse</div>
-      <div class="thumb" data-goto="order"><span class="tnum">8</span> Restaurant</div>
-      <div class="thumb" data-goto="checkout"><span class="tnum">9</span> Checkout</div>
-      <div class="thumb" data-goto="confirm"><span class="tnum">10</span> Confirmed</div>
-      <div class="thumb" data-goto="walmart"><span class="tnum">11</span> Walmart</div>
-      <div class="thumb" data-goto="chevron"><span class="tnum">12</span> Chevron</div>
-      <div class="thumb" data-goto="cvs"><span class="tnum">13</span> CVS Home</div>
-      <div class="thumb" data-goto="cvsstore"><span class="tnum">14</span> CVS Store</div>
-      <div class="thumb" data-goto="maddie"><span class="tnum">15</span> Maddie</div>
-      <div class="thumb" data-goto="wallet"><span class="tnum">16</span> Wallet</div>
-      <div class="thumb" data-goto="lock-rent"><span class="tnum">17</span> 🔔 Rent drop</div>
-      <div class="thumb" data-goto="lock-walmart"><span class="tnum">18</span> 🔔 Walmart</div>
-      <div class="thumb" data-goto="lock-geo"><span class="tnum">19</span> 🔔 Nearby</div>
-      <div class="thumb" data-goto="lock-credits"><span class="tnum">20</span> 🔔 Move-in</div>
-      <div class="thumb" data-goto="lock-pet"><span class="tnum">21</span> 🔔 Pet</div>
+      <div class="thumb is-active" data-goto="intro"><span class="tnum">1</span> Why Shop Local</div>
+      <div class="thumb" data-goto="welcome"><span class="tnum">2</span> Welcome</div>
+      <div class="thumb" data-goto="link"><span class="tnum">3</span> Link card</div>
+      <div class="thumb" data-goto="set"><span class="tnum">4</span> All set</div>
+      <div class="thumb" data-goto="home"><span class="tnum">5</span> Home</div>
+      <div class="thumb" data-goto="spend"><span class="tnum">6</span> Ways to spend</div>
+      <div class="thumb" data-goto="use"><span class="tnum">7</span> Ways to use</div>
+      <div class="thumb" data-goto="food"><span class="tnum">8</span> Food browse</div>
+      <div class="thumb" data-goto="order"><span class="tnum">9</span> Restaurant</div>
+      <div class="thumb" data-goto="checkout"><span class="tnum">10</span> Checkout</div>
+      <div class="thumb" data-goto="confirm"><span class="tnum">11</span> Confirmed</div>
+      <div class="thumb" data-goto="walmart"><span class="tnum">12</span> Walmart</div>
+      <div class="thumb" data-goto="chevron"><span class="tnum">13</span> Chevron</div>
+      <div class="thumb" data-goto="cvs"><span class="tnum">14</span> CVS Home</div>
+      <div class="thumb" data-goto="cvsstore"><span class="tnum">15</span> CVS Store</div>
+      <div class="thumb" data-goto="maddie"><span class="tnum">16</span> Maddie</div>
+      <div class="thumb" data-goto="wallet"><span class="tnum">17</span> Wallet</div>
+      <div class="thumb" data-goto="lock-rent"><span class="tnum">18</span> 🔔 Rent drop</div>
+      <div class="thumb" data-goto="lock-walmart"><span class="tnum">19</span> 🔔 Walmart</div>
+      <div class="thumb" data-goto="lock-geo"><span class="tnum">20</span> 🔔 Nearby</div>
+      <div class="thumb" data-goto="lock-credits"><span class="tnum">21</span> 🔔 Move-in</div>
+      <div class="thumb" data-goto="lock-pet"><span class="tnum">22</span> 🔔 Pet</div>
     </div>
   </div>
 
@@ -1662,7 +1811,7 @@
 (function(){
   const screens = Array.from(document.querySelectorAll('.screen'));
   const thumbs = Array.from(document.querySelectorAll('.thumb'));
-  const order = ['welcome','link','set','home','spend','use','food','order','checkout','confirm','walmart','chevron','cvs','cvsstore','maddie','wallet','lock-rent','lock-walmart','lock-geo','lock-credits','lock-pet'];
+  const order = ['intro','welcome','link','set','home','spend','use','food','order','checkout','confirm','walmart','chevron','cvs','cvsstore','maddie','wallet','lock-rent','lock-walmart','lock-geo','lock-credits','lock-pet'];
   const curNumEl = document.getElementById('cur-num');
   const curNameEl = document.getElementById('cur-name');
   const prevBtn = document.getElementById('prev');
@@ -1688,8 +1837,17 @@
     runCountups(target);
     runProgress(target);
     if (name === 'confirm') celebrate(target);
+    if (name === 'intro') introTo(1);
     updateNav(name);
   }
+
+  window.introTo = function(n){
+    const scr = document.getElementById('screen-intro');
+    if(!scr) return;
+    scr.querySelectorAll('.intro-panel').forEach(p => p.classList.toggle('on', +p.dataset.panel === n));
+    scr.querySelectorAll('.ip-dots .d').forEach((d,i) => d.classList.toggle('on', i === n-1));
+    const dots = scr.querySelector('.ip-dots'); if(dots) dots.style.color = '#0F172A';
+  };
 
   function updateNav(name) {
     const idx = order.indexOf(name);
@@ -1709,6 +1867,8 @@
 
   document.querySelectorAll('.phone .screen').forEach(screen => {
     screen.addEventListener('click', function(e){
+      const introEl = e.target.closest('[data-introto]');
+      if (introEl) { e.preventDefault(); e.stopPropagation(); introTo(+introEl.dataset.introto); return; }
       const hot = e.target.closest('[data-goto]');
       if (hot) {
         e.preventDefault(); e.stopPropagation();
@@ -1725,7 +1885,7 @@
 
   prevBtn.addEventListener('click', () => { const cur = getActive().dataset.screen; const idx = order.indexOf(cur); if (idx > 0) go(order[idx-1]); });
   nextBtn.addEventListener('click', () => { const cur = getActive().dataset.screen; const idx = order.indexOf(cur); if (idx < order.length - 1) go(order[idx+1]); });
-  restartBtn.addEventListener('click', () => go('welcome'));
+  restartBtn.addEventListener('click', () => go('intro'));
 
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight') nextBtn.click();
@@ -1790,6 +1950,7 @@
     return L.divIcon({ className:'', html:'<div class="pin-ico pin-'+kind+'" style="width:'+size+'px;height:'+size+'px;"></div>', iconSize:[size,size], iconAnchor:[size/2,size/2] });
   }
   function ensureMaps(target){
+    return; // Maps are now clean static SVG art (map-bg.svg). Leaflet disabled per design feedback.
     const el = target.querySelector('.lmap');
     if (!el || !el.id || !mapConfigs[el.id]) return;
     if (builtMaps[el.id]) { setTimeout(()=>builtMaps[el.id].invalidateSize(), 60); return; }
@@ -1870,7 +2031,7 @@
     render();
   })();
 
-  updateNav('welcome');
+  go('intro');
   (function(){ const first = getActive(); if (first){ ensureMaps(first); runCountups(first); runProgress(first); } })();
 })();
 </script>
