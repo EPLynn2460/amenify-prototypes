@@ -93,6 +93,87 @@
   .step-indicator .num { color: var(--loft-purple-dark); font-style: italic; }
   .step-indicator .star { color: var(--loft-orange); margin-left: 4px; }
 
+  /* ══════════ ADDED v2: Activity · Profile · Lock screens · CVS ══════════ */
+  /* ── Activity / Shop Local Cash ledger ── */
+  .act-hero { background:linear-gradient(135deg,var(--loft-purple) 0%,var(--loft-purple-dark) 100%); border-radius:20px; padding:18px 18px 16px; color:#fff; box-shadow:var(--shadow-md); }
+  .act-hero .ah-lab { font-size:12px; opacity:.9; font-weight:600; }
+  .act-hero .ah-amt { font-family:'DM Serif Display',serif; font-size:38px; line-height:1.1; margin-top:2px; }
+  .act-hero .ah-amt .heart { font-size:24px; }
+  .act-hero .ah-sub { font-size:11.5px; opacity:.85; margin-top:4px; }
+  .act-hero .ah-mini { display:flex; gap:10px; margin-top:14px; }
+  .act-hero .ah-mini .m { flex:1; background:rgba(255,255,255,.16); border-radius:12px; padding:9px 11px; }
+  .act-hero .ah-mini .ml { font-size:10px; opacity:.85; font-weight:600; text-transform:uppercase; letter-spacing:.4px; }
+  .act-hero .ah-mini .mv { font-size:16px; font-weight:800; margin-top:2px; }
+  .act-filters { display:flex; gap:8px; margin:16px 0 2px; }
+  .act-chip { padding:7px 14px; border-radius:999px; font-size:12.5px; font-weight:700; background:#fff; border:1px solid var(--loft-line-strong); color:var(--loft-muted); cursor:pointer; }
+  .act-chip.active { background:var(--loft-ink); color:#fff; border-color:var(--loft-ink); }
+  .act-day { font-size:12px; font-weight:700; color:var(--loft-faint); text-transform:uppercase; letter-spacing:.5px; margin:16px 2px 4px; }
+  .act-row { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--loft-line); }
+  .act-ic { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; font-size:20px; flex-shrink:0; background:var(--loft-lavender-soft); }
+  .act-ic.earn { background:#E7F7F0; }
+  .act-tx { flex:1; }
+  .act-tx .t { font-weight:600; font-size:14px; }
+  .act-tx .s { font-size:11.5px; color:var(--loft-muted); margin-top:1px; }
+  .act-amt { font-weight:800; font-size:15px; white-space:nowrap; }
+  .act-amt.earn { color:var(--loft-success); }
+  .act-amt.spend { color:var(--loft-ink); }
+
+  /* ── Profile ── */
+  .pf-head { display:flex; align-items:center; gap:14px; margin-top:6px; }
+  .pf-av { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--loft-purple),var(--loft-purple-dark)); color:#fff; display:grid; place-items:center; font-family:'DM Serif Display',serif; font-size:26px; box-shadow:var(--shadow-md); flex-shrink:0; }
+  .pf-name { font-family:'DM Serif Display',serif; font-size:22px; }
+  .pf-sub { font-size:12.5px; color:var(--loft-muted); margin-top:2px; }
+  .pf-badges { display:flex; gap:8px; margin-top:14px; }
+  .pf-badge { flex:1; background:#fff; border:1px solid var(--loft-line); border-radius:14px; padding:12px 8px; text-align:center; box-shadow:var(--shadow-sm); }
+  .pf-badge .v { font-family:'DM Serif Display',serif; font-size:18px; color:var(--loft-purple-dark); }
+  .pf-badge .l { font-size:10.5px; color:var(--loft-muted); margin-top:2px; font-weight:600; }
+  .pf-section { font-size:12px; font-weight:700; color:var(--loft-faint); text-transform:uppercase; letter-spacing:.5px; margin:18px 2px 8px; }
+  .pf-list { background:#fff; border:1px solid var(--loft-line); border-radius:16px; overflow:hidden; box-shadow:var(--shadow-sm); }
+  .pf-item { display:flex; align-items:center; gap:13px; padding:14px 15px; border-bottom:1px solid var(--loft-line); cursor:pointer; }
+  .pf-item:last-child { border-bottom:none; }
+  .pf-item .pi-ic { width:34px; height:34px; border-radius:9px; background:var(--loft-lavender-soft); display:grid; place-items:center; flex-shrink:0; }
+  .pf-item .pi-t { flex:1; font-weight:600; font-size:14px; }
+  .pf-item .pi-s { font-size:11px; color:var(--loft-muted); font-weight:500; margin-top:1px; }
+  .pf-item .pi-chev { color:var(--loft-faint); }
+  .pf-signout { text-align:center; color:var(--loft-danger); font-weight:700; font-size:14px; padding:16px; cursor:pointer; }
+
+  /* ── CVS flow (reuses fd-* / go-* / cta-dock; CVS-red accents) ── */
+  .cvs-hero2 { background:linear-gradient(135deg,#E23B3B 0%,#9E0303 100%); border-radius:20px; padding:20px; color:#fff; box-shadow:var(--shadow-md); }
+  .cvs-hero2 .ch-brand { font-weight:800; font-size:30px; letter-spacing:-1px; display:flex; align-items:center; gap:8px; }
+  .cvs-hero2 .ch-heart { font-size:22px; }
+  .cvs-hero2 .ch-back { margin-top:12px; font-size:16px; font-weight:600; }
+  .cvs-hero2 .ch-back .ch-num { font-family:'DM Serif Display',serif; font-size:22px; }
+  .cvs-hero2 .ch-sub { font-size:12px; opacity:.92; margin-top:6px; line-height:1.42; }
+  .cvs-th { background:#FDE8E8 !important; }
+  .cvs-badge { background:#FDE8E8 !important; color:#B00404 !important; }
+  .cvs-btn { background:#CC0000 !important; color:#fff !important; border-color:#CC0000 !important; }
+  .cvs-earn-ic { background:#CC0000 !important; }
+
+  /* ── Lock screens (push notifications) — LOFT lavender ── */
+  .screen.lockscreen { position:relative; background:
+      radial-gradient(115% 75% at 22% 10%, rgba(139,92,246,.60) 0%, transparent 55%),
+      radial-gradient(120% 85% at 88% 18%, rgba(248,200,216,.42) 0%, transparent 55%),
+      radial-gradient(150% 100% at 55% 108%, rgba(245,162,79,.40) 0%, transparent 58%),
+      linear-gradient(165deg,#191033 0%,#2A1E52 42%,#5B3AA6 78%,#7C4E8E 100%); }
+  .screen.lockscreen::after { content:''; position:absolute; inset:0; z-index:0; pointer-events:none; background:radial-gradient(125% 120% at 50% 38%, transparent 52%, rgba(0,0,0,.40) 100%); }
+  .lock-body { position:relative; z-index:1; height:100%; color:#fff; }
+  .lock-date { text-align:center; font-size:15.5px; font-weight:600; color:rgba(255,255,255,.95); margin-top:30px; letter-spacing:.3px; text-shadow:0 1px 12px rgba(0,0,0,.28); }
+  .lock-time { text-align:center; font-family:'DM Serif Display',serif; font-weight:400; font-size:78px; line-height:.96; letter-spacing:-2px; margin-top:2px; text-shadow:0 3px 30px rgba(0,0,0,.34); }
+  .lock-notifs { position:absolute; left:11px; right:11px; bottom:120px; display:flex; flex-direction:column; }
+  .lock-stack { height:20px; margin:0 15px -12px; border-radius:22px; background:rgba(242,240,255,.5); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,.25); }
+  .lock-stack.two { margin:0 27px -12px; height:18px; background:rgba(242,240,255,.32); }
+  .lnotif { background:rgba(250,248,255,.66); -webkit-backdrop-filter:blur(22px) saturate(150%); backdrop-filter:blur(22px) saturate(150%); border-radius:23px; padding:14px 15px; color:var(--loft-ink); box-shadow:0 16px 40px rgba(0,0,0,.30); border:1px solid rgba(255,255,255,.42); cursor:pointer; position:relative; z-index:2; }
+  .lnotif .ln-head { display:flex; align-items:center; gap:9px; margin-bottom:7px; }
+  .lnotif .ln-ic { width:30px; height:30px; border-radius:8px; background:var(--loft-purple); color:#fff; display:grid; place-items:center; font-family:'DM Serif Display',serif; font-size:12px; font-weight:700; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,.2); letter-spacing:-.3px; }
+  .lnotif .ln-app { font-size:11px; font-weight:800; color:#4A3B6B; text-transform:uppercase; letter-spacing:.6px; flex:1; }
+  .lnotif .ln-time { font-size:11.5px; color:#9B8FB5; font-weight:500; }
+  .lnotif .ln-title { font-weight:800; font-size:15px; line-height:1.28; margin-bottom:3px; letter-spacing:-0.2px; color:#1A1233; }
+  .lnotif .ln-body { font-size:12.5px; color:#54486B; line-height:1.42; }
+  .lnotif .ln-cta { margin-top:10px; font-size:12px; font-weight:800; color:var(--loft-purple-dark); }
+  .lock-bottom { position:absolute; left:0; right:0; bottom:52px; display:flex; align-items:center; justify-content:space-between; padding:0 34px; z-index:1; }
+  .lock-btn { width:48px; height:48px; border-radius:50%; background:rgba(0,0,0,.28); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); display:grid; place-items:center; font-size:20px; color:#fff; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); }
+  .lock-handle { position:absolute; left:50%; bottom:11px; transform:translateX(-50%); width:130px; height:5px; border-radius:3px; background:rgba(255,255,255,.7); z-index:1; }
+
   /* ─────────── Phone stage ─────────── */
   .phone-stage {
     display: grid; place-items: center;
@@ -1245,6 +1326,65 @@
   .go-step .gs-text strong { color: var(--loft-ink); }
   .go-link-note { text-align: center; font-size: 12px; margin-top: 12px; }
   .go-link-note a { color: var(--loft-purple-dark); font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--loft-purple-dark); }
+
+  /* Shared burger photo — drops in from _shared/food-photos/burger.jpg; gradient fallback if absent */
+  .fd-rest-img.g1, .fd-menu-hero, .fd-item-hero, .om-pop .op-thumb.food, .fd-qtile .ic.g-food {
+    background-image: url('../../_shared/food-photos/balboa_cafe_burger.jpeg'), linear-gradient(135deg,#F8C8D8,#F5A24F) !important;
+    background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
+    color: transparent;
+  }
+  .burger-thumb {
+    background-image: url('../../_shared/food-photos/balboa_cafe_burger.jpeg') !important;
+    background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;
+    color: transparent;
+  }
+
+  /* ─────────── Walmart double-dip flow ─────────── */
+  .wm-img { background: linear-gradient(135deg,#0071DC,#004F9A) !important; }
+  .wm-logo-lg { display: inline-flex; align-items: center; gap: 8px; }
+  .wm-word-lg { font-weight: 800; font-size: 26px; color: #FFF; letter-spacing: -.5px; }
+
+  .wm-hero { background: linear-gradient(135deg,#0071DC,#0a4fa0); border-radius: 20px; padding: 18px 18px 20px; color: #FFF; box-shadow: var(--shadow-md); margin-bottom: 14px; }
+  .wm-hero-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .wm-spark { display: inline-flex; }
+  .wm-word { font-weight: 800; font-size: 22px; letter-spacing: -.5px; display: inline-flex; align-items: center; gap: 6px; }
+  .wm-word.sm { font-size: 16px; color: var(--loft-ink); }
+  .wm-hero-back { font-family: 'DM Serif Display', serif; font-size: 22px; line-height: 1.15; }
+  .wm-hero-back .wm-num { color: #FFC220; font-size: 40px; display: inline-block; margin-right: 4px; }
+  .wm-hero-sub { font-size: 12px; line-height: 1.45; margin-top: 8px; color: rgba(255,255,255,.92); max-width: 94%; }
+
+  .wm-dip { background: #FFF; border: 1px solid var(--loft-lavender-line); border-radius: 18px; padding: 14px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+  .wm-dip-title { font-size: 12px; font-weight: 800; color: var(--loft-purple-dark); margin-bottom: 10px; }
+  .wm-dip-row { display: flex; align-items: center; gap: 11px; }
+  .wm-dip-ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 12px; color: #FFF; flex-shrink: 0; letter-spacing: -.3px; }
+  .wm-dip-ic.sl { background: var(--loft-purple); }
+  .wm-dip-ic.visa { background: #1A1F71; font-size: 9px; }
+  .wm-dip-txt { flex: 1; min-width: 0; }
+  .wm-dip-txt .t { font-weight: 700; font-size: 12.5px; }
+  .wm-dip-txt .s { font-size: 10.5px; color: var(--loft-muted); line-height: 1.35; margin-top: 2px; }
+  .wm-dip-amt { font-weight: 800; font-size: 13px; color: var(--loft-purple-dark); white-space: nowrap; }
+  .wm-dip-plus { text-align: center; font-size: 16px; font-weight: 800; color: var(--loft-lavender-line); margin: 4px 0; }
+
+  .wm-btn { background: #0071DC; color: #FFF; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .wm-btn .wm-spark svg { display: block; }
+
+  .wm-search { display: flex; align-items: center; gap: 8px; background: #FFF; border: 1px solid var(--loft-line-strong); border-radius: 999px; padding: 10px 14px; font-size: 12.5px; color: var(--loft-faint); margin-bottom: 10px; }
+  .wm-search svg { width: 15px; height: 15px; color: var(--loft-muted); }
+  .wm-badge { background: var(--loft-lavender-soft); margin: 0 0 12px; }
+  .wm-th { background: #EAF3FC !important; }
+  .wm-spark.xs { display: inline-flex; vertical-align: middle; }
+
+  .go-visa-row.flush { margin-bottom: 0; border: none; padding: 4px 0 0; }
+
+  .wm-earn { background: linear-gradient(135deg,var(--loft-lavender-soft),#FFF); border: 1px solid var(--loft-lavender-line); border-radius: 16px; padding: 13px 14px; margin-bottom: 14px; }
+  .wm-earn-title { font-size: 12px; font-weight: 800; color: var(--loft-purple-dark); margin-bottom: 9px; }
+  .wm-earn-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 0; }
+  .wm-earn-lab { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--loft-ink-2); }
+  .wm-earn-ic { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-weight: 800; font-size: 9px; color: #FFF; flex-shrink: 0; }
+  .wm-earn-ic.sl { background: var(--loft-purple); }
+  .wm-earn-ic.visa { background: #1A1F71; }
+  .wm-earn-val { font-weight: 800; font-size: 12.5px; color: var(--loft-success); white-space: nowrap; }
+  .wm-earn-val.muted { color: var(--loft-muted); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -1448,7 +1588,7 @@
           <div class="fd-quick-head">Shop &amp; earn Shop Local Cash 💜</div>
           <div class="fd-quick3">
             <div class="fd-qtile" data-goto="food">
-              <div class="ic g-food">🍔</div>
+              <div class="ic g-food"></div>
               <div class="nm">Food</div>
               <div class="sb">5% back</div>
             </div>
@@ -1487,8 +1627,8 @@
           <div class="tab active" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M14 20c0-2 2-4 5-4s4 1.5 4 4"/></svg>Community</div>
           <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
-          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
-          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+          <div class="tab" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+          <div class="tab" data-goto="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
         <div class="reveal-banner">Tap a highlighted area to continue</div>
       </div>
@@ -1537,8 +1677,8 @@
           <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
           <div class="tab active" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
-          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
-          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+          <div class="tab" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+          <div class="tab" data-goto="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
         <div class="reveal-banner">Tap a highlighted area to continue</div>
       </div>
@@ -1818,8 +1958,8 @@
               <div class="ws-lab">Your Savings</div>
               <div class="ws-amt">$889.89</div>
             </div>
-            <div class="ws-item">
-              <div class="ws-lab">Shop Local Cash</div>
+            <div class="ws-item" data-goto="activity" style="cursor:pointer">
+              <div class="ws-lab">Shop Local Cash · View ›</div>
               <div class="ws-amt purple"><span class="heart">💜</span>$44.00</div>
             </div>
           </div>
@@ -1858,10 +1998,10 @@
               <div class="st-name">Food / Grocery</div>
               <div class="st-meta">Delivery &amp; Pickup</div>
             </div>
-            <div class="service-tile s-orange" data-goto="home">
-              <div class="st-icon-wrap"><span class="st-icon">🛍️</span></div>
-              <div class="st-name">Online Shopping</div>
-              <div class="st-meta">Shop top home<br/>products</div>
+            <div class="service-tile s-orange" data-goto="cvs">
+              <div class="st-icon-wrap"><span class="st-icon">💊</span></div>
+              <div class="st-name">CVS Pharmacy</div>
+              <div class="st-meta">2% back in<br/>Shop Local Cash</div>
             </div>
             <div class="service-tile s-blue" data-goto="home">
               <div class="st-icon-wrap"><span class="st-icon">🔧</span></div>
@@ -1900,7 +2040,7 @@
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
           <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
           <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
-          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+          <div class="tab" data-goto="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
         <div class="reveal-banner">Tap "Link a card" to continue</div>
       </div>
@@ -2248,7 +2388,7 @@
             <div class="om-pin" style="top:60%;left:58%"><div class="om-chip">🍕</div><div class="om-dot"></div></div>
             <div class="om-pin" style="top:54%;left:18%"><div class="om-chip">🥗</div><div class="om-dot"></div></div>
             <div class="om-pop" data-goto="menu">
-              <div class="op-thumb food">🍔</div>
+              <div class="op-thumb food"></div>
               <div><div class="op-name">Balboa Cafe</div><div class="op-sub">American (new) · ★ 4.8 · 0.4 mi · Free delivery</div></div>
               <div class="op-go"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
             </div>
@@ -2266,7 +2406,7 @@
           <div class="fd-section-title">Popular near you</div>
 
           <div class="fd-rest-card" data-goto="menu">
-            <div class="fd-rest-img g1">🍔
+            <div class="fd-rest-img g1">
               <span class="fd-feat">💜 SHOP LOCAL</span>
               <div class="fd-heart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z"/></svg></div>
             </div>
@@ -2293,13 +2433,43 @@
               <div class="fd-tags"><span>Free delivery</span><span>5% Shop Local Cash</span></div>
             </div>
           </div>
+
+          <div class="fd-section-title">Grocery &amp; essentials</div>
+
+          <div class="fd-rest-card wm-entry" data-goto="walmart">
+            <div class="fd-rest-img wm-img">
+              <span class="fd-feat">💜 DOUBLE-DIP</span>
+              <span class="wm-logo-lg">
+                <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+                  <g fill="#FFC220"><circle cx="12" cy="12" r="2.4"/>
+                    <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9"/>
+                    <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9"/>
+                    <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9" transform="rotate(60 12 12)"/>
+                    <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9" transform="rotate(60 12 12)"/>
+                    <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9" transform="rotate(120 12 12)"/>
+                    <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9" transform="rotate(120 12 12)"/>
+                  </g>
+                </svg>
+                <span class="wm-word-lg">Walmart</span>
+              </span>
+              <div class="fd-heart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.4 12 21 12 21z"/></svg></div>
+            </div>
+            <div class="fd-rest-body">
+              <div class="fd-rest-row">
+                <div class="fd-rest-name">Walmart</div>
+                <div class="fd-rest-rating"><span class="star">★</span> 4.6 <span class="ct">(9,540)</span></div>
+              </div>
+              <div class="fd-rest-sub">Groceries &amp; essentials · 1.2 mi · Delivery in 1 hr</div>
+              <div class="fd-tags"><span>2% back in SL Credits</span><span>+ linked Visa cash back</span></div>
+            </div>
+          </div>
         </div>
         <nav class="tabbar">
           <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
           <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
           <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>Order</div>
-          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+          <div class="tab" data-goto="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
         <div class="reveal-banner">Tap a restaurant to view the menu</div>
       </div>
@@ -2319,7 +2489,7 @@
             <div class="fd-back" data-goto="food"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
             <div class="fd-title"><h2>Balboa Cafe</h2></div>
           </div>
-          <div class="fd-menu-hero">🍔<span class="fd-feat">💜 SHOP LOCAL</span></div>
+          <div class="fd-menu-hero"><span class="fd-feat">💜 SHOP LOCAL</span></div>
           <div class="fd-rest-head">
             <div class="fd-rest-meta"><span class="star">★ 4.8</span><span class="dot">·</span><span>American (new)</span><span class="dot">·</span><span>Free delivery</span><span class="dot">·</span><span>25–40 min</span></div>
             <div class="fd-localbadge"><span>💜</span> Earn 5% Shop Local Cash on this order</div>
@@ -2335,7 +2505,7 @@
           <div class="fd-menu-cat">Lunch — Entrees</div>
 
           <div class="fd-item" data-goto="item">
-            <div class="fd-item-thumb">🍔</div>
+            <div class="fd-item-thumb burger-thumb"></div>
             <div class="fd-item-info">
               <div class="fd-item-name">Balboa Burger on a Baguette</div>
               <div class="fd-item-desc">Butter lettuce, housemade pickles and onions, shoestring fries</div>
@@ -2395,7 +2565,7 @@
             <div class="fd-x" data-goto="menu"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
             <div class="fd-title"></div>
           </div>
-          <div class="fd-item-hero">🍔</div>
+          <div class="fd-item-hero"></div>
           <div class="fd-item-title">Balboa Burger on a Baguette</div>
           <div class="fd-item-fulldesc">Butter lettuce, housemade pickles and onions, shoestring fries.</div>
           <div class="fd-item-base">$16.50 base price</div>
@@ -2436,7 +2606,7 @@
           <div class="fd-cart-from">From <strong>Balboa Cafe</strong> · Delivery</div>
 
           <div class="fd-cart-line">
-            <div class="fd-cl-thumb">🍔</div>
+            <div class="fd-cl-thumb burger-thumb"></div>
             <div class="fd-cl-info">
               <div class="fd-cl-name">Balboa Burger on a Baguette</div>
               <div class="fd-cl-each">Qty 1 · $16.50 each</div>
@@ -2724,7 +2894,7 @@
           <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
           <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
           <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 21v-6h6v6"/></svg>Order</div>
-          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+          <div class="tab" data-goto="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
         </nav>
         <div class="reveal-banner">Tap a pin or offer to see the Visa cash-back deal</div>
       </div>
@@ -2793,6 +2963,730 @@
         <div class="reveal-banner">Tap "Open in Google Maps" to navigate &amp; earn</div>
       </div>
 
+      <!-- ─────────── SCREEN 23: WALMART OFFER ─────────── -->
+      <div class="screen has-cta-dock" data-screen="walmart" data-name="Walmart ★" data-step="23">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="food"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><div class="eyebrow">Shop Local Credit offer 💜</div><h2>Groceries</h2></div>
+          </div>
+
+          <div class="wm-hero">
+            <div class="wm-hero-brand">
+              <span class="wm-spark">
+                <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+                  <g fill="#FFC220"><circle cx="12" cy="12" r="2.4"/>
+                    <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9"/>
+                    <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9"/>
+                    <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9" transform="rotate(60 12 12)"/>
+                    <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9" transform="rotate(60 12 12)"/>
+                    <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9" transform="rotate(120 12 12)"/>
+                    <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9" transform="rotate(120 12 12)"/>
+                  </g>
+                </svg>
+              </span>
+              <span class="wm-word">Walmart</span>
+            </div>
+            <div class="wm-hero-back"><span class="wm-num">2.0%</span> back on groceries</div>
+            <div class="wm-hero-sub">In Shop Local (SL) Credits — dropped straight into your LOFT wallet. Order online for delivery or pickup.</div>
+          </div>
+
+          <div class="wm-dip">
+            <div class="wm-dip-title">💜 Double-dip on every order</div>
+            <div class="wm-dip-row">
+              <div class="wm-dip-ic sl">SL</div>
+              <div class="wm-dip-txt"><div class="t">2.0% back in Shop Local Credits</div><div class="s">Earned on your Walmart order — spend it on anything in LOFT.</div></div>
+              <div class="wm-dip-amt">+2.0%</div>
+            </div>
+            <div class="wm-dip-plus">+</div>
+            <div class="wm-dip-row">
+              <div class="wm-dip-ic visa">VISA</div>
+              <div class="wm-dip-txt"><div class="t">Linked Visa® card rewards</div><div class="s">Your card's own cash back stacks on top — automatically.</div></div>
+              <div class="wm-dip-amt">stacks</div>
+            </div>
+          </div>
+
+          <div class="go-visa-row">
+            <div class="gv-chip"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+            <div>
+              <div class="gv-name">Visa · ending in 1234</div>
+              <div class="gv-sub">Sarah Thompson</div>
+            </div>
+            <span class="gv-tag">✓ Linked</span>
+          </div>
+
+          <div class="go-steps">
+            <div class="gs-title">How the 2% back works</div>
+            <div class="go-step"><div class="gs-num">1</div><div class="gs-text">Shop Walmart online right inside LOFT and check out with your <strong>linked Visa</strong>.</div></div>
+            <div class="go-step"><div class="gs-num">2</div><div class="gs-text"><strong>2% back</strong> posts to your wallet as Shop Local Credit within 24 hours.</div></div>
+            <div class="go-step"><div class="gs-num">3</div><div class="gs-text">Your Visa's own rewards land separately — that's the <strong>double-dip</strong>.</div></div>
+          </div>
+
+          <div class="go-link-note">Prefer to shop in person? <a href="javascript:void(0)" data-goto="gas">Find Walmart locations in the SL app →</a></div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn wm-btn" data-goto="walmartshop">
+            <span class="wm-spark sm">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <g fill="#FFC220"><circle cx="12" cy="12" r="2.4"/>
+                  <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9"/>
+                  <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9"/>
+                  <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9" transform="rotate(60 12 12)"/>
+                  <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9" transform="rotate(60 12 12)"/>
+                  <rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9" transform="rotate(120 12 12)"/>
+                  <rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9" transform="rotate(120 12 12)"/>
+                </g>
+              </svg>
+            </span>
+            Shop Walmart online · earn 2% back
+          </button>
+        </div>
+        <div class="reveal-banner">Tap "Shop Walmart online" to start your order</div>
+      </div>
+
+      <!-- ─────────── SCREEN 24: WALMART STOREFRONT ─────────── -->
+      <div class="screen has-cta-dock" data-screen="walmartshop" data-name="Walmart Shop" data-step="24">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="walmart"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title">
+              <div class="wm-word sm"><span class="wm-spark xs"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="#FFC220"><circle cx="12" cy="12" r="2.4"/><rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9"/><rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9"/><rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9" transform="rotate(60 12 12)"/><rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9" transform="rotate(60 12 12)"/><rect x="11.1" y="1.3" width="1.8" height="5.1" rx=".9" transform="rotate(120 12 12)"/><rect x="11.1" y="17.6" width="1.8" height="5.1" rx=".9" transform="rotate(120 12 12)"/></g></svg></span>Walmart</div>
+            </div>
+          </div>
+
+          <div class="wm-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Search Walmart groceries…</div>
+
+          <div class="fd-localbadge wm-badge"><span>💜</span> Earn 2% Shop Local Credit + linked Visa rewards</div>
+
+          <div class="fd-menu-cat">Your usual · reorder</div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb wm-th">🥛</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Great Value Whole Milk, 1 gal</div>
+              <div class="fd-item-desc">Grade A · fridge</div>
+              <div class="fd-item-price">$3.48</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb wm-th">🥚</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Eggs, Large Grade A, 12 ct</div>
+              <div class="fd-item-desc">Cage-free</div>
+              <div class="fd-item-price">$4.62</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb wm-th">🍌</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Bananas, bunch</div>
+              <div class="fd-item-desc">Fresh produce · ~2.5 lb</div>
+              <div class="fd-item-price">$1.54</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-menu-cat">Popular near you</div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb wm-th">🍞</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Great Value White Bread, 20 oz</div>
+              <div class="fd-item-desc">Bakery</div>
+              <div class="fd-item-price">$1.42</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb wm-th">🧻</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Angel Soft Toilet Paper, 12 rolls</div>
+              <div class="fd-item-desc">Household essentials</div>
+              <div class="fd-item-price">$11.97</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb wm-th">☕</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Folgers Classic Roast Coffee, 25.9 oz</div>
+              <div class="fd-item-desc">Pantry</div>
+              <div class="fd-item-price">$8.98</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn wm-btn" data-goto="walmartcheckout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 4h2l2.2 12.5a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L21 8H6"/></svg>
+            View cart · 6 items · $32.01
+          </button>
+        </div>
+        <div class="reveal-banner">Tap "View cart" to check out and earn your 2%</div>
+      </div>
+
+      <!-- ─────────── SCREEN 25: WALMART CHECKOUT ─────────── -->
+      <div class="screen has-cta-dock" data-screen="walmartcheckout" data-name="Walmart Checkout ★" data-step="25">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="walmartshop"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2>Checkout</h2></div>
+          </div>
+          <div class="fd-cart-from">From <strong>Walmart</strong> · Delivery · 6 items</div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg> Deliver to</div>
+            <div class="fd-input-grid">
+              <div class="fd-input full"><div class="fd-in-lab">Street address</div><div class="fd-in-val">3155 Broderick Street</div></div>
+              <div class="fd-input"><div class="fd-in-lab">Apt / Suite</div><div class="fd-in-val">01-36</div></div>
+              <div class="fd-input"><div class="fd-in-lab">Window</div><div class="fd-in-val">Today · 1 hr</div></div>
+            </div>
+          </div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg> Pay with</div>
+            <div class="go-visa-row flush">
+              <div class="gv-chip"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+              <div>
+                <div class="gv-name">Visa · ending in 1234</div>
+                <div class="gv-sub">Required to earn 2% back</div>
+              </div>
+              <span class="gv-tag">✓ Linked</span>
+            </div>
+          </div>
+
+          <div class="wm-earn">
+            <div class="wm-earn-title">💜 You'll double-dip on this order</div>
+            <div class="wm-earn-row"><span class="wm-earn-lab"><span class="wm-earn-ic sl">SL</span> Shop Local Credit · 2% back</span><span class="wm-earn-val">+$0.64</span></div>
+            <div class="wm-earn-row"><span class="wm-earn-lab"><span class="wm-earn-ic visa">V</span> Linked Visa rewards</span><span class="wm-earn-val muted">stacks on top</span></div>
+          </div>
+
+          <div class="fd-slc-card">
+            <div class="fd-slc-top">
+              <div class="fd-slc-lab">
+                <span class="heart">💜</span>
+                <div><div class="t">Apply Shop Local Credit</div><div class="s">$50.00 available in LOFT wallet</div></div>
+              </div>
+              <div class="fd-switch" id="wm-slc-switch"></div>
+            </div>
+            <div class="fd-slc-applied" id="wm-slc-applied">−$10.00 applied · saves you $10 on this order</div>
+          </div>
+
+          <div class="fd-summary">
+            <div class="fd-row"><span>Subtotal · 6 items</span><span>$32.01</span></div>
+            <div class="fd-row"><span>Delivery</span><span class="free">Free</span></div>
+            <div class="fd-row"><span>Estimated tax</span><span>$2.72</span></div>
+            <div class="fd-row fd-credit" id="wm-credit-row"><span class="lab"><span class="heart">💜</span> Shop Local Credit</span><span id="wm-credit-amt">−$10.00</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row fd-total"><span>Total</span><span id="wm-total-line">$24.73</span></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn wm-btn" data-goto="track"><span id="wm-place-line">Place order · $24.73</span></button>
+        </div>
+        <div class="reveal-banner">$10 Shop Local Credit applied — you'll still earn 2% back on top</div>
+      </div>
+
+      <!-- ─────────── SCREEN 26: ACTIVITY (Shop Local Cash ledger) ─────────── -->
+      <div class="screen" data-screen="activity" data-name="Activity" data-step="26">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="wallet"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Activity</h2>
+          </div>
+          <div class="act-hero">
+            <div class="ah-lab"><span class="heart">💜</span> Shop Local Cash balance</div>
+            <div class="ah-amt">$44.00</div>
+            <div class="ah-sub">Earned on rent &amp; everyday spending · never expires</div>
+            <div class="ah-mini">
+              <div class="m"><div class="ml">Earned · May</div><div class="mv">+$54.00</div></div>
+              <div class="m"><div class="ml">Spent · May</div><div class="mv">−$20.00</div></div>
+            </div>
+          </div>
+          <div class="act-filters">
+            <div class="act-chip active" data-filter="all">All</div>
+            <div class="act-chip" data-filter="earn">Earned</div>
+            <div class="act-chip" data-filter="spend">Spent</div>
+          </div>
+
+          <div class="act-day">This week</div>
+          <div class="act-row" data-flt="earn">
+            <div class="act-ic earn">🏠</div>
+            <div class="act-tx"><div class="t">Rent payment · 2% back</div><div class="s">May 28 · $2,105 rent</div></div>
+            <div class="act-amt earn">+$42.10</div>
+          </div>
+          <div class="act-row" data-flt="spend">
+            <div class="act-ic">🛒</div>
+            <div class="act-tx"><div class="t">Walmart groceries</div><div class="s">May 27 · applied at checkout</div></div>
+            <div class="act-amt spend">−$10.00</div>
+          </div>
+          <div class="act-row" data-flt="earn">
+            <div class="act-ic earn">🍔</div>
+            <div class="act-tx"><div class="t">Balboa Cafe · 5% back</div><div class="s">May 26 · $18.77 order</div></div>
+            <div class="act-amt earn">+$0.94</div>
+          </div>
+
+          <div class="act-day">Earlier in May</div>
+          <div class="act-row" data-flt="spend">
+            <div class="act-ic">🧽</div>
+            <div class="act-tx"><div class="t">Cleaning · Anna C.</div><div class="s">May 20 · applied to booking</div></div>
+            <div class="act-amt spend">−$10.00</div>
+          </div>
+          <div class="act-row" data-flt="earn">
+            <div class="act-ic earn">⛽</div>
+            <div class="act-tx"><div class="t">Chevron gas · 25¢/gal back</div><div class="s">May 18 · 11.4 gal</div></div>
+            <div class="act-amt earn">+$2.85</div>
+          </div>
+          <div class="act-row" data-flt="earn">
+            <div class="act-ic earn">🎁</div>
+            <div class="act-tx"><div class="t">Move-in welcome credit</div><div class="s">May 1 · Villa Verano 01-36</div></div>
+            <div class="act-amt earn">+$50.00</div>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab active" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+          <div class="tab" data-goto="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap a filter, or Back to return to your wallet</div>
+      </div>
+
+      <!-- ─────────── SCREEN 27: PROFILE ─────────── -->
+      <div class="screen" data-screen="profile" data-name="Profile" data-step="27">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="topbar">
+            <div class="back" data-goto="home"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <h2>Profile</h2>
+          </div>
+          <div class="pf-head">
+            <div class="pf-av">S</div>
+            <div>
+              <div class="pf-name">Sarah Thompson</div>
+              <div class="pf-sub">Villa Verano · Unit 01-36</div>
+            </div>
+          </div>
+          <div class="pf-badges">
+            <div class="pf-badge"><div class="v">⭐ Silver</div><div class="l">Status</div></div>
+            <div class="pf-badge"><div class="v">💜 $44.00</div><div class="l">Shop Local Cash</div></div>
+            <div class="pf-badge"><div class="v">$889</div><div class="l">Saved</div></div>
+          </div>
+
+          <div class="pf-section">Account</div>
+          <div class="pf-list">
+            <div class="pf-item">
+              <div class="pi-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/></svg></div>
+              <div><div class="pi-t">Personal info</div><div class="pi-s">Name, phone, email</div></div>
+              <div class="pi-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+            <div class="pf-item" data-goto="link">
+              <div class="pi-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg></div>
+              <div><div class="pi-t">Linked cards</div><div class="pi-s">Visa ····1234 · earns everywhere</div></div>
+              <div class="pi-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+            <div class="pf-item" data-goto="payments">
+              <div class="pi-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div>
+              <div><div class="pi-t">Payment accounts</div><div class="pi-s">Manage rent payment methods</div></div>
+              <div class="pi-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="pf-section">Rewards &amp; activity</div>
+          <div class="pf-list">
+            <div class="pf-item" data-goto="activity">
+              <div class="pi-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M4 7h13a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2h11"/><circle cx="16.5" cy="13" r="1.3" fill="#8B5CF6"/></svg></div>
+              <div><div class="pi-t">Shop Local Cash activity</div><div class="pi-s">See everything you've earned &amp; spent</div></div>
+              <div class="pi-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+            <div class="pf-item" data-goto="lock-rent">
+              <div class="pi-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M18 8A6 6 0 1 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+              <div><div class="pi-t">Notifications</div><div class="pi-s">Preview offers &amp; reminders</div></div>
+              <div class="pi-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+            <div class="pf-item">
+              <div class="pi-ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .9-1 1.7"/><circle cx="12" cy="17" r=".6" fill="#8B5CF6"/></svg></div>
+              <div><div class="pi-t">Help &amp; support</div><div class="pi-s">Concierge, FAQs, contact</div></div>
+              <div class="pi-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+          <div class="pf-signout">Sign out</div>
+        </div>
+        <nav class="tabbar">
+          <div class="tab" data-goto="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>Home</div>
+          <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="7" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></svg>Community</div>
+          <div class="tab" data-goto="payments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Payments</div>
+          <div class="tab" data-goto="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>Rewards</div>
+          <div class="tab active" data-goto="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</div>
+        </nav>
+        <div class="reveal-banner">Tap a row to explore, or use the tab bar</div>
+      </div>
+
+      <!-- ─────────── SCREEN 28: CVS OFFER ─────────── -->
+      <div class="screen has-cta-dock" data-screen="cvs" data-name="CVS ★" data-step="28">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="wallet"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><div class="eyebrow">Shop Local Cash offer 💜</div><h2>Pharmacy &amp; essentials</h2></div>
+          </div>
+
+          <div class="cvs-hero2">
+            <div class="ch-brand"><span class="ch-heart">♥</span> CVS</div>
+            <div class="ch-back"><span class="ch-num">2%</span> back on everything at CVS</div>
+            <div class="ch-sub">In Shop Local Cash — dropped straight into your LOFT wallet. Order online for delivery, or pick up at the CVS on Redwood Hwy.</div>
+          </div>
+
+          <div class="wm-dip">
+            <div class="wm-dip-title">💜 Double-dip on every order</div>
+            <div class="wm-dip-row">
+              <div class="wm-dip-ic sl">SL</div>
+              <div class="wm-dip-txt"><div class="t">2.0% back in Shop Local Cash</div><div class="s">Earned on your CVS order — spend it on anything in LOFT.</div></div>
+              <div class="wm-dip-amt">+2.0%</div>
+            </div>
+            <div class="wm-dip-plus">+</div>
+            <div class="wm-dip-row">
+              <div class="wm-dip-ic visa">VISA</div>
+              <div class="wm-dip-txt"><div class="t">Linked Visa® card rewards</div><div class="s">Your card's own cash back stacks on top — automatically.</div></div>
+              <div class="wm-dip-amt">stacks</div>
+            </div>
+          </div>
+
+          <div class="go-visa-row">
+            <div class="gv-chip"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+            <div>
+              <div class="gv-name">Visa · ending in 1234</div>
+              <div class="gv-sub">Sarah Thompson</div>
+            </div>
+            <span class="gv-tag">✓ Linked</span>
+          </div>
+
+          <div class="go-steps">
+            <div class="gs-title">How the 2% back works</div>
+            <div class="go-step"><div class="gs-num">1</div><div class="gs-text">Shop CVS online right inside LOFT and check out with your <strong>linked Visa</strong>.</div></div>
+            <div class="go-step"><div class="gs-num">2</div><div class="gs-text"><strong>2% back</strong> posts to your wallet as Shop Local Cash within 24 hours.</div></div>
+            <div class="go-step"><div class="gs-num">3</div><div class="gs-text">Need a refill? Send it to Maddie, your <strong>concierge</strong>, and she'll handle the rest.</div></div>
+          </div>
+
+          <div class="go-link-note">Prefer to pick up? <a href="javascript:void(0)" data-goto="gas">Find CVS locations near you →</a></div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn cvs-btn" data-goto="cvsshop">Shop CVS online · earn 2% back</button>
+        </div>
+        <div class="reveal-banner">Tap "Shop CVS online" to start your order</div>
+      </div>
+
+      <!-- ─────────── SCREEN 29: CVS STOREFRONT ─────────── -->
+      <div class="screen has-cta-dock" data-screen="cvsshop" data-name="CVS Shop" data-step="29">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="cvs"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2 style="color:#CC0000;">♥ CVS</h2></div>
+          </div>
+
+          <div class="wm-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Search CVS pharmacy &amp; health…</div>
+
+          <div class="fd-localbadge cvs-badge"><span>💜</span> Earn 2% Shop Local Cash + linked Visa rewards</div>
+
+          <div class="fd-menu-cat">Pharmacy &amp; wellness</div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb cvs-th">💊</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">CVS Health Ibuprofen, 200mg · 100 ct</div>
+              <div class="fd-item-desc">Pain relief</div>
+              <div class="fd-item-price">$8.49</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb cvs-th">🩹</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Band-Aid Flexible Fabric, 100 ct</div>
+              <div class="fd-item-desc">First aid</div>
+              <div class="fd-item-price">$6.29</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb cvs-th">🧴</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">CeraVe Daily Moisturizing Lotion, 19 oz</div>
+              <div class="fd-item-desc">Skin care</div>
+              <div class="fd-item-price">$16.99</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-menu-cat">Everyday essentials</div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb cvs-th">🦷</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">Colgate Total Toothpaste, 2-pack</div>
+              <div class="fd-item-desc">Oral care</div>
+              <div class="fd-item-price">$7.49</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+
+          <div class="fd-item">
+            <div class="fd-item-thumb cvs-th">🧻</div>
+            <div class="fd-item-info">
+              <div class="fd-item-name">CVS Health Facial Tissues, 6 boxes</div>
+              <div class="fd-item-desc">Household</div>
+              <div class="fd-item-price">$9.99</div>
+            </div>
+            <div class="fd-add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn cvs-btn" data-goto="cvscheckout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 4h2l2.2 12.5a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L21 8H6"/></svg>
+            View cart · 5 items · $24.36
+          </button>
+        </div>
+        <div class="reveal-banner">Tap "View cart" to check out and earn your 2%</div>
+      </div>
+
+      <!-- ─────────── SCREEN 30: CVS CHECKOUT ─────────── -->
+      <div class="screen has-cta-dock" data-screen="cvscheckout" data-name="CVS Checkout ★" data-step="30">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span class="signal">
+            <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#1A1A1A"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#1A1A1A"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#1A1A1A"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#1A1A1A"/></svg>
+            <svg width="14" height="11" viewBox="0 0 14 11"><path d="M7 11 L0 4 Q7 -2 14 4 Z" fill="#1A1A1A" opacity=".9"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0" y="0" width="22" height="12" rx="3" stroke="#1A1A1A" fill="none" stroke-width="1"/><rect x="2" y="2" width="18" height="8" rx="1.5" fill="#1A1A1A"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#1A1A1A"/></svg>
+          </span>
+        </div>
+        <div class="body">
+          <div class="fd-topbar">
+            <div class="fd-back" data-goto="cvsshop"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div class="fd-title"><h2>Checkout</h2></div>
+          </div>
+          <div class="fd-cart-from">From <strong>CVS Pharmacy</strong> · Delivery · 5 items</div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M12 21s-7-6.7-7-12a7 7 0 1 1 14 0c0 5.3-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg> Deliver to</div>
+            <div class="fd-input-grid">
+              <div class="fd-input full"><div class="fd-in-lab">Street address</div><div class="fd-in-val">3155 Broderick Street</div></div>
+              <div class="fd-input"><div class="fd-in-lab">Apt / Suite</div><div class="fd-in-val">01-36</div></div>
+              <div class="fd-input"><div class="fd-in-lab">Window</div><div class="fd-in-val">Today · 2 hr</div></div>
+            </div>
+          </div>
+
+          <div class="fd-card">
+            <div class="fd-card-head"><svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg> Pay with</div>
+            <div class="go-visa-row flush">
+              <div class="gv-chip"><svg class="visa-svg sm" viewBox="0 0 60 18" xmlns="http://www.w3.org/2000/svg" fill="#FFFFFF"><text x="30" y="15" text-anchor="middle" font-size="18" letter-spacing="-1">VISA</text></svg></div>
+              <div>
+                <div class="gv-name">Visa · ending in 1234</div>
+                <div class="gv-sub">Required to earn 2% back</div>
+              </div>
+              <span class="gv-tag">✓ Linked</span>
+            </div>
+          </div>
+
+          <div class="wm-earn">
+            <div class="wm-earn-title">💜 You'll double-dip on this order</div>
+            <div class="wm-earn-row"><span class="wm-earn-lab"><span class="wm-earn-ic sl">SL</span> Shop Local Cash · 2% back</span><span class="wm-earn-val">+$0.49</span></div>
+            <div class="wm-earn-row"><span class="wm-earn-lab"><span class="wm-earn-ic visa">V</span> Linked Visa rewards</span><span class="wm-earn-val muted">stacks on top</span></div>
+          </div>
+
+          <div class="fd-slc-card">
+            <div class="fd-slc-top">
+              <div class="fd-slc-lab">
+                <span class="heart">💜</span>
+                <div><div class="t">Apply Shop Local Cash</div><div class="s">$44.00 available in LOFT wallet</div></div>
+              </div>
+              <div class="fd-switch" id="cv-slc-switch"></div>
+            </div>
+            <div class="fd-slc-applied" id="cv-slc-applied">−$10.00 applied · saves you $10 on this order</div>
+          </div>
+
+          <div class="fd-summary">
+            <div class="fd-row"><span>Subtotal · 5 items</span><span>$24.36</span></div>
+            <div class="fd-row"><span>Delivery</span><span class="free">Free</span></div>
+            <div class="fd-row"><span>Estimated tax</span><span>$2.07</span></div>
+            <div class="fd-row fd-credit" id="cv-credit-row"><span class="lab"><span class="heart">💜</span> Shop Local Cash</span><span id="cv-credit-amt">−$10.00</span></div>
+            <div class="fd-divider"></div>
+            <div class="fd-row fd-total"><span>Total</span><span id="cv-total-line">$16.43</span></div>
+          </div>
+        </div>
+        <div class="cta-dock">
+          <button class="btn cvs-btn" data-goto="track"><span id="cv-place-line">Place order · $16.43</span></button>
+        </div>
+        <div class="reveal-banner">$10 Shop Local Cash applied — you'll still earn 2% back on top</div>
+      </div>
+
+      <!-- ─────────── SCREEN 31: PUSH · RENT DROP ─────────── -->
+      <div class="screen lockscreen" data-screen="lock-rent" data-name="Push · Rent drop" data-step="31">
+        <div class="status-bar" style="color:#fff;"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#fff"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#fff"/></svg></span></div>
+        <div class="lock-body">
+          <div class="lock-date">Saturday, August 1</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="make">
+              <div class="ln-head"><div class="ln-ic">L</div><div class="ln-app">LOFT</div><div class="ln-time">now</div></div>
+              <div class="ln-title">🏠 Rent's due May 31 — pay now, earn Shop Local Cash</div>
+              <div class="ln-body">Pay your $2,105 rent in LOFT and earn Shop Local Cash back to spend on cleaning, food, gas, and more.</div>
+              <div class="ln-cta">Pay rent ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+      <!-- ─────────── SCREEN 32: PUSH · WALMART ─────────── -->
+      <div class="screen lockscreen" data-screen="lock-walmart" data-name="Push · Walmart" data-step="32">
+        <div class="status-bar" style="color:#fff;"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#fff"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#fff"/></svg></span></div>
+        <div class="lock-body">
+          <div class="lock-date">Saturday, August 1</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="walmart">
+              <div class="ln-head"><div class="ln-ic">L</div><div class="ln-app">LOFT</div><div class="ln-time">2m ago</div></div>
+              <div class="ln-title">⏰ 1 hour only: +$10 at Walmart online</div>
+              <div class="ln-body">Order groceries in the next hour and get an extra $10 in Shop Local Cash at checkout — pickup or delivery.</div>
+              <div class="ln-cta">Start a Walmart order ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+      <!-- ─────────── SCREEN 33: PUSH · NEARBY ─────────── -->
+      <div class="screen lockscreen" data-screen="lock-geo" data-name="Push · Nearby" data-step="33">
+        <div class="status-bar" style="color:#fff;"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#fff"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#fff"/></svg></span></div>
+        <div class="lock-body">
+          <div class="lock-date">Saturday, August 1</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="food">
+              <div class="ln-head"><div class="ln-ic">L</div><div class="ln-app">LOFT</div><div class="ln-time">now</div></div>
+              <div class="ln-title">📍 You're near Balboa Cafe</div>
+              <div class="ln-body">Order in the next 30 min and earn 5% back in Shop Local Cash — it's just around the corner from Villa Verano.</div>
+              <div class="ln-cta">Order now ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+      <!-- ─────────── SCREEN 34: PUSH · MOVE-IN ─────────── -->
+      <div class="screen lockscreen" data-screen="lock-credits" data-name="Push · Move-in" data-step="34">
+        <div class="status-bar" style="color:#fff;"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#fff"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#fff"/></svg></span></div>
+        <div class="lock-body">
+          <div class="lock-date">Saturday, August 1</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="wallet">
+              <div class="ln-head"><div class="ln-ic">L</div><div class="ln-app">LOFT</div><div class="ln-time">now</div></div>
+              <div class="ln-title">🛋️ Hi Sarah — $100 for furniture before move-in</div>
+              <div class="ln-body">Use your $100 furniture credit for Villa Verano 01-36 before your move-in date — plus a free 3D design of your new space.</div>
+              <div class="ln-cta">Claim &amp; design my space ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
+      <!-- ─────────── SCREEN 35: PUSH · PET ─────────── -->
+      <div class="screen lockscreen" data-screen="lock-pet" data-name="Push · Pet" data-step="35">
+        <div class="status-bar" style="color:#fff;"><span>9:41</span><span class="signal"><svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="6" width="3" height="5" rx="1" fill="#fff"/><rect x="5" y="4" width="3" height="7" rx="1" fill="#fff"/><rect x="10" y="2" width="3" height="9" rx="1" fill="#fff"/><rect x="15" y="0" width="3" height="11" rx="1" fill="#fff"/></svg></span></div>
+        <div class="lock-body">
+          <div class="lock-date">Saturday, August 1</div>
+          <div class="lock-time">9:41</div>
+          <div class="lock-notifs">
+            <div class="lock-stack two"></div>
+            <div class="lock-stack"></div>
+            <div class="lnotif" data-goto="wallet">
+              <div class="ln-head"><div class="ln-ic">L</div><div class="ln-app">LOFT</div><div class="ln-time">now</div></div>
+              <div class="ln-title">🐾 Barker's registered — $15 pet food credit</div>
+              <div class="ln-body">Pet registration complete! Enjoy $15 Shop Local Cash toward organic pet food for Barker.</div>
+              <div class="ln-cta">Shop for Barker ›</div>
+            </div>
+          </div>
+          <div class="lock-bottom"><div class="lock-btn">🔦</div><div class="lock-btn">📷</div></div>
+          <div class="lock-handle"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2820,6 +3714,19 @@
       <div class="thumb" data-goto="track"><span class="tnum">20</span>Tracking</div>
       <div class="thumb" data-goto="gas"><span class="tnum">21</span>Gas Map</div>
       <div class="thumb" data-goto="gasoffer"><span class="tnum">22</span>Gas Offer ★</div>
+      <div class="thumb" data-goto="walmart"><span class="tnum">23</span>Walmart ★</div>
+      <div class="thumb" data-goto="walmartshop"><span class="tnum">24</span>WM Shop</div>
+      <div class="thumb" data-goto="walmartcheckout"><span class="tnum">25</span>WM Checkout ★</div>
+      <div class="thumb" data-goto="activity"><span class="tnum">26</span>Activity</div>
+      <div class="thumb" data-goto="profile"><span class="tnum">27</span>Profile</div>
+      <div class="thumb" data-goto="cvs"><span class="tnum">28</span>CVS ★</div>
+      <div class="thumb" data-goto="cvsshop"><span class="tnum">29</span>CVS Shop</div>
+      <div class="thumb" data-goto="cvscheckout"><span class="tnum">30</span>CVS Checkout ★</div>
+      <div class="thumb alt" data-goto="lock-rent"><span class="tnum">31</span>Push · Rent</div>
+      <div class="thumb alt" data-goto="lock-walmart"><span class="tnum">32</span>Push · Walmart</div>
+      <div class="thumb alt" data-goto="lock-geo"><span class="tnum">33</span>Push · Nearby</div>
+      <div class="thumb alt" data-goto="lock-credits"><span class="tnum">34</span>Push · Move-in</div>
+      <div class="thumb alt" data-goto="lock-pet"><span class="tnum">35</span>Push · Pet</div>
     </div>
   </div>
 
@@ -2831,7 +3738,7 @@
 (function(){
   const screens = Array.from(document.querySelectorAll('.screen'));
   const thumbs = Array.from(document.querySelectorAll('.thumb'));
-  const order = ['survey','reward','home','payments','make','method','summary','approved','ach','wallet','why','link','set','maddie','food','menu','item','cart','checkout','track','gas','gasoffer'];
+  const order = ['survey','reward','home','payments','make','method','summary','approved','ach','wallet','why','link','set','maddie','food','menu','item','cart','checkout','track','gas','gasoffer','walmart','walmartshop','walmartcheckout','activity','profile','cvs','cvsshop','cvscheckout','lock-rent','lock-walmart','lock-geo','lock-credits','lock-pet'];
   const curNumEl = document.getElementById('cur-num');
   const curNameEl = document.getElementById('cur-name');
   const prevBtn = document.getElementById('prev');
@@ -2848,7 +3755,8 @@
     screens.forEach(s => {
       s.classList.remove('is-active');
       s.classList.remove('reveal-hotspots');
-      s.querySelector('.body').scrollTop = 0;
+      const b = s.querySelector('.body');
+      if (b) b.scrollTop = 0;
     });
     target.classList.add('is-active');
     const step = target.dataset.step;
@@ -3031,6 +3939,82 @@
   (function(){
     const sw = document.getElementById('cart-slc-switch');
     if (sw) sw.addEventListener('click', e => e.stopPropagation()); // applied by default, non-destructive
+  })();
+
+  // ── Walmart checkout: Shop Local Credit toggle + total recompute ──
+  (function(){
+    const co = document.querySelector('.screen[data-screen="walmartcheckout"]');
+    if (!co) return;
+    const BASE = 34.73; // subtotal 32.01 + tax 2.72
+    const totalLine = document.getElementById('wm-total-line');
+    const placeLine = document.getElementById('wm-place-line');
+    const creditRow = document.getElementById('wm-credit-row');
+    const slcSwitch = document.getElementById('wm-slc-switch');
+    const slcApplied = document.getElementById('wm-slc-applied');
+    let creditOn = true;
+    const fmt = n => '$' + n.toFixed(2);
+    function render(){
+      const credit = creditOn ? 10 : 0;
+      const total = BASE - credit;
+      creditRow.style.display = creditOn ? '' : 'none';
+      totalLine.textContent = fmt(total);
+      placeLine.textContent = 'Place order · ' + fmt(total);
+      slcSwitch.classList.toggle('off', !creditOn);
+      slcApplied.textContent = creditOn
+        ? '−$10.00 applied · saves you $10 on this order'
+        : 'Tap to apply $10 Shop Local Credit from your wallet';
+    }
+    if (slcSwitch) slcSwitch.addEventListener('click', e => { e.stopPropagation(); creditOn = !creditOn; render(); });
+    render();
+  })();
+
+  // ── CVS checkout: Shop Local Cash toggle + total recompute ──
+  (function(){
+    const co = document.querySelector('.screen[data-screen="cvscheckout"]');
+    if (!co) return;
+    const BASE = 26.43; // subtotal 24.36 + tax 2.07
+    const totalLine = document.getElementById('cv-total-line');
+    const placeLine = document.getElementById('cv-place-line');
+    const creditRow = document.getElementById('cv-credit-row');
+    const slcSwitch = document.getElementById('cv-slc-switch');
+    const slcApplied = document.getElementById('cv-slc-applied');
+    let creditOn = true;
+    const fmt = n => '$' + n.toFixed(2);
+    function render(){
+      const credit = creditOn ? 10 : 0;
+      const total = BASE - credit;
+      creditRow.style.display = creditOn ? '' : 'none';
+      totalLine.textContent = fmt(total);
+      placeLine.textContent = 'Place order · ' + fmt(total);
+      slcSwitch.classList.toggle('off', !creditOn);
+      slcApplied.textContent = creditOn
+        ? '−$10.00 applied · saves you $10 on this order'
+        : 'Tap to apply $10 Shop Local Cash from your wallet';
+    }
+    if (slcSwitch) slcSwitch.addEventListener('click', e => { e.stopPropagation(); creditOn = !creditOn; render(); });
+    render();
+  })();
+
+  // ── Activity: filter chips (All / Earned / Spent) ──
+  (function(){
+    const act = document.querySelector('.screen[data-screen="activity"]');
+    if (!act) return;
+    const chips = Array.from(act.querySelectorAll('.act-chip'));
+    const rows = Array.from(act.querySelectorAll('.act-row'));
+    const days = Array.from(act.querySelectorAll('.act-day'));
+    chips.forEach(chip => chip.addEventListener('click', e => {
+      e.stopPropagation();
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const f = chip.dataset.filter;
+      rows.forEach(r => { r.style.display = (f === 'all' || r.dataset.flt === f) ? '' : 'none'; });
+      // hide a day header if it has no visible rows under it
+      days.forEach(d => {
+        let n = d.nextElementSibling, any = false;
+        while (n && n.classList.contains('act-row')) { if (n.style.display !== 'none') any = true; n = n.nextElementSibling; }
+        d.style.display = any ? '' : 'none';
+      });
+    }));
   })();
 
   updateNav('survey');
