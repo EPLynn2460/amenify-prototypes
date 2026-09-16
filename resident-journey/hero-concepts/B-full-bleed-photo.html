@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hero B: Full-Bleed Photo</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="common.css">
+<style>
+.hero{position:relative;min-height:100vh;display:flex;align-items:flex-end;padding:120px 6vw 80px;color:#fff;background:#0F172A url(../assets/sarah-home.jpg) 60% center/cover;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,23,42,.92) 0%,rgba(15,23,42,.65) 45%,rgba(15,23,42,.1) 100%),linear-gradient(0deg,rgba(15,23,42,.6),transparent 40%)}
+.copy{position:relative;z-index:2;max-width:720px}
+h1{font-size:clamp(44px,6.4vw,92px)} .hl{background:linear-gradient(90deg,#93C5FD,#C4B5FD 60%,#F9A8D4);-webkit-background-clip:text;background-clip:text}
+.lede{color:#CBD5E1}
+.chip{position:absolute;z-index:2;animation:bob 6s ease-in-out infinite}
+.c1{top:22%;right:10%}.c2{top:44%;right:24%;animation-delay:-2s}.c3{top:62%;right:6%;animation-delay:-4s}
+.stats{position:relative;z-index:2;display:flex;gap:32px;margin-top:36px;flex-wrap:wrap}
+.stats b{display:block;font:800 30px var(--display)} .stats span{font-size:13px;color:#94A3B8}
+@media(max-width:760px){.chip{display:none}.c1{display:flex;top:14%;right:6%}}
+</style></head><body>
+<div class="bar"><a href="index.html">← All concepts</a><span>B · Full-bleed photo, dark overlay</span><label>Headline: <select id="hsel"></select></label></div>
+<section class="hero">
+<div class="chip c1"><span class="ic" style="background:#EFF6FF">🏠</span><div><small>Rent paid on time</small><b>+$21.05</b></div></div>
+<div class="chip c2"><span class="ic" style="background:#F0FDF4">🛒</span><div><small>Groceries · 2× drop</small><b>+$8.64</b></div></div>
+<div class="chip c3"><span class="ic" style="background:#FCE7F3">🎁</span><div><small>Renewal gift</small><b>+$100</b></div></div>
+<div class="copy"><h1></h1><p class="lede"></p><a class="btn" href="#">See the journey →</a>
+<div class="stats"><div><b>150K+</b><span>five-star reviews</span></div><div><b>$1,023</b><span>a year for Sarah</span></div><div><b>50,000+</b><span>merchants</span></div></div></div>
+</section>
+<script src="headlines.js"></script>
+</body></html>

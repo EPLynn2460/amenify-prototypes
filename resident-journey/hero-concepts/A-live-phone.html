@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hero A: Live Phone</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="common.css">
+<style>
+.hero{min-height:100vh;padding:110px 6vw 60px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;background:radial-gradient(900px 600px at 80% 20%,#DBEAFE,transparent 60%),radial-gradient(700px 500px at 0% 100%,#ECFDF5,transparent 60%)}
+h1{font-size:clamp(42px,5.6vw,76px)} .lede{color:var(--muted)}
+.stage{position:relative;height:640px;display:grid;place-items:center}
+.glow{position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,.35),rgba(124,58,237,.18) 45%,transparent 70%)}
+.ring{position:absolute;width:480px;height:480px;border-radius:50%;border:1.5px dashed rgba(37,99,235,.3);animation:spin 50s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.phone{position:relative;width:300px;height:620px;border-radius:48px;background:#0B1220;padding:11px;transform:rotate(-4deg);box-shadow:0 60px 100px -30px rgba(30,58,138,.55)}
+.sw{position:relative;height:100%;border-radius:38px;overflow:hidden;background:#fff}
+.sw div{position:absolute;inset:0;background:center top/cover;opacity:0;transition:opacity .8s}.sw div.on{opacity:1}
+.chip{position:absolute;animation:bob 6s ease-in-out infinite}
+.c1{top:10%;left:2%}.c2{top:32%;right:0}.c3{top:60%;left:0;animation-delay:-2s}.c4{bottom:12%;right:2%;animation-delay:-4s}
+.tick{position:absolute;left:8%;bottom:0;background:var(--ink);color:#fff;border-radius:20px;padding:14px 18px;min-width:220px}
+.tick small{color:#93C5FD;font:600 11px var(--display)} .tick b{display:block;font:800 30px var(--display)}
+@media(max-width:860px){.hero{grid-template-columns:1fr}.stage{height:540px}.phone{transform:rotate(-4deg) scale(.82)}.c2,.c4{right:-2%}}
+</style></head><body>
+<div class="bar"><a href="index.html">← All concepts</a><span>A · Live phone + orbiting moments</span><label>Headline: <select id="hsel"></select></label></div>
+<section class="hero"><div><h1></h1><p class="lede"></p><a class="btn" href="#">See the journey →</a></div>
+<div class="stage"><div class="glow"></div><div class="ring"></div>
+<div class="phone"><div class="sw"><div class="on" style="background-image:url(../assets/earn-hero.jpg)"></div><div style="background-image:url(../assets/screen-order.jpg)"></div><div style="background-image:url(../assets/screen-cvs.jpg)"></div><div style="background-image:url(../assets/screen-food.jpg)"></div></div></div>
+<div class="chip c1"><span class="ic" style="background:#EFF6FF">🏠</span><div><small>Rent paid on time</small><b>+$21.05</b></div></div>
+<div class="chip c2"><span class="ic" style="background:#F0FDF4">🛒</span><div><small>Groceries · 2× drop</small><b>+$8.64</b></div></div>
+<div class="chip c3"><span class="ic" style="background:#FEF3C7">⛽</span><div><small>Gas Boost week</small><b>+$2.25</b></div></div>
+<div class="chip c4"><span class="ic" style="background:#FCE7F3">🎁</span><div><small>Birthday gift</small><b>+$25.00</b></div></div>
+<div class="tick"><small>Sarah’s year, earned back</small><b id="t">$0.00</b></div>
+</div></section>
+<script src="headlines.js"></script>
+<script>const d=[...document.querySelectorAll('.sw div')];let k=0;setInterval(()=>{d[k].classList.remove('on');k=(k+1)%d.length;d[k].classList.add('on')},2800);
+let v=0;const st=[21.05,8.64,2.25,25,21.05,12.44,100];let j=0;setInterval(()=>{v+=st[j++%st.length];if(v>1023)v=0;document.getElementById('t').textContent='$'+v.toFixed(2)},1400)</script>
+</body></html>

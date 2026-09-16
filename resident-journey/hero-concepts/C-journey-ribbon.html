@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hero C: Journey Ribbon</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="common.css">
+<style>
+.hero{min-height:100vh;padding:120px 0 60px;text-align:center;background:linear-gradient(180deg,#fff,#EFF6FF);overflow:hidden}
+.copy{padding:0 6vw;display:flex;flex-direction:column;align-items:center}
+h1{font-size:clamp(42px,6vw,84px);max-width:1000px} .lede{color:var(--muted);margin-inline:auto}
+.ribbon{margin-top:56px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.track{display:flex;gap:18px;width:max-content;animation:sc 60s linear infinite;padding:10px 0 30px}
+.track:hover{animation-play-state:paused}
+@keyframes sc{to{transform:translateX(-50%)}}
+.tile{width:220px;height:300px;border-radius:26px;position:relative;overflow:hidden;background:#fff center top/cover;box-shadow:0 24px 50px -24px rgba(15,23,42,.45);text-align:left;flex:none}
+.tile:nth-child(even){transform:translateY(24px)}
+.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(15,23,42,.85))}
+.tile span{position:absolute;left:14px;bottom:14px;right:14px;z-index:2;color:#fff;font:800 17px/1.2 var(--display)}
+.tile span small{display:block;font:700 10px var(--display);letter-spacing:.12em;color:#93C5FD;margin-bottom:4px}
+</style></head><body>
+<div class="bar"><a href="index.html">← All concepts</a><span>C · Journey ribbon</span><label>Headline: <select id="hsel"></select></label></div>
+<section class="hero"><div class="copy"><h1></h1><p class="lede"></p><a class="btn" href="#">See the journey →</a></div>
+<div class="ribbon"><div class="track" id="tr"></div></div></section>
+<script src="headlines.js"></script>
+<script>
+const T=[['01','Lease signed','earn-hero.jpg'],['02','Design your home','design-render.jpg'],['03','Welcome gift','welcome-kit.svg'],['04','Move-in week','movein-mirror.jpg'],['05','First rent','community.jpg'],['08','Dining','screen-order.jpg'],['09','Pharmacy','screen-cvs.jpg'],['10','Home services','pro-anna.jpg'],['12','Birthday','birthday.svg'],['06','Groceries','screen-food.jpg']];
+const h=T.map(t=>'<div class="tile" style="background-image:url(../assets/'+t[2]+')"><span><small>STAGE '+t[0]+'</small>'+t[1]+'</span></div>').join('');
+document.getElementById('tr').innerHTML=h+h;
+</script>
+</body></html>
