@@ -708,9 +708,15 @@ footer img{height:30px}
 .wg-art{height:120px;object-fit:cover;object-position:center 60%}
 .hero h1{font-size:clamp(42px,5.6vw,72px)}
 .stat .num{font-size:clamp(28px,2.8vw,38px)}
-.stat .num.word{font-size:clamp(22px,2vw,26px);line-height:1.1;min-height:2.2em;display:flex;flex-direction:column;justify-content:flex-end}
-.stat .num.word+p{margin-top:10px}
-@media (max-width:520px){.stat .num.word{font-size:20px}}
-.stat .num.word{display:flex;align-items:flex-end;min-height:1em;height:clamp(30px,3.4vw,42px);font-size:clamp(22px,2.1vw,28px);white-space:nowrap}
-.stat .num.word+p{margin-top:0}
-@media (max-width:520px){.stat .num.word{font-size:18px;height:26px;white-space:normal}}
+@media (max-width:520px){}
+@media (max-width:520px){}
+
+/* v8 stat tiles: one consistent number style */
+.stats{max-width:1240px;margin:0 auto}
+.stat{display:flex;flex-direction:column}
+.stat .num,.stat .num.word{font:800 30px/1.1 var(--display);letter-spacing:-.03em;white-space:nowrap;display:block;height:auto;min-height:0;text-align:left}
+.stat h3{margin-top:10px}
+@media (max-width:1100px){.stats{grid-template-columns:1fr 1fr}.stat .num,.stat .num.word{font-size:30px}}
+@media (max-width:860px){.stats{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.stat .num,.stat .num.word{font-size:22px;white-space:normal}}
+@media (max-width:520px){.stats{grid-template-columns:1fr 1fr}.stat .num,.stat .num.word{min-height:2.2em;display:flex;align-items:flex-end}}
