@@ -47,6 +47,10 @@ const STAGES=[
   benefit:'On-time rent earns <b>1% back: $21.05</b>.',
   tech:'The PMS payment event triggers the credit.',
   merch:'Credits get spent at local merchants.'},
+ {ch:1,k:'Card linking',ic:'card',title:'Link once. Earn everywhere.',
+  benefit:'One tap links her Visa. Up to <b>5% back</b> at Walmart, Kroger, CVS and more.',
+  tech:'Visa card-linked offers. No new card, codes or receipts.',
+  merch:'50,000+ merchants reach her on the card she already carries.'},
  {ch:1,k:'Groceries',ic:'cart',title:'Earn on the weekly shop.',
   benefit:'Up to <b>5% back</b> on the card she already has.',
   moment:['Credit Drop','Double earn back at Kroger: her $86 shop earns $8.64.'],
@@ -84,9 +88,14 @@ const STAGES=[
  {ch:2,k:'Moving out',ic:'box',title:'A great goodbye.',
   benefit:'Move-out is handled, and <b>her credits and membership move with her</b>.',
   tech:'Her membership transfers to any partner community.',
-  merch:'Best customers stay reachable in a new city.',human:true}
+  merch:'Best customers stay reachable in a new city.',human:true},
+ {ch:2,k:'Satisfaction guarantee',ic:'shield',title:'Every service, guaranteed.',
+  benefit:'Tracked, rated and tipped, and if anything’s off, <b>our concierge team will make it right</b>.',
+  tech:'Live job tracking, photo proof, ratings and tips feed pro quality scores.',
+  merch:'Happy residents leave 5-star reviews for the property.',human:true}
 ];
 Object.assign(ICONS,{
+ card:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
  sofa:'<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M3 12a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3zM5 17v2M19 17v2"/>',
  pill:'<rect x="3" y="9" width="18" height="7" rx="3.5" transform="rotate(-35 12 12.5)"/><path d="M9.5 8.5l5 7"/>',
  wrench:'<path d="M14.5 6.5a4 4 0 0 0 5 5L12 19a2.1 2.1 0 0 1-3-3l7.5-7.5a4 4 0 0 1-5-5 4 4 0 0 1 3 3z"/>',
