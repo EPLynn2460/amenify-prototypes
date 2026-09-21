@@ -249,6 +249,16 @@
     color: var(--loft-ink); line-height: 1; text-transform: none;
   }
   .loft-logo .wm-s, .pl-logo .wm-s, .pill .wm-s, .wm-s { color: #2C5286; }
+/* --- Shop Local Credits, brought to you by Prisma --- */
+.sl-by { display:flex; align-items:center; flex-wrap:wrap; gap:5px; font-size:10.5px; font-weight:700;
+  letter-spacing:.1px; color:#425466; line-height:1.3; }
+.sl-by .slb-cur { color:#00263A; font-weight:800; }
+.sl-by .slb-sep { opacity:.4; }
+.sl-by .slb-txt { font-weight:600; opacity:.85; }
+.sl-by .slb-wm { display:inline-flex; align-items:center; gap:3px; color:#00263A; font-weight:800; }
+.sl-by .slb-wm svg.pr-mark { height:1.1em; }
+.sl-by.on-dark { color:rgba(255,255,255,.74); }
+.sl-by.on-dark .slb-cur, .sl-by.on-dark .slb-wm { color:#FFFFFF; }
 /* --- Prisma wordmark --- */
 .loft-logo, .pl-logo, .pill { display: inline-flex; align-items: center; gap: 6px; color: #00263A; }
 .pill svg.pr-mark { height: 1em; }
@@ -1448,7 +1458,7 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
         <img class="wv2-photo" src="app-home-hero.png" alt="Earn on rent and everyday life">
         <div class="status-bar wv2-status"><span>9:41</span><span class="signal">••• ᯤ ▮</span></div>
         <div class="wv2-foot">
-          <button class="btn btn-purple wv2-cta" data-goto="survey">Get started</button>
+          <div class="sl-by" style="justify-content:center;font-size:12.5px;margin-bottom:2px"><span class="slb-cur">Shop Local Credits</span><span class="slb-sep">·</span><span class="slb-txt">brought to you by</span><span class="slb-wm"><svg class="pr-mark" viewBox="0 0 29.6 46.876" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(0,-2.827)" fill="currentColor"><path d="M0,40.559,13.986,49.7V30.185L0,13.433Z"/><path d="M16.6,38.1l12.987-8.222V13.433L16.6,30.185Z"/><path d="M.923,11.128H28.663l-13.832-8.3Z"/></g></svg> prisma</span></div><button class="btn btn-purple wv2-cta" data-goto="survey">Get started</button>
           <div class="wv2-reviews"><span class="wv2-stars">★★★★★</span> 120,000+ five-star reviews</div>
           <a class="wv2-login" data-goto="home">Already a member? <b>Log in</b></a>
         </div>
@@ -1472,8 +1482,8 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
 
           <div class="reward-hero">
             <div class="rh-pill"><span class="heart">💙</span> RESIDENT PERKS</div>
-            <div class="rh-title">Get <span class="amt">$50</span> in Prisma credit.</div>
-            <div class="rh-sub">Tell us what you'd actually use — we'll drop the credit into your wallet within 24 hours.</div>
+            <div class="rh-title">Get <span class="amt">$50</span> in Shop Local Credits.</div>
+            <div class="rh-sub">Tell us what you'd actually use — we'll drop the credits into your wallet within 24 hours.</div><div class="sl-by" style="margin-top:10px"><span class="slb-cur">Shop Local Credits</span><span class="slb-sep">·</span><span class="slb-txt">brought to you by</span><span class="slb-wm"><svg class="pr-mark" viewBox="0 0 29.6 46.876" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(0,-2.827)" fill="currentColor"><path d="M0,40.559,13.986,49.7V30.185L0,13.433Z"/><path d="M16.6,38.1l12.987-8.222V13.433L16.6,30.185Z"/><path d="M.923,11.128H28.663l-13.832-8.3Z"/></g></svg> prisma</span></div>
           </div>
 
           <div class="q-prompt">
@@ -1542,8 +1552,8 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
           </div>
         </div>
         <div class="cta-dock">
-          <div class="selected-count" id="survey-count">Pick at least one to claim your <strong>$50 credit</strong></div>
-          <button class="btn btn-primary" id="survey-submit" data-goto="reward" disabled>Claim my $50 credit →</button>
+          <div class="selected-count" id="survey-count">Pick at least one to claim your <strong>$50 in Shop Local Credits</strong></div>
+          <button class="btn btn-primary" id="survey-submit" data-goto="reward" disabled>Claim my $50 in credits →</button>
           <a class="skip" data-goto="home">Maybe later</a>
         </div>
       </div>
@@ -1570,12 +1580,12 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
               <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#1B3F6B" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 7"/></svg>
             </div>
             <div class="thanks-title">Thanks, Sarah —<br/><span class="hl">your $50 is in.</span></div>
-            <div class="thanks-sub">We added <strong>$50 in Prisma credit</strong> to your wallet. Use it on anything below — it never expires.</div>
+            <div class="thanks-sub">We added <strong>$50 in Shop Local Credits</strong> to your wallet. Use it on anything below — it never expires.</div>
 
             <div class="credit-card">
-              <div class="cc-lab">Prisma Wallet · Credit added</div>
+              <div class="cc-lab">Shop Local Credits added</div>
               <div class="cc-amt">+ $50.00</div>
-              <div class="cc-sub">Available now · 💙 Shop Local Credits</div>
+              <div class="cc-sub">Available now · never expires</div>
             </div>
 
             <div class="you-picked">You're interested in</div>
@@ -1612,7 +1622,8 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
               <div class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2"><path d="M4 4h16v16H4z"/><polyline points="4,4 12,13 20,4"/></svg></div>
             </div>
           </div>
-          <div class="hero-tile">
+          <div class="sl-by" style="margin:-2px 0 12px"><span class="slb-cur">Shop Local Credits</span><span class="slb-sep">·</span><span class="slb-txt">brought to you by</span><span class="slb-wm"><svg class="pr-mark" viewBox="0 0 29.6 46.876" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(0,-2.827)" fill="currentColor"><path d="M0,40.559,13.986,49.7V30.185L0,13.433Z"/><path d="M16.6,38.1l12.987-8.222V13.433L16.6,30.185Z"/><path d="M.923,11.128H28.663l-13.832-8.3Z"/></g></svg> prisma</span></div>
+           <div class="hero-tile">
             <h3>Welcome to the <span class="hl">community!</span></h3>
             <div class="tier-row">
               <span class="tier-pill">⭐ Silver Status</span>
@@ -1883,7 +1894,7 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
           </div>
           <div class="banner-cta" data-goto="why">
             <div class="bc-meta">
-              <div class="bc-title">Now earn earn back everywhere you spend</div>
+              <div class="bc-title">Now earn back everywhere you spend</div>
               <div class="bc-sub">Link a card to earn at Uber, Walmart, CVS, and 3,400+ more brands.</div>
             </div>
             <div class="bc-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
@@ -1987,7 +1998,7 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
             </div>
           </div>
 
-          <div class="wallet-stats">
+          <div class="sl-by" style="margin:2px 0 12px"><span class="slb-cur">Shop Local Credits</span><span class="slb-sep">·</span><span class="slb-txt">brought to you by</span><span class="slb-wm"><svg class="pr-mark" viewBox="0 0 29.6 46.876" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(0,-2.827)" fill="currentColor"><path d="M0,40.559,13.986,49.7V30.185L0,13.433Z"/><path d="M16.6,38.1l12.987-8.222V13.433L16.6,30.185Z"/><path d="M.923,11.128H28.663l-13.832-8.3Z"/></g></svg> prisma</span></div><div class="wallet-stats">
             <div class="ws-item">
               <div class="ws-lab">Your Savings</div>
               <div class="ws-amt">$889.89</div>
@@ -2096,7 +2107,7 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
             <div class="x" data-goto="home"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
           </div>
 
-          <div class="why-headline">Earn <span class="hl">Shop Local Credits</span> everywhere you spend.</div>
+          <div class="why-headline">Earn <span class="hl">Shop Local Credits</span> everywhere you spend.</div><div class="sl-by" style="margin:6px 0 4px"><span class="slb-cur">Shop Local Credits</span><span class="slb-sep">·</span><span class="slb-txt">brought to you by</span><span class="slb-wm"><svg class="pr-mark" viewBox="0 0 29.6 46.876" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g transform="translate(0,-2.827)" fill="currentColor"><path d="M0,40.559,13.986,49.7V30.185L0,13.433Z"/><path d="M16.6,38.1l12.987-8.222V13.433L16.6,30.185Z"/><path d="M.923,11.128H28.663l-13.832-8.3Z"/></g></svg> prisma</span></div>
           <p class="why-sub">Use your linked Visa card at thousands of brands — plus <strong>up to 25¢/gal back at the pump</strong> — and we'll auto-credit your wallet. <strong>Exclusive Visa partnership</strong>.</p>
 
           <div class="gas-link-feat" data-goto="gas">
@@ -3898,10 +3909,10 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
   function refreshSurveyCount() {
     const n = document.querySelectorAll('[data-survey-tile].selected').length;
     if (n === 0) {
-      surveyCount.innerHTML = 'Pick at least one to claim your <strong>$50 credit</strong>';
+      surveyCount.innerHTML = 'Pick at least one to claim your <strong>$50 in Shop Local Credits</strong>';
       surveySubmit.disabled = true;
     } else {
-      surveyCount.innerHTML = '<strong>' + n + '</strong> selected · ready to claim your <strong>$50 credit</strong>';
+      surveyCount.innerHTML = '<strong>' + n + '</strong> selected · ready to claim your <strong>$50 in Shop Local Credits</strong>';
       surveySubmit.disabled = false;
     }
   }
@@ -3915,7 +3926,7 @@ svg.pr-mark { height: 1.15em; width: auto; color: inherit; flex-shrink: 0; displ
     });
   });
 
-  // When the user taps "Claim my $50 credit", copy selections to chips on reward screen
+  // When the user taps "Claim my $50 in credits", copy selections to chips on reward screen
   if (surveySubmit) {
     surveySubmit.addEventListener('click', e => {
       if (surveySubmit.disabled) { e.preventDefault(); e.stopPropagation(); return; }
